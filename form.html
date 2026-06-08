@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>กรอกข้อมูล — อุทยานแห่งชาติแก่งกระจาน</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --c-bg: #f0f3ef;
+            --c-card: #ffffff;
+            --c-hdr-a: #0d2416;
+            --c-hdr-b: #133a22;
+            --c-green: #1a6b42;
+            --c-green-lt: #d4eddf;
+            --c-green-md: #2d9b6f;
+            --c-amber: #b86a00;
+            --c-amber-lt: #fdf0d5;
+            --c-red: #b52222;
+            --c-red-lt: #fde8e8;
+            --c-border: #dde3d9;
+            --c-ink: #111b14;
+            --c-ink2: #3d5045;
+            --c-ink3: #7a927f;
+            --ff: 'IBM Plex Sans Thai', 'Sarabun', sans-serif;
+            --ff-mono: 'DM Mono', monospace;
+            --r: 10px;
+            --r-lg: 16px;
+            --sh: 0 1px 3px rgba(13, 36, 22, .06), 0 6px 18px rgba(13, 36, 22, .04);
+            --sh-md: 0 4px 12px rgba(13, 36, 22, .08), 0 16px 40px rgba(13, 36, 22, .06);
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        html {
+            scroll-behavior: smooth
+        }
+
+        body {
+            font-family: var(--ff);
+            background: var(--c-bg);
+            color: var(--c-ink);
+            font-size: 14px;
+            line-height: 1.65;
+            -webkit-font-smoothing: antialiased
+        }
+
+        button,
+        input,
+        select,
+        textarea {
+            font-family: var(--ff)
+        }
+
+        /* HEADER */
+        .hdr {
+            background: linear-gradient(135deg, var(--c-hdr-a) 0%, var(--c-hdr-b) 100%);
+            position: relative;
+            overflow: hidden;
+            padding: 0 2rem
+        }
+
+        .hdr::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.025'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")
+        }
+
+        .hdr-inner {
+            max-width: 900px;
+            margin: 0 auto;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            position: relative
+        }
+
+        .hdr-left {
+            display: flex;
+            align-items: center;
+            gap: 14px
+        }
+
+        .hdr-badge {
+            width: 42px;
+            height: 42px;
+            background: rgba(255, 255, 255, .1);
+            border: 1px solid rgba(255, 255, 255, .15);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px
+        }
+
+        .hdr-title h1 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+            letter-spacing: -.01em
+        }
+
+        .hdr-title p {
+            font-size: 11.5px;
+            color: rgba(255, 255, 255, .5);
+            margin-top: 1px
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, .08);
+            border: 1px solid rgba(255, 255, 255, .12);
+            border-radius: 20px;
+            padding: 4px 14px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, .8);
+            text-decoration: none;
+            transition: all .15s
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, .15)
+        }
+
+        /* MAIN */
+        main {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem
+        }
+
+        /* TABS */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            background: var(--c-card);
+            border-radius: var(--r-lg);
+            padding: 6px;
+            box-shadow: var(--sh);
+            border: 1px solid var(--c-border);
+            margin-bottom: 1.5rem
+        }
+
+        .tab {
+            flex: 1;
+            padding: 10px 16px;
+            border-radius: 10px;
+            border: none;
+            background: transparent;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--c-ink3);
+            cursor: pointer;
+            transition: all .2s;
+            text-align: center
+        }
+
+        .tab:hover {
+            background: var(--c-green-lt);
+            color: var(--c-green)
+        }
+
+        .tab.active {
+            background: var(--c-green);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(26, 107, 66, .3)
+        }
+
+        /* FORM CARD */
+        .form-card {
+            background: var(--c-card);
+            border-radius: var(--r-lg);
+            padding: 2rem;
+            box-shadow: var(--sh);
+            border: 1px solid var(--c-border)
+        }
+
+        .form-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--c-ink);
+            margin-bottom: 4px
+        }
+
+        .form-sub {
+            font-size: 12px;
+            color: var(--c-ink3);
+            margin-bottom: 1.5rem
+        }
+
+        /* FORM GRID */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem
+        }
+
+        .form-grid.g3 {
+            grid-template-columns: 1fr 1fr 1fr
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px
+        }
+
+        .form-group.full {
+            grid-column: 1/-1
+        }
+
+        label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+            color: var(--c-ink3)
+        }
+
+        label span.req {
+            color: var(--c-red);
+            margin-left: 2px
+        }
+
+        input,
+        select,
+        textarea {
+            padding: 9px 12px;
+            border: 1.5px solid var(--c-border);
+            border-radius: 8px;
+            font-size: 13px;
+            color: var(--c-ink);
+            background: var(--c-bg);
+            transition: border-color .15s, box-shadow .15s;
+            outline: none;
+            width: 100%
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--c-green);
+            box-shadow: 0 0 0 3px rgba(26, 107, 66, .1);
+            background: #fff
+        }
+
+        input.error,
+        select.error {
+            border-color: var(--c-red)
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px
+        }
+
+        select {
+            cursor: pointer
+        }
+
+        /* SECTION */
+        .section-title {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: var(--c-green);
+            margin: 1.5rem 0 .75rem;
+            padding-bottom: 6px;
+            border-bottom: 2px solid var(--c-green-lt)
+        }
+
+        /* SUBMIT */
+        .form-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--c-border);
+            flex-wrap: wrap;
+            gap: 1rem
+        }
+
+        .btn-submit {
+            padding: 11px 28px;
+            background: var(--c-green);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s;
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .btn-submit:hover {
+            background: #155a36;
+            box-shadow: 0 4px 12px rgba(26, 107, 66, .3);
+            transform: translateY(-1px)
+        }
+
+        .btn-submit:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+            transform: none
+        }
+
+        .btn-reset {
+            padding: 11px 20px;
+            background: transparent;
+            color: var(--c-ink3);
+            border: 1.5px solid var(--c-border);
+            border-radius: 10px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all .15s
+        }
+
+        .btn-reset:hover {
+            border-color: var(--c-red);
+            color: var(--c-red)
+        }
+
+        /* ALERT */
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 1rem
+        }
+
+        .alert.show {
+            display: flex
+        }
+
+        .alert-success {
+            background: var(--c-green-lt);
+            color: #065f46;
+            border: 1px solid #a7f3d0
+        }
+
+        .alert-error {
+            background: var(--c-red-lt);
+            color: #7f1d1d;
+            border: 1px solid #fca5a5
+        }
+
+        /* HINT */
+        .hint {
+            font-size: 11px;
+            color: var(--c-ink3);
+            margin-top: 3px
+        }
+
+        @media(max-width:600px) {
+
+            .form-grid,
+            .form-grid.g3 {
+                grid-template-columns: 1fr
+            }
+
+            main {
+                padding: 1rem
+            }
+
+            .tabs {
+                flex-direction: column
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="hdr">
+        <div class="hdr-inner">
+            <div class="hdr-left">
+                <div class="hdr-badge">📝</div>
+                <div class="hdr-title">
+                    <h1>กรอกข้อมูล — อุทยานแห่งชาติแก่งกระจาน</h1>
+                    <p>บันทึกข้อมูลเข้าระบบโดยตรง</p>
+                </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+                <span id="user-email" style="font-size:11px;color:rgba(255,255,255,.5)"></span>
+                <button onclick="doLogout()" class="nav-link"
+                    style="cursor:pointer;border:1px solid rgba(255,255,255,.12)">ออกจากระบบ</button>
+                <a href="index.html" class="nav-link">← กลับหน้าหลัก</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen"
+        style="display:none;position:fixed;inset:0;background:var(--c-bg);z-index:999;align-items:center;justify-content:center">
+        <div
+            style="background:var(--c-card);border-radius:var(--r-lg);padding:2.5rem;box-shadow:var(--sh-md);border:1px solid var(--c-border);width:100%;max-width:400px;margin:1rem">
+            <div style="text-align:center;margin-bottom:1.5rem">
+                <div style="font-size:40px;margin-bottom:8px">🌿</div>
+                <div style="font-size:16px;font-weight:600;color:var(--c-ink)">เข้าสู่ระบบ</div>
+                <div style="font-size:12px;color:var(--c-ink3);margin-top:4px">อุทยานแห่งชาติแก่งกระจาน</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px">
+                <div>
+                    <label
+                        style="font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--c-ink3);display:block;margin-bottom:5px">Email</label>
+                    <input type="email" id="login-email" placeholder="email@example.com"
+                        style="width:100%;padding:10px 12px;border:1.5px solid var(--c-border);border-radius:8px;font-size:13px;outline:none"
+                        onkeydown="if(event.key==='Enter')doLogin()">
+                </div>
+                <div>
+                    <label
+                        style="font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--c-ink3);display:block;margin-bottom:5px">รหัสผ่าน</label>
+                    <input type="password" id="login-password" placeholder="••••••••"
+                        style="width:100%;padding:10px 12px;border:1.5px solid var(--c-border);border-radius:8px;font-size:13px;outline:none"
+                        onkeydown="if(event.key==='Enter')doLogin()">
+                </div>
+                <div id="login-error"
+                    style="display:none;color:var(--c-red);font-size:12px;background:var(--c-red-lt);padding:8px 12px;border-radius:6px">
+                </div>
+                <button id="btn-login" onclick="doLogin()"
+                    style="padding:11px;background:var(--c-green);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;margin-top:4px">เข้าสู่ระบบ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- APP SCREEN -->
+    <div id="app-screen" style="display:none">
+
+        <main>
+            <!-- TABS -->
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('compensation')">💰 สถิติการเยียวยา</button>
+                <button class="tab" onclick="switchTab('casualty')">🩹 คนบาดเจ็บ/ตาย</button>
+                <button class="tab" onclick="switchTab('elephant')">🐘 ช้างตาย</button>
+            </div>
+
+            <!-- ALERT -->
+            <div class="alert alert-success" id="alert-success">✅ บันทึกข้อมูลสำเร็จแล้ว</div>
+            <div class="alert alert-error" id="alert-error">❌ เกิดข้อผิดพลาด: <span id="error-msg"></span></div>
+
+            <!-- FORM: COMPENSATION -->
+            <div id="form-compensation" class="form-card">
+                <div class="form-title">สถิติการเยียวยาจากช้างป่า</div>
+                <div class="form-sub">กรอกข้อมูลผู้ขอรับการเยียวยา — ช่องที่มี * จำเป็นต้องกรอก</div>
+
+                <div class="section-title">ข้อมูลเหตุการณ์</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>วันที่เกิดเหตุ<span class="req">*</span></label>
+                        <input type="date" id="c-incident_date">
+                    </div>
+                    <div class="form-group">
+                        <label>ปีงบประมาณ<span class="req">*</span></label>
+                        <select id="c-fiscal_year">
+                            <option value="">-- เลือกปี --</option>
+                            <option value="2567">2567</option>
+                            <option value="2568">2568</option>
+                            <option value="2569">2569</option>
+                            <option value="2570">2570</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>กรณีเยียวยา<span class="req">*</span></label>
+                        <select id="c-compensation_case">
+                            <option value="">-- เลือกประเภท --</option>
+                            <option>เสียชีวิต</option>
+                            <option>บาดเจ็บ</option>
+                            <option>พืชผลทางการเกษตร</option>
+                            <option>ทรัพย์สิน</option>
+                            <option>ทรัพย์สิน+พืชผลทางการเกษตร</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>สถานะการเยียวยา<span class="req">*</span></label>
+                        <select id="c-compensation_status">
+                            <option value="">-- เลือกสถานะ --</option>
+                            <option>จ่ายเงินแล้ว</option>
+                            <option>ยังไม่จ่าย</option>
+                            <option>ไม่ขอรับการเยียวยา</option>
+                            <option>รอเจ้าหน้าที่ศูนย์ช้างลงข้อมูล</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="section-title">ข้อมูลผู้รับการเยียวยา</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>ชื่อ-นามสกุล<span class="req">*</span></label>
+                        <input type="text" id="c-name" placeholder="นาย/นาง/นางสาว ชื่อ นามสกุล">
+                    </div>
+                    <div class="form-group">
+                        <label>เพศ<span class="req">*</span></label>
+                        <select id="c-gender">
+                            <option value="">-- เลือกเพศ --</option>
+                            <option>ชาย</option>
+                            <option>หญิง</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>อายุ (ปี)</label>
+                        <input type="number" id="c-age" placeholder="อายุ" min="0" max="120">
+                    </div>
+                    <div class="form-group">
+                        <label>จำนวนเงินที่ขอเยียวยา (฿)</label>
+                        <input type="number" id="c-requested_amount" placeholder="0.00" min="0" step="0.01">
+                    </div>
+                </div>
+
+                <div class="section-title">ที่อยู่</div>
+                <div class="form-grid g3">
+                    <div class="form-group">
+                        <label>หมู่บ้าน</label>
+                        <input type="text" id="c-village" placeholder="หมู่ที่...">
+                    </div>
+                    <div class="form-group">
+                        <label>ตำบล</label>
+                        <input type="text" id="c-subdistrict" placeholder="ตำบล">
+                    </div>
+                    <div class="form-group">
+                        <label>อำเภอ</label>
+                        <input type="text" id="c-district" placeholder="อำเภอ">
+                    </div>
+                    <div class="form-group">
+                        <label>จังหวัด</label>
+                        <input type="text" id="c-province" placeholder="จังหวัด">
+                    </div>
+                    <div class="form-group">
+                        <label>Latitude</label>
+                        <input type="number" id="c-lat" placeholder="12.xxxxx" step="0.000001">
+                    </div>
+                    <div class="form-group">
+                        <label>Longitude</label>
+                        <input type="number" id="c-lon" placeholder="99.xxxxx" step="0.000001">
+                    </div>
+                </div>
+
+                <div class="section-title">ข้อมูลการจ่ายเงิน</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>วันที่ส่งเรื่อง</label>
+                        <input type="date" id="c-submission_date">
+                    </div>
+                    <div class="form-group">
+                        <label>วันที่จ่ายเงิน</label>
+                        <input type="date" id="c-payment_date">
+                    </div>
+                    <div class="form-group">
+                        <label>รูปแบบการจ่ายเงิน</label>
+                        <select id="c-payment_method">
+                            <option value="">-- เลือก --</option>
+                            <option>โอนเข้าบัญชี</option>
+                            <option>เช็คเงินสด</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>เยียวยาครั้งที่ 2 (฿)</label>
+                        <input type="number" id="c-second_compensation" placeholder="0.00" min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>วันที่จ่ายเงินครั้งที่ 2</label>
+                        <input type="date" id="c-second_payment_date">
+                    </div>
+                    <div class="form-group">
+                        <label>รายละเอียดการจ่ายเงิน</label>
+                        <input type="text" id="c-payment_detail" placeholder="รายละเอียด">
+                    </div>
+                </div>
+
+                <div class="form-grid" style="margin-top:1rem">
+                    <div class="form-group full">
+                        <label>หมายเหตุ</label>
+                        <textarea id="c-remark" placeholder="หมายเหตุเพิ่มเติม"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-footer">
+                    <button class="btn-reset" onclick="resetForm('compensation')">↺ ล้างข้อมูล</button>
+                    <button class="btn-submit" id="btn-compensation" onclick="submitCompensation()">
+                        <span>💾 บันทึกข้อมูล</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- FORM: CASUALTY -->
+            <div id="form-casualty" class="form-card" style="display:none">
+                <div class="form-title">สถิติคนบาดเจ็บ/เสียชีวิต</div>
+                <div class="form-sub">กรอกข้อมูลผู้ได้รับผลกระทบจากช้างป่า</div>
+
+                <div class="section-title">ข้อมูลเหตุการณ์</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>วันที่เกิดเหตุ<span class="req">*</span></label>
+                        <input type="date" id="ca-incident_date">
+                    </div>
+                    <div class="form-group">
+                        <label>บาดเจ็บ/เสียชีวิต<span class="req">*</span></label>
+                        <select id="ca-casualty_type">
+                            <option value="">-- เลือก --</option>
+                            <option>บาดเจ็บ</option>
+                            <option>เสียชีวิต</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>จำนวน (คน)<span class="req">*</span></label>
+                        <input type="number" id="ca-count" placeholder="จำนวน" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>ประเภทสถานที่เกิดเหตุ</label>
+                        <select id="ca-location_type">
+                            <option value="">-- เลือก --</option>
+                            <option>ในพื้นที่อุทยาน</option>
+                            <option>นอกพื้นที่อุทยาน</option>
+                            <option>พื้นที่เกษตร</option>
+                            <option>ที่อยู่อาศัย</option>
+                            <option>ถนน/เส้นทาง</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>สถานที่เกิดเหตุ</label>
+                        <input type="text" id="ca-location" placeholder="ระบุสถานที่">
+                    </div>
+                </div>
+
+                <div class="section-title">ข้อมูลผู้ได้รับผลกระทบ</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>ชื่อ-นามสกุล<span class="req">*</span></label>
+                        <input type="text" id="ca-name" placeholder="นาย/นาง/นางสาว ชื่อ นามสกุล">
+                    </div>
+                    <div class="form-group">
+                        <label>เพศ</label>
+                        <select id="ca-gender">
+                            <option value="">-- เลือกเพศ --</option>
+                            <option>ชาย</option>
+                            <option>หญิง</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>อายุ (ปี)</label>
+                        <input type="number" id="ca-age" placeholder="อายุ" min="0" max="120">
+                    </div>
+                </div>
+
+                <div class="section-title">สถานที่</div>
+                <div class="form-grid g3">
+                    <div class="form-group">
+                        <label>ตำบล</label>
+                        <input type="text" id="ca-subdistrict" placeholder="ตำบล">
+                    </div>
+                    <div class="form-group">
+                        <label>อำเภอ</label>
+                        <input type="text" id="ca-district" placeholder="อำเภอ">
+                    </div>
+                    <div class="form-group">
+                        <label>จังหวัด</label>
+                        <input type="text" id="ca-province" placeholder="จังหวัด">
+                    </div>
+                </div>
+
+                <div class="form-grid" style="margin-top:1rem">
+                    <div class="form-group">
+                        <label>หมายเหตุ</label>
+                        <textarea id="ca-remark" placeholder="หมายเหตุ"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>หมายเหตุ 2</label>
+                        <textarea id="ca-remark_2" placeholder="หมายเหตุเพิ่มเติม"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-footer">
+                    <button class="btn-reset" onclick="resetForm('casualty')">↺ ล้างข้อมูล</button>
+                    <button class="btn-submit" id="btn-casualty" onclick="submitCasualty()">
+                        <span>💾 บันทึกข้อมูล</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- FORM: ELEPHANT DEATH -->
+            <div id="form-elephant" class="form-card" style="display:none">
+                <div class="form-title">สถิติช้างตาย</div>
+                <div class="form-sub">กรอกข้อมูลช้างที่เสียชีวิต</div>
+
+                <div class="section-title">ข้อมูลเหตุการณ์</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>วันที่พบ<span class="req">*</span></label>
+                        <input type="date" id="e-incident_date">
+                    </div>
+                    <div class="form-group">
+                        <label>สาเหตุการตาย<span class="req">*</span></label>
+                        <select id="e-cause">
+                            <option value="">-- เลือกสาเหตุ --</option>
+                            <option>ถูกยิง</option>
+                            <option>ถูกวางยา</option>
+                            <option>ถูกไฟฟ้าดูด</option>
+                            <option>อุบัติเหตุ</option>
+                            <option>ป่วย/ชรา</option>
+                            <option>ไม่ทราบสาเหตุ</option>
+                            <option>อื่นๆ</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>จำนวน (ตัว)<span class="req">*</span></label>
+                        <input type="number" id="e-count" placeholder="จำนวน" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>เพศ</label>
+                        <select id="e-gender">
+                            <option value="">-- เลือก --</option>
+                            <option>ตัวผู้</option>
+                            <option>ตัวเมีย</option>
+                            <option>ไม่ทราบ</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>ช่วงชั้นอายุ</label>
+                        <select id="e-age_class">
+                            <option value="">-- เลือก --</option>
+                            <option>ลูกช้าง (0-3 ปี)</option>
+                            <option>วัยรุ่น (3-10 ปี)</option>
+                            <option>วัยผู้ใหญ่ (10-40 ปี)</option>
+                            <option>วัยชรา (40+ ปี)</option>
+                            <option>ไม่ทราบ</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>ประเภทพื้นที่</label>
+                        <select id="e-area_type">
+                            <option value="">-- เลือก --</option>
+                            <option>ในพื้นที่อุทยาน</option>
+                            <option>นอกพื้นที่อุทยาน</option>
+                            <option>พื้นที่เกษตร</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="section-title">สถานที่</div>
+                <div class="form-grid g3">
+                    <div class="form-group">
+                        <label>บริเวณ</label>
+                        <input type="text" id="e-area" placeholder="ระบุบริเวณ">
+                    </div>
+                    <div class="form-group">
+                        <label>ตำบล</label>
+                        <input type="text" id="e-subdistrict" placeholder="ตำบล">
+                    </div>
+                    <div class="form-group">
+                        <label>อำเภอ</label>
+                        <input type="text" id="e-district" placeholder="อำเภอ">
+                    </div>
+                    <div class="form-group full">
+                        <label>จังหวัด</label>
+                        <input type="text" id="e-province" placeholder="จังหวัด">
+                    </div>
+                </div>
+
+                <div class="form-grid" style="margin-top:1rem">
+                    <div class="form-group full">
+                        <label>รายละเอียดเพิ่มเติม</label>
+                        <textarea id="e-detail" placeholder="รายละเอียด"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-footer">
+                    <button class="btn-reset" onclick="resetForm('elephant')">↺ ล้างข้อมูล</button>
+                    <button class="btn-submit" id="btn-elephant" onclick="submitElephant()">
+                        <span>💾 บันทึกข้อมูล</span>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://xzuzpkzxyimcvgninskt.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6dXpwa3p4eWltY3Znbmluc2t0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MjcwMTksImV4cCI6MjA5NjMwMzAxOX0.P8uSZ4dlhCXyEfSOntD65eTAbYsJWkQ3SQFSsbmJm7k';
+
+        const { createClient } = supabase;
+        const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // เช็ค session ตอนโหลดหน้า
+        window.addEventListener('load', async () => {
+            const { data: { session } } = await sb.auth.getSession();
+            if (session) {
+                showApp(session.user.email);
+            } else {
+                showLogin();
+            }
+        });
+
+        function showLogin() {
+            document.getElementById('login-screen').style.display = 'flex';
+            document.getElementById('app-screen').style.display = 'none';
+        }
+
+        function showApp(email) {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('app-screen').style.display = 'block';
+            document.getElementById('user-email').textContent = email;
+        }
+
+        async function doLogin() {
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+            const btn = document.getElementById('btn-login');
+            const err = document.getElementById('login-error');
+
+            if (!email || !password) { err.textContent = 'กรุณากรอก email และรหัสผ่าน'; err.style.display = 'block'; return; }
+
+            btn.disabled = true;
+            btn.textContent = 'กำลังเข้าสู่ระบบ...';
+            err.style.display = 'none';
+
+            const { data, error } = await sb.auth.signInWithPassword({ email, password });
+
+            if (error) {
+                err.textContent = 'email หรือรหัสผ่านไม่ถูกต้อง';
+                err.style.display = 'block';
+                btn.disabled = false;
+                btn.textContent = 'เข้าสู่ระบบ';
+            } else {
+                showApp(data.user.email);
+            }
+        }
+
+        async function doLogout() {
+            await sb.auth.signOut();
+            showLogin();
+        }
+
+        // แก้ insertRow ให้ใช้ supabase client แทน fetch ตรงๆ
+        async function getNextId(table) {
+            const { data } = await sb.from(table).select('id').order('id', { ascending: false }).limit(1);
+            return data && data.length > 0 ? data[0].id + 1 : 1;
+        }
+
+        async function insertRow(table, data) {
+            const { error } = await sb.from(table).insert([data]);
+            if (error) throw new Error(error.message);
+            return true;
+        }
+
+        /* TABS */
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach((t, i) => {
+                t.classList.toggle('active', ['compensation', 'casualty', 'elephant'][i] === tab);
+            });
+            document.getElementById('form-compensation').style.display = tab === 'compensation' ? 'block' : 'none';
+            document.getElementById('form-casualty').style.display = tab === 'casualty' ? 'block' : 'none';
+            document.getElementById('form-elephant').style.display = tab === 'elephant' ? 'block' : 'none';
+            hideAlerts();
+        }
+
+        function val(id) { return document.getElementById(id).value.trim(); }
+        function numVal(id) { const v = val(id); return v !== '' ? parseFloat(v) : null; }
+        function intVal(id) { const v = val(id); return v !== '' ? parseInt(v) : null; }
+
+        function thaiDateFromInput(dateStr) {
+            if (!dateStr) return '';
+            const [y, m, d] = dateStr.split('-');
+            return `${d}/${m}/${parseInt(y) + 543}`;
+        }
+        function getYearBE(dateStr) { if (!dateStr) return null; return parseInt(dateStr.split('-')[0]) + 543; }
+        function getYearAD(dateStr) { if (!dateStr) return null; return parseInt(dateStr.split('-')[0]); }
+
+        function showAlert(type, msg = '') {
+            hideAlerts();
+            if (type === 'success') { document.getElementById('alert-success').classList.add('show'); }
+            else { document.getElementById('error-msg').textContent = msg; document.getElementById('alert-error').classList.add('show'); }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        function hideAlerts() {
+            document.getElementById('alert-success').classList.remove('show');
+            document.getElementById('alert-error').classList.remove('show');
+        }
+
+        async function submitCompensation() {
+            const name = val('c-name'), incident_date = val('c-incident_date');
+            const compensation_case = val('c-compensation_case'), compensation_status = val('c-compensation_status');
+            const fiscal_year = val('c-fiscal_year');
+            if (!name || !incident_date || !compensation_case || !compensation_status || !fiscal_year) {
+                showAlert('error', 'กรุณากรอกข้อมูลที่จำเป็นให้ครบ (*)'); return;
+            }
+            const btn = document.getElementById('btn-compensation');
+            btn.disabled = true; btn.innerHTML = '<span>⏳ กำลังบันทึก...</span>';
+            try {
+                const id = await getNextId('compensation');
+                await insertRow('compensation', {
+                    id, incident_date: thaiDateFromInput(incident_date),
+                    year_be: getYearBE(incident_date), year_ad: getYearAD(incident_date),
+                    fiscal_year: parseInt(fiscal_year), name, gender: val('c-gender') || null,
+                    age: intVal('c-age'), lat: numVal('c-lat'), lon: numVal('c-lon'),
+                    village: val('c-village') || null, subdistrict: val('c-subdistrict') || null,
+                    district: val('c-district') || null, province: val('c-province') || null,
+                    compensation_case, requested_amount: numVal('c-requested_amount'),
+                    submission_date: val('c-submission_date') || null, payment_date: val('c-payment_date') || null,
+                    second_compensation: numVal('c-second_compensation'),
+                    second_payment_date: val('c-second_payment_date') || null,
+                    compensation_status, payment_method: val('c-payment_method') || null,
+                    payment_detail: val('c-payment_detail') || null, remark: val('c-remark') || null,
+                });
+                showAlert('success'); resetForm('compensation');
+            } catch (e) { showAlert('error', e.message); }
+            finally { btn.disabled = false; btn.innerHTML = '<span>💾 บันทึกข้อมูล</span>'; }
+        }
+
+        async function submitCasualty() {
+            const name = val('ca-name'), incident_date = val('ca-incident_date');
+            const casualty_type = val('ca-casualty_type'), count = val('ca-count');
+            if (!name || !incident_date || !casualty_type || !count) {
+                showAlert('error', 'กรุณากรอกข้อมูลที่จำเป็นให้ครบ (*)'); return;
+            }
+            const btn = document.getElementById('btn-casualty');
+            btn.disabled = true; btn.innerHTML = '<span>⏳ กำลังบันทึก...</span>';
+            try {
+                const id = await getNextId('casualty');
+                await insertRow('casualty', {
+                    id, incident_date: thaiDateFromInput(incident_date),
+                    year_ad: getYearAD(incident_date), year_be: getYearBE(incident_date),
+                    name, gender: val('ca-gender') || null, age: intVal('ca-age'),
+                    location_type: val('ca-location_type') || null, location: val('ca-location') || null,
+                    subdistrict: val('ca-subdistrict') || null, district: val('ca-district') || null,
+                    province: val('ca-province') || null, casualty_type, count: parseInt(count),
+                    remark: val('ca-remark') || null, remark_2: val('ca-remark_2') || null,
+                });
+                showAlert('success'); resetForm('casualty');
+            } catch (e) { showAlert('error', e.message); }
+            finally { btn.disabled = false; btn.innerHTML = '<span>💾 บันทึกข้อมูล</span>'; }
+        }
+
+        async function submitElephant() {
+            const incident_date = val('e-incident_date'), cause = val('e-cause'), count = val('e-count');
+            if (!incident_date || !cause || !count) {
+                showAlert('error', 'กรุณากรอกข้อมูลที่จำเป็นให้ครบ (*)'); return;
+            }
+            const btn = document.getElementById('btn-elephant');
+            btn.disabled = true; btn.innerHTML = '<span>⏳ กำลังบันทึก...</span>';
+            try {
+                const id = await getNextId('elephant_death');
+                await insertRow('elephant_death', {
+                    id, incident_date: thaiDateFromInput(incident_date),
+                    year_ad: getYearAD(incident_date), year_be: getYearBE(incident_date),
+                    area_type: val('e-area_type') || null, area: val('e-area') || null,
+                    subdistrict: val('e-subdistrict') || null, district: val('e-district') || null,
+                    province: val('e-province') || null, gender: val('e-gender') || null,
+                    age_class: val('e-age_class') || null, count: parseInt(count),
+                    cause, detail: val('e-detail') || null,
+                });
+                showAlert('success'); resetForm('elephant');
+            } catch (e) { showAlert('error', e.message); }
+            finally { btn.disabled = false; btn.innerHTML = '<span>💾 บันทึกข้อมูล</span>'; }
+        }
+
+        function resetForm(type) {
+            const prefix = { compensation: 'c-', casualty: 'ca-', elephant: 'e-' }[type];
+            document.querySelectorAll(`[id^="${prefix}"]`).forEach(el => el.value = '');
+        }
+    </script>
+</body>
+
+</html>
