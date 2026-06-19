@@ -12,7 +12,63 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     <style>
+        .loading-screen {
+            position: fixed;
+            inset: 0;
+            background: var(--c-bg);
+            z-index: 998;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .loader {
+            display: block;
+            width: 84px;
+            height: 84px;
+            position: relative;
+        }
+
+        .loader:before,
+        .loader:after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: var(--c-green);
+            transform: translate(-50%, -100%) scale(0);
+            animation: push_401 2s infinite linear;
+        }
+
+        .loader:after {
+            animation-delay: 1s;
+        }
+
+        @keyframes push_401 {
+
+            0%,
+            50% {
+                transform: translate(-50%, 0%) scale(1);
+            }
+
+            100% {
+                transform: translate(-50%, -100%) scale(0);
+            }
+        }
+
+        .loading-text {
+            font-size: 13px;
+            color: var(--c-ink3);
+        }
+
         :root {
             --c-bg: #f0f3ef;
             --c-card: #fff;
@@ -1018,6 +1074,249 @@
             margin-top: 0.5rem;
         }
 
+        .fab-print {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            z-index: 997;
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: #1a6b42;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 16px rgba(26, 107, 66, .45);
+            transition: all .5s;
+            overflow: visible;
+        }
+
+        .fab-print:hover {
+            border-radius: 12px;
+            transform: translateY(-6px);
+            background: #155a36;
+            box-shadow: 0 8px 24px rgba(26, 107, 66, .5);
+        }
+
+        .fab-label {
+            position: absolute;
+            bottom: 58px;
+            right: 0;
+            background: #1a6b42;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 600;
+            font-family: var(--ff);
+            padding: 4px 10px;
+            border-radius: 20px;
+            white-space: nowrap;
+            opacity: 0;
+            transform: translateY(6px);
+            transition: all .3s;
+            pointer-events: none;
+        }
+
+        .fab-print:hover .fab-label {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* REPORT MODAL */
+        .report-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .report-overlay.open {
+            display: flex;
+        }
+
+        .report-modal {
+            background: #fff;
+            border-radius: 16px;
+            width: min(480px, 92vw);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, .3);
+            overflow: hidden;
+        }
+
+        .report-modal-hdr {
+            background: linear-gradient(135deg, #0d2416, #133a22);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .report-modal-hdr h2 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .report-modal-close {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, .6);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 6px;
+        }
+
+        .report-modal-body {
+            padding: 20px;
+        }
+
+        .report-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1.5px solid var(--c-border);
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all .15s;
+        }
+
+        .report-option:hover {
+            border-color: var(--c-green);
+            background: var(--c-green-lt);
+        }
+
+        .report-option input[type=radio] {
+            accent-color: var(--c-green);
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+        }
+
+        .report-option-txt strong {
+            font-size: 13px;
+            color: var(--c-ink);
+            display: block;
+        }
+
+        .report-option-txt span {
+            font-size: 11px;
+            color: var(--c-ink3);
+        }
+
+        .report-sections {
+            margin-top: 14px;
+        }
+
+        .report-sections label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+            color: var(--c-ink3);
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .report-check {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--c-ink2);
+            padding: 4px 0;
+            cursor: pointer;
+        }
+
+        .report-check input {
+            accent-color: var(--c-green);
+            width: 15px;
+            height: 15px;
+        }
+
+        .report-modal-footer {
+            padding: 14px 20px;
+            border-top: 1px solid var(--c-border);
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .btn-print-go {
+            padding: 9px 24px;
+            background: var(--c-green);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: var(--ff);
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .btn-print-go:hover {
+            background: #155a36;
+        }
+
+        .btn-print-cancel {
+            padding: 9px 18px;
+            background: transparent;
+            color: var(--c-ink3);
+            border: 1px solid var(--c-border);
+            border-radius: 10px;
+            font-size: 13px;
+            font-family: var(--ff);
+            cursor: pointer;
+        }
+
+        /* PRINT STYLES */
+        @media print {
+            body * {
+                display: none !important;
+            }
+
+            #print-area,
+            #print-area * {
+                display: block !important;
+            }
+
+            #print-area table {
+                display: table !important;
+            }
+
+            #print-area thead {
+                display: table-header-group !important;
+            }
+
+            #print-area tbody {
+                display: table-row-group !important;
+            }
+
+            #print-area tr {
+                display: table-row !important;
+            }
+
+            #print-area th,
+            #print-area td {
+                display: table-cell !important;
+            }
+
+            @page {
+                margin: 15mm 12mm;
+                size: A4;
+            }
+        }
+
+        #print-area {
+            display: none;
+        }
+
         @keyframes blink {
 
             0%,
@@ -1033,6 +1332,14 @@
 </head>
 
 <body>
+
+    <div class="print-header"
+        style="display:none;padding:12px 0 16px;border-bottom:2px solid #1a6b42;margin-bottom:16px">
+        <div style="font-size:18px;font-weight:700;color:#1a6b42">รายงานสถิติการเยียวยาผลกระทบจากช้างป่า</div>
+        <div style="font-size:12px;color:#7a927f;margin-top:4px">อุทยานแห่งชาติแก่งกระจาน</div>
+        <div style="font-size:11px;color:#aaa;margin-top:2px" id="print-date"></div>
+    </div>
+
     <div class="dd-overlay" id="dd-overlay" onclick="closeDD()"></div>
 
     <header class="hdr">
@@ -1045,11 +1352,11 @@
                 </div>
             </div>
             <div class="hdr-right">
-                <a href="index.html">💰 เยียวยา</a>
-                <a href="casualty.html">🩹 บาดเจ็บ/ตาย</a>
-                <a href="elephant_death.html">🐘 ช้างตาย</a>
-                <a href="form.html">📝 กรอกข้อมูล</a>
-                <span id="update-ts">—</span>
+                <a href="index.html" class="nav-link">💰 เยียวยา</a>
+                <a href="casualty.html" class="nav-link">🩹 บาดเจ็บ/ตาย</a>
+                <a href="elephant_death.html" class="nav-link">🐘 ช้างตาย</a>
+                <a href="village_network.html" class="nav-link">🏘️ หมู่บ้านเครือข่าย</a>
+                <a href="form.html" class="nav-link">📝 กรอกข้อมูล</a>
             </div>
         </div>
     </header>
@@ -1058,13 +1365,38 @@
         <div class="insights-inner" id="insights-bar"></div>
     </div>
 
+    <div class="loading-screen" id="loading-screen">
+        <span class="loader"></span>
+        <span class="loading-text">กำลังโหลดข้อมูล...</span>
+    </div>
+
     <main>
         <div class="filter-card">
             <div class="filter-row">
                 <div class="filter-group">
+                    <label>เดือน</label>
+                    <div class="dd-wrap" id="month-dd-wrap">
+                        <button class="dd-btn" id="month-dd-btn" onclick="toggleGenericDD('month')">
+                            <span id="month-dd-label">ทุกเดือน</span><span>▾</span>
+                        </button>
+                        <div class="dd-panel" id="month-dd-panel">
+                            <div class="dd-panel-hdr">
+                                <span>เลือกเดือน</span>
+                                <button class="dd-panel-close" onclick="closeGenericDD('month')">✕</button>
+                            </div>
+                            <div class="dd-list" id="month-dd-list"></div>
+                            <div class="dd-footer">
+                                <button onclick="selectAllGeneric('month', MONTH_VALS)">เลือกทั้งหมด</button>
+                                <button onclick="clearGeneric('month')">ล้าง</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="filter-group">
                     <label>ปีงบประมาณ</label>
                     <div class="pills" id="year-pills"></div>
                 </div>
+
                 <div class="filter-group">
                     <label>สถานะการเยียวยา</label>
                     <div class="pills" id="status-pills"></div>
@@ -1218,6 +1550,59 @@
                 <div class="tbl-pager" id="tbl-pager"></div>
             </div>
         </div>
+
+        <button onclick="openReport()" class="fab-print">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" height="22" width="22">
+                <path fill="white"
+                    d="M17 8H7V6h10v2zm2 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-2 7H7v-4h10v4zm3-11H4c-1.1 0-2 .9-2 2v6h4v4h12v-4h4v-6c0-1.1-.9-2-2-2z" />
+            </svg>
+            <span class="fab-label">พิมพ์รายงาน</span>
+        </button>
+
+
+        <!-- REPORT MODAL -->
+        <div class="report-overlay" id="report-overlay" onclick="if(event.target===this)closeReport()">
+            <div class="report-modal">
+                <div class="report-modal-hdr">
+                    <h2>🖨️ สร้างรายงาน</h2>
+                    <button class="report-modal-close" onclick="closeReport()">✕</button>
+                </div>
+                <div class="report-modal-body">
+                    <label
+                        style="font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--c-ink3);display:block;margin-bottom:8px">ข้อมูลที่ต้องการออกรายงาน</label>
+                    <label class="report-option">
+                        <input type="radio" name="report-scope" value="all" checked>
+                        <div class="report-option-txt">
+                            <strong>📋 ข้อมูลทั้งหมด</strong>
+                            <span id="rpt-all-count">ทุกรายการ</span>
+                        </div>
+                    </label>
+                    <label class="report-option">
+                        <input type="radio" name="report-scope" value="filtered">
+                        <div class="report-option-txt">
+                            <strong>🔍 เฉพาะข้อมูลที่กรองอยู่</strong>
+                            <span id="rpt-filtered-count">รายการที่เลือก</span>
+                        </div>
+                    </label>
+
+                    <div class="report-sections">
+                        <label>ส่วนที่ต้องการแสดงในรายงาน</label>
+                        <label class="report-check"><input type="checkbox" id="rpt-kpi" checked> สรุปตัวเลขสำคัญ
+                            (KPI)</label>
+                        <label class="report-check"><input type="checkbox" id="rpt-chart" checked> กราฟสถิติ</label>
+                        <label class="report-check"><input type="checkbox" id="rpt-table" checked>
+                            ตารางข้อมูลรายการ</label>
+                    </div>
+                </div>
+                <div class="report-modal-footer">
+                    <button class="btn-print-cancel" onclick="closeReport()">ยกเลิก</button>
+                    <button class="btn-print-go" onclick="doPrint()">🖨️ พิมพ์รายงาน</button>
+                </div>
+            </div>
+        </div>
+
+
+
     </main>
 
     <footer>
@@ -1226,6 +1611,141 @@
     </footer>
 
     <script>
+
+        function openReport() {
+            const all = RAW.length;
+            const filtered = getFiltered().length;
+            document.getElementById('rpt-all-count').textContent = `${all} รายการทั้งหมด`;
+            document.getElementById('rpt-filtered-count').textContent =
+                filtered === all ? `${filtered} รายการ (ยังไม่ได้กรอง)` : `${filtered} รายการที่กรองแล้ว`;
+            document.getElementById('report-overlay').classList.add('open');
+        }
+
+        function closeReport() {
+            document.getElementById('report-overlay').classList.remove('open');
+        }
+
+        function doPrint() {
+            const scope = document.querySelector('input[name="report-scope"]:checked').value;
+            const data = scope === 'filtered' ? getFiltered() : RAW;
+            const showKPI = document.getElementById('rpt-kpi').checked;
+            const showChart = document.getElementById('rpt-chart').checked;
+            const showTable = document.getElementById('rpt-table').checked;
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+
+            const paid = data.filter(r => r.compensation_status === 'จ่ายเงินแล้ว');
+            const pend = data.filter(r => r.compensation_status === 'ยังไม่จ่าย');
+            const totalAmt = data.reduce((a, r) => a + r.requested_amount, 0);
+            const paidAmt = paid.reduce((a, r) => a + r.requested_amount, 0);
+
+            const kpiHTML = showKPI ? `
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0">
+            ${[
+                    { lbl: 'กรณีทั้งหมด', val: data.length, sub: 'รายการ', color: '#1a4faa' },
+                    { lbl: 'จ่ายเงินแล้ว', val: paid.length, sub: '฿' + paidAmt.toLocaleString('th-TH'), color: '#059669' },
+                    { lbl: 'รอการจ่าย', val: pend.length, sub: '฿' + pend.reduce((a, r) => a + r.requested_amount, 0).toLocaleString('th-TH'), color: '#d97706' },
+                    { lbl: 'มูลค่ารวม', val: '฿' + (totalAmt >= 1000000 ? (totalAmt / 1000000).toFixed(2) + 'M' : totalAmt.toLocaleString('th-TH')), sub: 'บาท', color: '#dc2626' },
+                ].map(k => `
+                <div style="border:1px solid #dde3d9;border-radius:8px;padding:10px 12px;border-top:3px solid ${k.color}">
+                    <div style="font-size:9px;color:#7a927f;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">${k.lbl}</div>
+                    <div style="font-size:20px;font-weight:600;color:${k.color};line-height:1">${k.val}</div>
+                    <div style="font-size:10px;color:#7a927f;margin-top:3px">${k.sub}</div>
+                </div>`).join('')}
+        </div>` : '';
+
+            const chartHTML = showChart ? `
+        <div style="margin:16px 0;padding:12px;border:1px solid #dde3d9;border-radius:8px">
+            <div style="font-size:11px;font-weight:600;color:#3d5045;margin-bottom:10px">สัดส่วนสถานะการเยียวยา</div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                ${[
+                    { label: 'จ่ายเงินแล้ว', count: paid.length, color: '#059669' },
+                    { label: 'รอการจ่าย', count: pend.length, color: '#d97706' },
+                    { label: 'ไม่ขอรับ', count: data.filter(r => r.compensation_status === 'ไม่ขอรับการเยียวยา').length, color: '#9ca3af' },
+                ].map(s => {
+                    const pct = data.length > 0 ? Math.round(s.count / data.length * 100) : 0;
+                    return `<div style="flex:1;min-width:80px">
+                        <div style="font-size:10px;color:#7a927f;margin-bottom:4px">${s.label}</div>
+                        <div style="background:#f0f0ee;border-radius:4px;height:10px;overflow:hidden">
+                            <div style="width:${pct}%;background:${s.color};height:100%;border-radius:4px"></div>
+                        </div>
+                        <div style="font-size:11px;font-weight:600;color:${s.color};margin-top:3px">${s.count} ราย (${pct}%)</div>
+                    </div>`;
+                }).join('')}
+            </div>
+            <div style="margin-top:12px;font-size:11px;font-weight:600;color:#3d5045;margin-bottom:8px">ประเภทกรณีเยียวยา</div>
+            ${(() => {
+                    const types = {};
+                    data.forEach(r => { types[r.compensation_case] = (types[r.compensation_case] || 0) + 1; });
+                    const colors = { 'เสียชีวิต': '#ef4444', 'บาดเจ็บ': '#3b82f6', 'พืชผลทางการเกษตร': '#16a34a', 'ทรัพย์สิน': '#ea580c', 'ทรัพย์สิน+พืชผลทางการเกษตร': '#8b5cf6' };
+                    return Object.entries(types).sort((a, b) => b[1] - a[1]).map(([t, c]) => {
+                        const pct = Math.round(c / data.length * 100);
+                        const col = colors[t] || '#64748b';
+                        return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+                        <div style="font-size:11px;color:#3d5045;width:160px;flex-shrink:0">${t}</div>
+                        <div style="flex:1;background:#f0f0ee;border-radius:4px;height:8px">
+                            <div style="width:${pct}%;background:${col};height:100%;border-radius:4px"></div>
+                        </div>
+                        <div style="font-size:11px;font-weight:600;color:${col};width:50px;text-align:right">${c} ราย</div>
+                    </div>`;
+                    }).join('');
+                })()}
+        </div>` : '';
+
+            const tableHTML = showTable ? `
+        <div style="margin-top:16px">
+            <div style="font-size:11px;font-weight:600;color:#3d5045;margin-bottom:8px">รายละเอียดข้อมูลทั้งหมด (${data.length} รายการ)</div>
+            <table style="width:100%;border-collapse:collapse;font-size:10px">
+                <thead>
+                    <tr style="background:#1a6b42;color:#fff">
+                        <th style="padding:6px 8px;text-align:left">#</th>
+                        <th style="padding:6px 8px;text-align:left">วันที่เกิดเหตุ</th>
+                        <th style="padding:6px 8px;text-align:left">ชื่อ-นามสกุล</th>
+                        <th style="padding:6px 8px;text-align:center">เพศ</th>
+                        <th style="padding:6px 8px;text-align:left">กรณีเยียวยา</th>
+                        <th style="padding:6px 8px;text-align:right">จำนวนเงิน (฿)</th>
+                        <th style="padding:6px 8px;text-align:center">ปีงบ</th>
+                        <th style="padding:6px 8px;text-align:left">สถานะ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${data.map((r, i) => `
+                        <tr style="background:${i % 2 === 0 ? '#fff' : '#f8faf8'}">
+                            <td style="padding:5px 8px;color:#7a927f">${r.id || '—'}</td>
+                            <td style="padding:5px 8px;white-space:nowrap">${r.incident_date || '—'}</td>
+                            <td style="padding:5px 8px;font-weight:500">${r.name || '—'}</td>
+                            <td style="padding:5px 8px;text-align:center">${r.gender || '—'}</td>
+                            <td style="padding:5px 8px">${r.compensation_case || '—'}</td>
+                            <td style="padding:5px 8px;text-align:right;font-weight:500">${r.requested_amount > 0 ? '฿' + r.requested_amount.toLocaleString('th-TH') : '—'}</td>
+                            <td style="padding:5px 8px;text-align:center">${r.fiscal_year || '—'}</td>
+                            <td style="padding:5px 8px">${r.compensation_status || '—'}</td>
+                        </tr>`).join('')}
+                </tbody>
+            </table>
+        </div>` : '';
+
+            document.getElementById('print-content').innerHTML = `
+        <div style="font-family:'IBM Plex Sans Thai','Sarabun',sans-serif;padding:0">
+            <div style="background:linear-gradient(135deg,#0d2416,#133a22);padding:16px 20px;border-radius:0">
+                <div style="font-size:18px;font-weight:700;color:#fff">รายงานสถิติการเยียวยาผลกระทบจากช้างป่า</div>
+                <div style="font-size:11px;color:rgba(255,255,255,.6);margin-top:4px">อุทยานแห่งชาติแก่งกระจาน &nbsp;·&nbsp; ออกรายงาน: ${dateStr}</div>
+                <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:2px">${scope === 'filtered' ? `ข้อมูลที่กรองแล้ว: ${data.length} รายการ` : `ข้อมูลทั้งหมด: ${data.length} รายการ`}</div>
+            </div>
+            <div style="padding:16px 20px">
+                ${kpiHTML}
+                ${chartHTML}
+                ${tableHTML}
+                <div style="margin-top:20px;padding-top:10px;border-top:1px solid #dde3d9;font-size:9px;color:#aaa;text-align:center">
+                    รายงานนี้ออกโดยระบบสถิติข้อมูลช้างป่า อุทยานแห่งชาติแก่งกระจาน &nbsp;·&nbsp; ${dateStr}
+                </div>
+            </div>
+        </div>`;
+
+            closeReport();
+            setTimeout(() => window.print(), 100);
+        }
+
+
         const SUPABASE_URL = "https://xzuzpkzxyimcvgninskt.supabase.co";
         const SUPABASE_KEY =
             "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6dXpwa3p4eWltY3Znbmluc2t0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MjcwMTksImV4cCI6MjA5NjMwMzAxOX0.P8uSZ4dlhCXyEfSOntD65eTAbYsJWkQ3SQFSsbmJm7k";
@@ -1256,6 +1776,8 @@
                 initGenderChart(RAW);
                 initMap(RAW);
                 renderTable();
+
+                document.getElementById('loading-screen').style.display = 'none';
                 document.getElementById("filter-summary").innerHTML =
                     `แสดง <strong>${RAW.length}</strong> จาก ${RAW.length} รายการ`;
             });
@@ -1289,7 +1811,7 @@
             toolbar: { show: false },
             animations: { speed: 350, animateGradually: { enabled: false } },
         };
-        const F = { years: new Set(), statuses: new Set(), names: new Set() };
+        const F = { years: new Set(), statuses: new Set(), names: new Set(), months: new Set() };
         let tableSort = { col: "id", dir: "asc" },
             tablePage = 1;
         const CHARTS = {};
@@ -1299,13 +1821,24 @@
             showHeat = false;
 
         function getFiltered() {
-            return RAW.filter(
-                (r) =>
-                    (!F.years.size || F.years.has(String(r.fiscal_year))) &&
-                    (!F.statuses.size || F.statuses.has(r.compensation_status)) &&
-                    (!F.names.size || F.names.has(r.name)),
-            );
+            return RAW.filter(r => {
+                if (F.years.size && !F.years.has(String(r.fiscal_year))) return false;
+                if (F.statuses.size && !F.statuses.has(r.compensation_status)) return false;
+                if (F.names.size && !F.names.has(r.name)) return false;
+                if (F.months.size) {
+                    if (!r.incident_date) return false;
+                    const parts = r.incident_date.split('/');
+                    if (parts.length !== 3) return false;
+                    let m = parseInt(parts[1]);
+                    let y = parseInt(parts[2]);
+                    if (y > 2500) y = y - 543;
+                    const key = `${y}-${String(m).padStart(2, '0')}`;
+                    if (!F.months.has(key)) return false;
+                }
+                return true;
+            });
         }
+
         function toggleYear(y) {
             F.years.has(y) ? F.years.delete(y) : F.years.add(y);
             refresh();
@@ -1335,10 +1868,12 @@
             F.years.clear();
             F.statuses.clear();
             F.names.clear();
+            F.months.clear();
             rebuildGenericList("year");
             rebuildGenericList("status");
             buildDDList();
             updateNameBtn();
+            buildMonthDD();
             refresh();
         }
         function uniqueNames() {
@@ -2185,7 +2720,54 @@
             renderTable();
         }
 
+
+        const MONTH_NAMES = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+        let MONTH_VALS = [];
+
         function buildFilters() {
+
+
+
+            console.log('MONTH_VALS:', MONTH_VALS);
+            console.log('RAW sample:', RAW.slice(0, 3).map(r => r.incident_date));
+
+
+            function buildMonthDD() {
+                // หา เดือน-ปี ที่มีข้อมูลจริงใน DB
+                const monthSet = new Set();
+                RAW.forEach(r => {
+                    if (!r.incident_date) return;
+                    const parts = r.incident_date.split('/');
+                    console.log('incident_date raw:', r.incident_date);
+                    if (parts.length !== 3) return;
+                    let m = parseInt(parts[1]);
+                    let y = parseInt(parts[2]);
+                    if (y > 2500) y = y - 543; // แปลง พ.ศ. → ค.ศ.
+                    if (!m || !y) return;
+                    monthSet.add(`${y}-${String(m).padStart(2, '0')}`);
+                });
+
+                MONTH_VALS = [...monthSet].sort();
+
+                const list = document.getElementById('month-dd-list');
+                list.innerHTML = MONTH_VALS.map(v => {
+                    const [y, m] = v.split('-');
+                    const label = `${MONTH_NAMES[parseInt(m) - 1]} ${parseInt(y) + 543}`;
+                    return `<label class="dd-item">
+            <input type="checkbox" ${F.months.has(v) ? 'checked' : ''}
+                onchange="toggleGenericItem('month','${v}',this.checked)">
+            <span>${label}</span>
+        </label>`;
+                }).join('');
+
+                // ลง wrapper
+                const target = document.getElementById('month-dd-wrap');
+                if (target) updateGenericBtn('month', 'ทุกเดือน');
+
+
+            }
+
+
             // Year dropdown
             const fys = [...new Set(RAW.map((r) => r.fiscal_year))].sort();
             buildGenericDD(
@@ -2200,6 +2782,8 @@
                 { val: "ยังไม่จ่าย", label: "⏳ รอจ่าย" },
                 { val: "ไม่ขอรับการเยียวยา", label: "✗ ไม่ขอรับ" },
             ];
+
+            buildMonthDD();
             buildGenericDD("status", "ทุกสถานะ", statuses);
 
             // Name dropdown (มีอยู่แล้ว)
@@ -2289,12 +2873,14 @@
             if (!anyOpen)
                 document.getElementById("dd-overlay").classList.remove("open");
         }
+
         function toggleGenericItem(type, val, checked) {
-            const FSet = type === "year" ? F.years : F.statuses;
+            const FSet = type === 'year' ? F.years : type === 'status' ? F.statuses : F.months;
             checked ? FSet.add(val) : FSet.delete(val);
             updateGenericBtn(type);
             refresh();
         }
+
         function selectAllGeneric(type, vals) {
             const FSet = type === "year" ? F.years : F.statuses;
             vals.forEach((v) => FSet.add(v));
@@ -2302,12 +2888,14 @@
             updateGenericBtn(type);
             refresh();
         }
+
         function clearGeneric(type) {
-            (type === "year" ? F.years : F.statuses).clear();
+            (type === 'year' ? F.years : type === 'status' ? F.statuses : F.months).clear();
             rebuildGenericList(type);
             updateGenericBtn(type);
             refresh();
         }
+
         function rebuildGenericList(type) {
             const FSet = type === "year" ? F.years : F.statuses;
             document
@@ -2330,35 +2918,48 @@
                     if (val) cb.checked = FSet.has(val);
                 });
         }
+
         function updateGenericBtn(type, placeholder, items) {
-            const FSet = type === "year" ? F.years : F.statuses;
-            const ph = placeholder || (type === "year" ? "ทุกปี" : "ทุกสถานะ");
+            const FSet = type === 'year' ? F.years : type === 'status' ? F.statuses : F.months;
+            const ph = placeholder || (type === 'year' ? 'ทุกปี' : type === 'status' ? 'ทุกสถานะ' : 'ทุกเดือน');
             const btn = document.getElementById(`${type}-dd-btn`);
             const lbl = document.getElementById(`${type}-dd-label`);
             if (!btn) return;
-            let cnt = btn.querySelector(".dd-count");
+            let cnt = btn.querySelector('.dd-count');
             if (FSet.size) {
-                lbl.textContent =
-                    FSet.size === 1 ? [...FSet][0] : `${FSet.size} รายการ`;
-                btn.classList.add("has-val");
+                if (type === 'month') {
+                    // แสดงชื่อเดือนแทน key
+                    const [y, m] = [...FSet][0].split('-');
+                    lbl.textContent = FSet.size === 1
+                        ? `${MONTH_NAMES[parseInt(m) - 1]} ${parseInt(y) + 543}`
+                        : `${FSet.size} เดือน`;
+                } else {
+                    lbl.textContent = FSet.size === 1 ? [...FSet][0] : `${FSet.size} รายการ`;
+                }
+                btn.classList.add('has-val');
                 if (!cnt) {
-                    cnt = document.createElement("span");
-                    cnt.className = "dd-count";
+                    cnt = document.createElement('span');
+                    cnt.className = 'dd-count';
                     btn.insertBefore(cnt, btn.lastChild);
                 }
                 cnt.textContent = FSet.size;
             } else {
                 lbl.textContent = ph;
-                btn.classList.remove("has-val");
+                btn.classList.remove('has-val');
                 if (cnt) cnt.remove();
             }
         }
 
-        window.onload = () => {
-            document.getElementById("update-ts").textContent =
-                "ข้อมูล ณ มี.ค. 2569";
-        };
+
+
     </script>
+
+    <!-- PRINT AREA -->
+    <div id="print-area">
+        <div id="print-content"></div>
+    </div>
+
+
 </body>
 
 </html>

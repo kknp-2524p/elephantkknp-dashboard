@@ -591,6 +591,18 @@
             min-height: 44px;
         }
 
+        .addr-loading {
+            font-size: 11px;
+            color: var(--c-ink3);
+            padding: 4px 0;
+            display: none;
+        }
+
+        select:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         footer {
             text-align: center;
             padding: 1.25rem 1rem;
@@ -598,6 +610,81 @@
             color: var(--c-ink3);
             border-top: 1px solid var(--c-border);
             margin-top: 0.5rem;
+        }
+
+        .addr-search-wrap {
+            position: relative;
+        }
+
+        .addr-search-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid var(--c-border);
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--c-ink);
+            background: var(--c-bg);
+            outline: none;
+            min-height: 44px;
+            cursor: text;
+        }
+
+        .addr-search-input:focus {
+            border-color: var(--c-green);
+            box-shadow: 0 0 0 3px rgba(26, 107, 66, .1);
+            background: #fff;
+        }
+
+        .addr-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #fff;
+            border: 1.5px solid var(--c-green);
+            border-radius: 8px;
+            box-shadow: var(--sh-md);
+            z-index: 100;
+            max-height: 220px;
+            overflow-y: auto;
+            margin-top: 2px;
+        }
+
+        .addr-dropdown.open {
+            display: block;
+        }
+
+        .addr-option {
+            padding: 10px 12px;
+            font-size: 13px;
+            color: var(--c-ink2);
+            cursor: pointer;
+            transition: background .1s;
+            border-bottom: 1px solid #f0f0ee;
+        }
+
+        .addr-option:last-child {
+            border-bottom: none;
+        }
+
+        .addr-option:hover,
+        .addr-option.active {
+            background: var(--c-green-lt);
+            color: var(--c-green);
+        }
+
+        .addr-option small {
+            font-size: 11px;
+            color: var(--c-ink3);
+            display: block;
+            margin-top: 1px;
+        }
+
+        .addr-no-result {
+            padding: 10px 12px;
+            font-size: 13px;
+            color: var(--c-ink3);
         }
     </style>
 </head>
@@ -736,25 +823,53 @@
                 <div class="section-title">ที่อยู่</div>
                 <div class="form-grid g3">
                     <div class="form-group">
-                        <label>หมู่บ้าน</label><input type="text" id="c-village" placeholder="หมู่ที่..." />
+                        <label>หมู่บ้าน</label>
+                        <div class="addr-search-wrap">
+                            <input type="text" class="addr-search-input" id="c-village-search"
+                                placeholder="พิมพ์ค้นหาหมู่บ้าน..." oninput="searchVillage('c', this.value)"
+                                onfocus="openVillageDD('c')" autocomplete="off" />
+                            <div class="addr-dropdown" id="c-village-dd"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>ตำบล</label>
+                        <select id="c-subdistrict-sel" onchange="onSubdistrictChange('c')" disabled>
+                            <option value="">-- เลือกตำบล --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>อำเภอ</label>
+                        <select id="c-district-sel" onchange="onDistrictChange('c')" disabled>
+                            <option value="">-- เลือกอำเภอ --</option>
+                        </select>
                     </div>
                     <div class="form-group">
-                        <label>ตำบล</label><input type="text" id="c-subdistrict" placeholder="ตำบล" />
+                        <label>จังหวัด</label>
+                        <select id="c-province-sel" onchange="onProvinceChange('c')" disabled>
+                            <option value="">-- เลือกจังหวัด --</option>
+                        </select>
+                    </div>
+
+
+
+                    <div class="form-group">
+                        <label>Latitude</label>
+                        <input type="number" id="c-lat" placeholder="12.xxxxx" step="0.000001" />
                     </div>
                     <div class="form-group">
-                        <label>อำเภอ</label><input type="text" id="c-district" placeholder="อำเภอ" />
+                        <label>Longitude</label>
+                        <input type="number" id="c-lon" placeholder="99.xxxxx" step="0.000001" />
                     </div>
-                    <div class="form-group">
-                        <label>จังหวัด</label><input type="text" id="c-province" placeholder="จังหวัด" />
-                    </div>
-                    <div class="form-group">
-                        <label>Latitude</label><input type="number" id="c-lat" placeholder="12.xxxxx" step="0.000001" />
-                    </div>
-                    <div class="form-group">
-                        <label>Longitude</label><input type="number" id="c-lon" placeholder="99.xxxxx"
-                            step="0.000001" />
-                    </div>
+
+
                 </div>
+                <!-- hidden fields -->
+                <input type="hidden" id="c-village" />
+                <input type="hidden" id="c-subdistrict" />
+                <input type="hidden" id="c-district" />
+                <input type="hidden" id="c-province" />
 
                 <div class="section-title">รายการความเสียหาย</div>
                 <table class="damage-table">
@@ -886,15 +1001,29 @@
                 <div class="section-title">สถานที่</div>
                 <div class="form-grid g3">
                     <div class="form-group">
-                        <label>ตำบล</label><input type="text" id="ca-subdistrict" placeholder="ตำบล" />
+                        <label>ตำบล</label>
+                        <div class="addr-search-wrap">
+                            <input type="text" class="addr-search-input" id="ca-subdistrict-search"
+                                placeholder="พิมพ์ค้นหาตำบล..." oninput="searchSubdistrict('ca', this.value)"
+                                onfocus="openSubdistrictDD('ca')" autocomplete="off" />
+                            <div class="addr-dropdown" id="ca-subdistrict-dd"></div>
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label>อำเภอ</label><input type="text" id="ca-district" placeholder="อำเภอ" />
+                        <label>อำเภอ</label>
+                        <input type="text" id="ca-district-display" readonly placeholder="อำเภอ"
+                            style="background:#f5f5f5;cursor:default" />
                     </div>
                     <div class="form-group">
-                        <label>จังหวัด</label><input type="text" id="ca-province" placeholder="จังหวัด" />
+                        <label>จังหวัด</label>
+                        <input type="text" id="ca-province-display" readonly placeholder="จังหวัด"
+                            style="background:#f5f5f5;cursor:default" />
                     </div>
                 </div>
+                <input type="hidden" id="ca-subdistrict" />
+                <input type="hidden" id="ca-district" />
+                <input type="hidden" id="ca-province" />
+
 
                 <div class="form-grid" style="margin-top: 0.875rem">
                     <div class="form-group">
@@ -978,19 +1107,42 @@
 
                 <div class="section-title">สถานที่</div>
                 <div class="form-grid g3">
+
+
                     <div class="form-group">
-                        <label>บริเวณ</label><input type="text" id="e-area" placeholder="ระบุบริเวณ" />
+                        <label>บริเวณ</label>
+                        <div class="addr-search-wrap">
+                            <input type="text" class="addr-search-input" id="e-area"
+                                placeholder="พิมพ์ค้นหาหมู่บ้าน/บริเวณ..." oninput="searchVillage('e', this.value)"
+                                onfocus="openVillageDD('e')" autocomplete="off" />
+                            <div class="addr-dropdown" id="e-village-dd"></div>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label>ตำบล</label>
+                        <div class="addr-search-wrap">
+                            <input type="text" class="addr-search-input" id="e-subdistrict-search"
+                                placeholder="พิมพ์ค้นหาตำบล..." oninput="searchSubdistrict('e', this.value)"
+                                onfocus="openSubdistrictDD('e')" autocomplete="off" />
+                            <div class="addr-dropdown" id="e-subdistrict-dd"></div>
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label>ตำบล</label><input type="text" id="e-subdistrict" placeholder="ตำบล" />
+                        <label>อำเภอ</label>
+                        <input type="text" id="e-district-display" readonly placeholder="อำเภอ"
+                            style="background:#f5f5f5;cursor:default" />
                     </div>
                     <div class="form-group">
-                        <label>อำเภอ</label><input type="text" id="e-district" placeholder="อำเภอ" />
-                    </div>
-                    <div class="form-group full">
-                        <label>จังหวัด</label><input type="text" id="e-province" placeholder="จังหวัด" />
+                        <label>จังหวัด</label>
+                        <input type="text" id="e-province-display" readonly placeholder="จังหวัด"
+                            style="background:#f5f5f5;cursor:default" />
                     </div>
                 </div>
+                <input type="hidden" id="e-subdistrict" />
+                <input type="hidden" id="e-district" />
+                <input type="hidden" id="e-province" />
 
                 <div class="form-grid" style="margin-top: 0.875rem">
                     <div class="form-group full">
@@ -1341,6 +1493,353 @@
                 btn.innerHTML = "<span>💾 บันทึก</span>";
             }
         }
+
+        let ADDRESS_DATA = [];
+
+        async function loadAddress() {
+            const { data, error } = await sb.from('address').select('*');
+            if (!error && data) {
+                ADDRESS_DATA = data;
+                buildProvinceDropdowns();
+                buildVillageDropdowns();
+            }
+        }
+
+        function buildProvinceDropdowns() {
+            console.log('building dropdowns, data length:', ADDRESS_DATA.length);
+            const provinces = [...new Map(
+                ADDRESS_DATA.map(r => [r.provincecode, r.provinceth])
+            ).entries()].sort((a, b) => a[1].localeCompare(b[1], 'th'));
+
+            console.log('provinces:', provinces);
+
+            ['c', 'ca', 'e'].forEach(prefix => {
+                const sel = document.getElementById(`${prefix}-province-sel`);
+                console.log(`${prefix}-province-sel:`, sel);
+                if (!sel) return;
+                sel.innerHTML = '<option value="">-- เลือกจังหวัด --</option>';
+                provinces.forEach(([code, name]) => {
+                    const o = document.createElement('option');
+                    o.value = code; o.textContent = name;
+                    sel.appendChild(o);
+                });
+            });
+        }
+
+        function buildVillageDropdowns() {
+            const villages = [...ADDRESS_DATA].sort((a, b) =>
+                a.villagenames.localeCompare(b.villagenames, 'th'));
+
+            ['c', 'ca', 'e'].forEach(prefix => {
+                const sel = document.getElementById(`${prefix}-village-sel`);
+                if (!sel) return;
+                sel.innerHTML = '<option value="">-- เลือกหมู่บ้าน --</option>';
+                villages.forEach(r => {
+                    const o = document.createElement('option');
+                    o.value = r.villagecode;
+                    o.textContent = `${r.villagenames} (${r.subdistrictth}, ${r.districtth})`;
+                    o.dataset.province = r.provinceth;
+                    o.dataset.district = r.districtth;
+                    o.dataset.subdistrict = r.subdistrictth;
+                    o.dataset.provincecode = r.provincecode;
+                    o.dataset.districtcode = r.districtcode;
+                    o.dataset.subdistcode = r.subdistcode;
+                    sel.appendChild(o);
+                });
+            });
+        }
+
+        function onProvinceChange(prefix) {
+            const pvCode = document.getElementById(`${prefix}-province-sel`).value;
+            const pvName = document.getElementById(`${prefix}-province-sel`).selectedOptions[0]?.text || '';
+            document.getElementById(`${prefix}-province`).value = pvName;
+
+            // reset อำเภอ ตำบล หมู่บ้าน
+            resetDistrict(prefix);
+
+            if (!pvCode) return;
+
+            const dSel = document.getElementById(`${prefix}-district-sel`);
+            const districts = [...new Map(
+                ADDRESS_DATA.filter(r => r.provincecode === pvCode)
+                    .map(r => [r.districtcode, r.districtth])
+            ).entries()].sort((a, b) => a[1].localeCompare(b[1], 'th'));
+            districts.forEach(([code, name]) => {
+                const o = document.createElement('option'); o.value = code; o.textContent = name;
+                dSel.appendChild(o);
+            });
+
+            // filter หมู่บ้านตามจังหวัด
+            filterVillages(prefix, pvCode, null, null);
+        }
+
+        function onDistrictChange(prefix) {
+            const pvCode = document.getElementById(`${prefix}-province-sel`).value;
+            const dtCode = document.getElementById(`${prefix}-district-sel`).value;
+            const dtName = document.getElementById(`${prefix}-district-sel`).selectedOptions[0]?.text || '';
+            document.getElementById(`${prefix}-district`).value = dtName;
+
+            resetSubdistrict(prefix);
+
+            if (!dtCode) { filterVillages(prefix, pvCode, null, null); return; }
+
+            const sSel = document.getElementById(`${prefix}-subdistrict-sel`);
+            if (sSel) {
+                const subdistricts = [...new Map(
+                    ADDRESS_DATA.filter(r => r.provincecode === pvCode && r.districtcode === dtCode)
+                        .map(r => [r.subdistcode, r.subdistrictth])
+                ).entries()].sort((a, b) => a[1].localeCompare(b[1], 'th'));
+                subdistricts.forEach(([code, name]) => {
+                    const o = document.createElement('option'); o.value = code; o.textContent = name;
+                    sSel.appendChild(o);
+                });
+            }
+
+            filterVillages(prefix, pvCode, dtCode, null);
+        }
+
+        function onSubdistrictChange(prefix) {
+            const pvCode = document.getElementById(`${prefix}-province-sel`).value;
+            const dtCode = document.getElementById(`${prefix}-district-sel`).value;
+            const sdCode = document.getElementById(`${prefix}-subdistrict-sel`).value;
+            const sdName = document.getElementById(`${prefix}-subdistrict-sel`).selectedOptions[0]?.text || '';
+            document.getElementById(`${prefix}-subdistrict`).value = sdName;
+
+            const vSel = document.getElementById(`${prefix}-village-sel`);
+            if (vSel) {
+                vSel.innerHTML = '<option value="">-- เลือกหมู่บ้าน --</option>';
+                if (document.getElementById(`${prefix}-village`)) document.getElementById(`${prefix}-village`).value = '';
+            }
+
+            filterVillages(prefix, pvCode, dtCode, sdCode);
+        }
+
+        function onVillageChange(prefix) {
+            const sel = document.getElementById(`${prefix}-village-sel`);
+            const opt = sel.selectedOptions[0];
+            if (!opt || !opt.value) return;
+
+            // auto fill จังหวัด อำเภอ ตำบล
+            const pvCode = opt.dataset.provincecode;
+            const dtCode = opt.dataset.districtcode;
+            const sdCode = opt.dataset.subdistcode;
+
+            // set province
+            const pSel = document.getElementById(`${prefix}-province-sel`);
+            pSel.value = pvCode;
+            document.getElementById(`${prefix}-province`).value = opt.dataset.province;
+
+            // build & set district
+            const dSel = document.getElementById(`${prefix}-district-sel`);
+            dSel.innerHTML = '<option value="">-- เลือกอำเภอ --</option>';
+            [...new Map(ADDRESS_DATA.filter(r => r.provincecode === pvCode).map(r => [r.districtcode, r.districtth])).entries()]
+                .sort((a, b) => a[1].localeCompare(b[1], 'th'))
+                .forEach(([code, name]) => {
+                    const o = document.createElement('option'); o.value = code; o.textContent = name;
+                    dSel.appendChild(o);
+                });
+            dSel.value = dtCode;
+            document.getElementById(`${prefix}-district`).value = opt.dataset.district;
+
+            // build & set subdistrict
+            const sSel = document.getElementById(`${prefix}-subdistrict-sel`);
+            if (sSel) {
+                sSel.innerHTML = '<option value="">-- เลือกตำบล --</option>';
+                [...new Map(ADDRESS_DATA.filter(r => r.provincecode === pvCode && r.districtcode === dtCode).map(r => [r.subdistcode, r.subdistrictth])).entries()]
+                    .sort((a, b) => a[1].localeCompare(b[1], 'th'))
+                    .forEach(([code, name]) => {
+                        const o = document.createElement('option'); o.value = code; o.textContent = name;
+                        sSel.appendChild(o);
+                    });
+                sSel.value = sdCode;
+                document.getElementById(`${prefix}-subdistrict`).value = opt.dataset.subdistrict;
+            }
+
+            if (document.getElementById(`${prefix}-village`))
+                document.getElementById(`${prefix}-village`).value = opt.text.split(' (')[0];
+        }
+
+        function filterVillages(prefix, pvCode, dtCode, sdCode) {
+            const vSel = document.getElementById(`${prefix}-village-sel`);
+            if (!vSel) return;
+            vSel.innerHTML = '<option value="">-- เลือกหมู่บ้าน --</option>';
+            if (document.getElementById(`${prefix}-village`)) document.getElementById(`${prefix}-village`).value = '';
+
+            let filtered = ADDRESS_DATA;
+            if (pvCode) filtered = filtered.filter(r => r.provincecode === pvCode);
+            if (dtCode) filtered = filtered.filter(r => r.districtcode === dtCode);
+            if (sdCode) filtered = filtered.filter(r => r.subdistcode === sdCode);
+
+            filtered.sort((a, b) => a.villagenames.localeCompare(b.villagenames, 'th'))
+                .forEach(r => {
+                    const o = document.createElement('option');
+                    o.value = r.villagecode;
+                    o.textContent = pvCode && dtCode && sdCode
+                        ? r.villagenames
+                        : `${r.villagenames} (${r.subdistrictth}, ${r.districtth})`;
+                    o.dataset.province = r.provinceth;
+                    o.dataset.district = r.districtth;
+                    o.dataset.subdistrict = r.subdistrictth;
+                    o.dataset.provincecode = r.provincecode;
+                    o.dataset.districtcode = r.districtcode;
+                    o.dataset.subdistcode = r.subdistcode;
+                    vSel.appendChild(o);
+                });
+        }
+
+        function searchSubdistrict(prefix, q) {
+            const dd = document.getElementById(`${prefix}-subdistrict-dd`);
+            let filtered = ADDRESS_DATA;
+            if (q) filtered = filtered.filter(r =>
+                r.subdistrictth.includes(q) ||
+                r.districtth.includes(q) ||
+                r.provinceth.includes(q)
+            );
+            filtered = [...new Map(filtered.map(r => [r.subdistcode, r])).values()]
+                .sort((a, b) => a.subdistrictth.localeCompare(b.subdistrictth, 'th'))
+                .slice(0, 50);
+
+            if (!filtered.length) {
+                dd.innerHTML = '<div class="addr-no-result">ไม่พบข้อมูล</div>';
+            } else {
+                dd.innerHTML = filtered.map(r => `
+            <div class="addr-option" onclick="selectSubdistrict('${prefix}','${r.subdistcode}','${r.subdistrictth}','${r.districtth}','${r.provinceth}')">
+                ${r.subdistrictth}
+                <small>${r.districtth} · ${r.provinceth}</small>
+            </div>`).join('');
+            }
+            dd.classList.add('open');
+        }
+
+        function openSubdistrictDD(prefix) {
+            searchSubdistrict(prefix, document.getElementById(`${prefix}-subdistrict-search`).value);
+        }
+
+        function selectSubdistrict(prefix, code, subdistrict, district, province) {
+            document.getElementById(`${prefix}-subdistrict-search`).value = subdistrict;
+            document.getElementById(`${prefix}-subdistrict-dd`).classList.remove('open');
+            document.getElementById(`${prefix}-subdistrict`).value = subdistrict;
+            document.getElementById(`${prefix}-district`).value = district;
+            document.getElementById(`${prefix}-province`).value = province;
+            document.getElementById(`${prefix}-district-display`).value = district;
+            document.getElementById(`${prefix}-province-display`).value = province;
+        }
+
+
+        function resetDistrict(prefix) {
+            const dSel = document.getElementById(`${prefix}-district-sel`);
+            if (dSel) dSel.innerHTML = '<option value="">-- เลือกอำเภอ --</option>';
+            document.getElementById(`${prefix}-district`).value = '';
+            resetSubdistrict(prefix);
+        }
+
+        function resetSubdistrict(prefix) {
+            const sSel = document.getElementById(`${prefix}-subdistrict-sel`);
+            if (sSel) sSel.innerHTML = '<option value="">-- เลือกตำบล --</option>';
+            document.getElementById(`${prefix}-subdistrict`).value = '';
+            const vSel = document.getElementById(`${prefix}-village-sel`);
+            if (vSel) vSel.innerHTML = '<option value="">-- เลือกหมู่บ้าน --</option>';
+            if (document.getElementById(`${prefix}-village`)) document.getElementById(`${prefix}-village`).value = '';
+        }
+
+        function searchVillage(prefix, q) {
+            const dd = document.getElementById(`${prefix}-village-dd`);
+            const pvCode = document.getElementById(`${prefix}-province-sel`)?.value || '';
+            const dtCode = document.getElementById(`${prefix}-district-sel`)?.value || '';
+            const sdCode = document.getElementById(`${prefix}-subdistrict-sel`)?.value || '';
+
+            let filtered = ADDRESS_DATA;
+            if (pvCode) filtered = filtered.filter(r => r.provincecode === pvCode);
+            if (dtCode) filtered = filtered.filter(r => r.districtcode === dtCode);
+            if (sdCode) filtered = filtered.filter(r => r.subdistcode === sdCode);
+            if (q) filtered = filtered.filter(r =>
+                r.villagenames.toLowerCase().includes(q.toLowerCase()) ||
+                r.subdistrictth.toLowerCase().includes(q.toLowerCase()) ||
+                r.districtth.toLowerCase().includes(q.toLowerCase())
+            );
+
+            filtered = filtered.slice(0, 50).sort((a, b) => a.villagenames.localeCompare(b.villagenames, 'th'));
+
+            if (!filtered.length) {
+                dd.innerHTML = '<div class="addr-no-result">ไม่พบข้อมูล</div>';
+            } else {
+                dd.innerHTML = filtered.map(r => `
+            <div class="addr-option" onclick="selectVillage('${prefix}', '${r.villagecode}', '${r.villagenames}', '${r.subdistrictth}', '${r.districtth}', '${r.provinceth}', '${r.subdistcode}', '${r.districtcode}', '${r.provincecode}')">
+                ${r.villagenames}
+                <small>${r.subdistrictth} · ${r.districtth} · ${r.provinceth}</small>
+            </div>`).join('');
+            }
+            dd.classList.add('open');
+        }
+
+        function openVillageDD(prefix) {
+            const inputId = prefix === 'e' ? `${prefix}-area` : `${prefix}-village-search`;
+            const q = document.getElementById(inputId)?.value || '';
+            searchVillage(prefix, q);
+        }
+
+        function selectVillage(prefix, code, name, subdistrict, district, province, sdCode, dtCode, pvCode) {
+            // set input
+            if (prefix === 'e') {
+                document.getElementById('e-area').value = name;
+                document.getElementById('e-village-dd').classList.remove('open');
+            } else {
+                document.getElementById(`${prefix}-village-search`).value = name;
+                document.getElementById(`${prefix}-village-dd`).classList.remove('open');
+                if (document.getElementById(`${prefix}-village`))
+                    document.getElementById(`${prefix}-village`).value = name;
+            }
+
+            document.getElementById(`${prefix}-subdistrict`).value = subdistrict;
+            document.getElementById(`${prefix}-district`).value = district;
+            document.getElementById(`${prefix}-province`).value = province;
+
+            // auto fill district/province display สำหรับ e และ ca
+            if (document.getElementById(`${prefix}-district-display`))
+                document.getElementById(`${prefix}-district-display`).value = district;
+            if (document.getElementById(`${prefix}-province-display`))
+                document.getElementById(`${prefix}-province-display`).value = province;
+
+            // auto fill subdistrict search
+            if (document.getElementById(`${prefix}-subdistrict-search`))
+                document.getElementById(`${prefix}-subdistrict-search`).value = subdistrict;
+
+            const pSel = document.getElementById(`${prefix}-province-sel`);
+            if (pSel) pSel.value = pvCode;
+
+            const dSel = document.getElementById(`${prefix}-district-sel`);
+            if (dSel) {
+                dSel.innerHTML = '<option value="">-- เลือกอำเภอ --</option>';
+                [...new Map(ADDRESS_DATA.filter(r => r.provincecode === pvCode).map(r => [r.districtcode, r.districtth])).entries()]
+                    .sort((a, b) => a[1].localeCompare(b[1], 'th'))
+                    .forEach(([c, n]) => { const o = document.createElement('option'); o.value = c; o.textContent = n; dSel.appendChild(o); });
+                dSel.value = dtCode;
+            }
+
+            const sSel = document.getElementById(`${prefix}-subdistrict-sel`);
+            if (sSel) {
+                sSel.innerHTML = '<option value="">-- เลือกตำบล --</option>';
+                [...new Map(ADDRESS_DATA.filter(r => r.provincecode === pvCode && r.districtcode === dtCode).map(r => [r.subdistcode, r.subdistrictth])).entries()]
+                    .sort((a, b) => a[1].localeCompare(b[1], 'th'))
+                    .forEach(([c, n]) => { const o = document.createElement('option'); o.value = c; o.textContent = n; sSel.appendChild(o); });
+                sSel.value = sdCode;
+            }
+        }
+
+        // ปิด dropdown เมื่อคลิกที่อื่น
+        document.addEventListener('click', e => {
+            if (!e.target.closest('.addr-search-wrap')) {
+                document.querySelectorAll('.addr-dropdown').forEach(dd => dd.classList.remove('open'));
+            }
+        });
+
+        function showApp(email) {
+            document.getElementById("login-screen").classList.remove("show");
+            document.getElementById("app-screen").style.display = "block";
+            document.getElementById("user-email").textContent = email;
+            loadAddress(); // เพิ่มบรรทัดนี้
+        }
+
 
         function resetForm(type) {
             const prefix = { compensation: "c-", casualty: "ca-", elephant: "e-" }[

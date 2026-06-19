@@ -1,0 +1,1550 @@
+<!doctype html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>หมู่บ้านเครือข่ายเฝ้าระวัง — อุทยานแห่งชาติแก่งกระจาน</title>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.45.2/dist/apexcharts.min.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        :root {
+            --c-bg: #f0f3ef;
+            --c-card: #ffffff;
+            --c-hdr-a: #0d2416;
+            --c-hdr-b: #133a22;
+            --c-green: #1a6b42;
+            --c-green-lt: #d4eddf;
+            --c-amber: #b86a00;
+            --c-amber-lt: #fdf0d5;
+            --c-red: #b52222;
+            --c-red-lt: #fde8e8;
+            --c-blue: #1a4faa;
+            --c-blue-lt: #dbeafe;
+            --c-border: #dde3d9;
+            --c-ink: #111b14;
+            --c-ink2: #3d5045;
+            --c-ink3: #7a927f;
+            --ff: "IBM Plex Sans Thai", "Sarabun", sans-serif;
+            --ff-mono: "DM Mono", monospace;
+            --r: 10px;
+            --r-lg: 16px;
+            --sh:
+                0 1px 3px rgba(13, 36, 22, 0.06), 0 6px 18px rgba(13, 36, 22, 0.04);
+            --sh-md:
+                0 4px 12px rgba(13, 36, 22, 0.08), 0 16px 40px rgba(13, 36, 22, 0.06);
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--ff);
+            background: var(--c-bg);
+            color: var(--c-ink);
+            font-size: 14px;
+            line-height: 1.65;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        button,
+        select,
+        input {
+            font-family: var(--ff);
+            cursor: pointer;
+        }
+
+        /* LOADING */
+        .loading-screen {
+            position: fixed;
+            inset: 0;
+            background: var(--c-bg);
+            z-index: 998;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .loader {
+            display: block;
+            width: 84px;
+            height: 84px;
+            position: relative;
+        }
+
+        .loader:before,
+        .loader:after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: var(--c-green);
+            transform: translate(-50%, -100%) scale(0);
+            animation: push_401 2s infinite linear;
+        }
+
+        .loader:after {
+            animation-delay: 1s;
+        }
+
+        @keyframes push_401 {
+
+            0%,
+            50% {
+                transform: translate(-50%, 0%) scale(1);
+            }
+
+            100% {
+                transform: translate(-50%, -100%) scale(0);
+            }
+        }
+
+        .loading-text {
+            font-size: 13px;
+            color: var(--c-ink3);
+        }
+
+        /* HEADER */
+        .hdr {
+            background: linear-gradient(135deg,
+                    var(--c-hdr-a) 0%,
+                    var(--c-hdr-b) 100%);
+            position: relative;
+            overflow: hidden;
+            padding: 0 2rem;
+        }
+
+        .hdr::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.025'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .hdr-inner {
+            max-width: 1360px;
+            margin: 0 auto;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            position: relative;
+        }
+
+        .hdr-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .hdr-badge {
+            width: 42px;
+            height: 42px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .hdr-title h1 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+            letter-spacing: -0.01em;
+        }
+
+        .hdr-title p {
+            font-size: 11.5px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 1px;
+        }
+
+        .hdr {
+            background: linear-gradient(135deg, var(--c-hdr-a), var(--c-hdr-b));
+            position: relative;
+            overflow: hidden;
+            padding: 0 1rem;
+        }
+
+        .hdr::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.025'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .hdr-inner {
+            max-width: 1360px;
+            margin: 0 auto;
+            min-height: 58px;
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            position: relative;
+            flex-wrap: wrap;
+        }
+
+        .hdr-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .hdr-badge {
+            width: 36px;
+            height: 36px;
+            flex-shrink: 0;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .hdr-title h1 {
+            font-size: 13px;
+            font-weight: 600;
+            color: #fff;
+            letter-spacing: -0.01em;
+            line-height: 1.3;
+        }
+
+        .hdr-title p {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 2px;
+        }
+
+        .hdr-right {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            padding-bottom: 1px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .hdr-right::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hdr-right a {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 20px;
+            padding: 4px 10px;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            white-space: nowrap;
+            flex-shrink: 0;
+            transition: background 0.15s;
+        }
+
+        .hdr-right a:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 20px;
+            padding: 4px 14px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.15s;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* INSIGHTS */
+        .insights-bar {
+            background: var(--c-hdr-b);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+            padding: 0 2rem;
+        }
+
+        .insights-inner {
+            max-width: 1360px;
+            margin: 0 auto;
+            display: flex;
+            gap: 0;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .insights-inner::-webkit-scrollbar {
+            display: none;
+        }
+
+        .insight {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px 10px 0;
+            border-right: 1px solid rgba(255, 255, 255, 0.07);
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+
+        .insight:last-child {
+            border-right: none;
+        }
+
+        .insight-ico {
+            font-size: 16px;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            flex-shrink: 0;
+        }
+
+        .insight-ico.info {
+            background: rgba(74, 222, 128, 0.15);
+        }
+
+        .insight-ico.warn {
+            background: rgba(251, 191, 36, 0.15);
+        }
+
+        .insight-ico.danger {
+            background: rgba(239, 68, 68, 0.15);
+        }
+
+        .insight-txt {
+            font-size: 11.5px;
+        }
+
+        .insight-txt strong {
+            color: #fff;
+            font-weight: 500;
+            display: block;
+            line-height: 1.3;
+        }
+
+        .insight-txt span {
+            color: rgba(255, 255, 255, 0.45);
+            font-size: 10.5px;
+        }
+
+        /* MAIN */
+        main {
+            max-width: 1360px;
+            margin: 0 auto;
+            padding: 1.5rem 2rem 3rem;
+        }
+
+        @media(max-width:768px) {
+            .hdr-inner {
+                height: auto;
+                padding: 12px 0;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .hdr-right {
+                overflow-x: auto;
+                scrollbar-width: none;
+                padding-bottom: 2px;
+                -webkit-overflow-scrolling: touch;
+                gap: 5px;
+                width: 100%
+            }
+
+            .hdr-right::-webkit-scrollbar {
+                display: none
+            }
+
+            .nav-link {
+                font-size: 11px;
+                padding: 4px 10px;
+                white-space: nowrap;
+                flex-shrink: 0
+            }
+
+            .hdr-title h1 {
+                font-size: 13px;
+            }
+
+            .hdr-title p {
+                display: none;
+            }
+
+            main {
+                padding: 0.75rem;
+            }
+
+            .kpi-row {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+
+            .kpi-val {
+                font-size: 22px;
+            }
+
+            .g-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-row {
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .filter-group {
+                flex: 1 1 calc(50% - 4px);
+                min-width: 0;
+            }
+
+            select.filter-select {
+                width: 100%;
+                min-width: 0;
+            }
+
+            .filter-row>div:last-child {
+                flex: 1 1 100%;
+                margin-left: 0;
+            }
+
+            select.filter-select {
+                min-width: 100%;
+            }
+
+            #map {
+                height: 300px;
+            }
+
+            .tbl-search {
+                width: 100%;
+            }
+
+            .tbl-hd {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .insights-inner {
+                gap: 0;
+            }
+
+            .insight {
+                padding: 8px 12px 8px 0;
+                margin-right: 12px;
+            }
+        }
+
+        /* FILTER */
+        .filter-card {
+            background: var(--c-card);
+            border-radius: var(--r-lg);
+            padding: 1rem 1.25rem;
+            box-shadow: var(--sh);
+            margin-bottom: 1.25rem;
+            border: 1px solid var(--c-border);
+        }
+
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            gap: 1rem;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .filter-group label {
+            font-size: 10.5px;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--c-ink3);
+        }
+
+        select.filter-select {
+            padding: 7px 12px;
+            border: 1.5px solid var(--c-border);
+            border-radius: 8px;
+            font-size: 13px;
+            color: var(--c-ink);
+            background: var(--c-bg);
+            outline: none;
+            min-width: 160px;
+            transition: border-color 0.15s;
+        }
+
+        select.filter-select:focus {
+            border-color: var(--c-green);
+        }
+
+        .btn-reset {
+            padding: 7px 16px;
+            border-radius: 20px;
+            border: 1px solid var(--c-border);
+            background: transparent;
+            font-size: 12.5px;
+            color: var(--c-ink3);
+            transition: all 0.15s;
+        }
+
+        .btn-reset:hover {
+            border-color: var(--c-red);
+            color: var(--c-red);
+        }
+
+        .filter-summary {
+            font-size: 11.5px;
+            color: var(--c-ink3);
+            white-space: nowrap;
+        }
+
+        .filter-summary strong {
+            color: var(--c-green);
+            font-weight: 600;
+        }
+
+        /* KPI */
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 1.25rem;
+        }
+
+        @media (max-width: 900px) {
+            .kpi-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .kpi {
+            background: var(--c-card);
+            border-radius: var(--r-lg);
+            padding: 1.1rem 1.25rem 1.25rem;
+            box-shadow: var(--sh);
+            border: 1px solid var(--c-border);
+            position: relative;
+            overflow: hidden;
+            transition:
+                transform 0.2s,
+                box-shadow 0.2s;
+        }
+
+        .kpi:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--sh-md);
+        }
+
+        .kpi::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            border-radius: 3px 3px 0 0;
+        }
+
+        .kpi.g::after {
+            background: linear-gradient(90deg, #059669, #34d399);
+        }
+
+        .kpi.b::after {
+            background: linear-gradient(90deg, #1a4faa, #60a5fa);
+        }
+
+        .kpi.a::after {
+            background: linear-gradient(90deg, #d97706, #fbbf24);
+        }
+
+        .kpi.r::after {
+            background: linear-gradient(90deg, #dc2626, #f87171);
+        }
+
+        .kpi-lbl {
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.04em;
+            color: var(--c-ink3);
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .kpi-val {
+            font-family: var(--ff-mono);
+            font-size: 28px;
+            font-weight: 500;
+            letter-spacing: -0.02em;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .kpi.g .kpi-val {
+            color: #059669;
+        }
+
+        .kpi.b .kpi-val {
+            color: #1a4faa;
+        }
+
+        .kpi.a .kpi-val {
+            color: #b45309;
+        }
+
+        .kpi.r .kpi-val {
+            color: #dc2626;
+        }
+
+        .kpi-sub {
+            font-size: 11.5px;
+            color: var(--c-ink3);
+        }
+
+        .kpi-ico {
+            position: absolute;
+            right: 14px;
+            top: 14px;
+            font-size: 24px;
+            opacity: 0.1;
+        }
+
+        /* CARD */
+        .card {
+            background: var(--c-card);
+            border-radius: var(--r-lg);
+            padding: 1.25rem 1.5rem;
+            box-shadow: var(--sh);
+            border: 1px solid var(--c-border);
+            margin-bottom: 1.25rem;
+        }
+
+        .card-hd {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 4px;
+            gap: 8px;
+        }
+
+        .card-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--c-ink);
+            letter-spacing: -0.01em;
+        }
+
+        .card-sub {
+            font-size: 11.5px;
+            color: var(--c-ink3);
+            margin-bottom: 12px;
+        }
+
+        .chip {
+            font-size: 10px;
+            padding: 2px 9px;
+            border-radius: 20px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .chip-g {
+            background: var(--c-green-lt);
+            color: var(--c-green);
+        }
+
+        .chip-b {
+            background: var(--c-blue-lt);
+            color: var(--c-blue);
+        }
+
+        .g-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+        }
+
+        /* TABLE */
+        .tbl-hd {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tbl-search {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--c-bg);
+            border: 1px solid var(--c-border);
+            border-radius: 8px;
+            padding: 6px 12px;
+            width: 280px;
+        }
+
+        .tbl-search input {
+            border: none;
+            background: transparent;
+            font-family: var(--ff);
+            font-size: 13px;
+            color: var(--c-ink);
+            outline: none;
+            width: 100%;
+        }
+
+        .tbl-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12.5px;
+        }
+
+        th {
+            padding: 9px 12px;
+            text-align: left;
+            font-size: 10.5px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--c-ink3);
+            border-bottom: 2px solid var(--c-border);
+            white-space: nowrap;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        th:hover {
+            color: var(--c-green);
+        }
+
+        th .sort-ico {
+            margin-left: 4px;
+            opacity: 0.4;
+            font-size: 10px;
+        }
+
+        th.sorted .sort-ico {
+            opacity: 1;
+            color: var(--c-green);
+        }
+
+        td {
+            padding: 9px 12px;
+            border-bottom: 1px solid #f0f0ee;
+            color: var(--c-ink2);
+            vertical-align: middle;
+        }
+
+        tr:hover td {
+            background: var(--c-green-lt);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .tbl-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 12px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tbl-info {
+            font-size: 11.5px;
+            color: var(--c-ink3);
+        }
+
+        .tbl-pager {
+            display: flex;
+            gap: 5px;
+        }
+
+        .pg-btn {
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--c-border);
+            background: var(--c-card);
+            font-size: 12px;
+            color: var(--c-ink2);
+            transition: all 0.15s;
+        }
+
+        .pg-btn:hover:not(:disabled) {
+            background: var(--c-green-lt);
+            border-color: var(--c-green);
+            color: var(--c-green);
+        }
+
+        .pg-btn.curr {
+            background: var(--c-green);
+            border-color: var(--c-green);
+            color: #fff;
+        }
+
+        .pg-btn:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        .no-data-msg {
+            text-align: center;
+            padding: 2rem;
+            font-size: 13px;
+            color: var(--c-ink3);
+        }
+
+        /* MAP */
+        #map {
+            height: 480px;
+            border-radius: 10px;
+            margin-top: 8px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1.5rem 2rem;
+            font-size: 11.5px;
+            color: var(--c-ink3);
+            border-top: 1px solid var(--c-border);
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- LOADING -->
+    <div class="loading-screen" id="loading-screen">
+        <span class="loader"></span>
+        <span class="loading-text">กำลังโหลดข้อมูล...</span>
+    </div>
+
+    <header class="hdr">
+        <div class="hdr-inner">
+            <div class="hdr-left">
+                <div class="hdr-badge">🏘️</div>
+                <div class="hdr-title">
+                    <h1>หมู่บ้านเครือข่ายเฝ้าระวังช้างป่า</h1>
+                    <p>
+                        อุทยานแห่งชาติแก่งกระจาน &nbsp;·&nbsp; ข้อมูลหมู่บ้านในเครือข่าย
+                    </p>
+                </div>
+            </div>
+            <div class="hdr-right">
+                <a href="index.html" class="nav-link">💰 เยียวยา</a>
+                <a href="casualty.html" class="nav-link">🩹 บาดเจ็บ/ตาย</a>
+                <a href="elephant_death.html" class="nav-link">🐘 ช้างตาย</a>
+                <a href="village_network.html" class="nav-link">🏘️ หมู่บ้านเครือข่าย</a>
+                <a href="form.html" class="nav-link">📝 กรอกข้อมูล</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="insights-bar">
+        <div class="insights-inner" id="insights-bar"></div>
+    </div>
+
+    <main>
+        <!-- FILTER -->
+        <div class="filter-card">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label>จังหวัด</label>
+                    <select class="filter-select" id="f-province" onchange="onProvinceChange()">
+                        <option value="">ทั้งหมด</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>อำเภอ</label>
+                    <select class="filter-select" id="f-district" onchange="onDistrictChange()">
+                        <option value="">ทั้งหมด</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>ตำบล</label>
+                    <select class="filter-select" id="f-subdistrict" onchange="refresh()">
+                        <option value="">ทั้งหมด</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>ปี</label>
+                    <select class="filter-select" id="f-year" onchange="refresh()">
+                        <option value="">ทั้งหมด</option>
+                    </select>
+                </div>
+                <div style="
+              display: flex;
+              align-items: flex-end;
+              gap: 8px;
+              margin-left: auto;
+            ">
+                    <span class="filter-summary" id="filter-summary"></span>
+                    <button class="btn-reset" onclick="resetAll()">
+                        ✕ ล้างตัวกรอง
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- KPI -->
+        <div class="kpi-row" id="kpi-row"></div>
+
+        <!-- MAP -->
+        <div class="card">
+            <div class="card-hd">
+                <div>
+                    <div class="card-title">แผนที่หมู่บ้านเครือข่าย</div>
+                    <div class="card-sub" style="margin-bottom: 0">
+                        จุดตำแหน่งหมู่บ้านที่มีข้อมูล lat/lon
+                    </div>
+                </div>
+                <span class="chip chip-g" id="chip-map">0 จุด</span>
+            </div>
+            <div id="map"></div>
+        </div>
+
+        <!-- CHARTS -->
+        <div class="g-2">
+            <div class="card">
+                <div class="card-hd">
+                    <span class="card-title">จำนวนหมู่บ้านรายจังหวัด</span>
+                </div>
+                <div class="card-sub">แยกตามจังหวัด</div>
+                <div id="chart-province" style="min-height: 220px"></div>
+            </div>
+            <div class="card">
+                <div class="card-hd">
+                    <span class="card-title">จำนวนหมู่บ้านรายปี</span>
+                </div>
+                <div class="card-sub">แนวโน้มการขยายเครือข่าย</div>
+                <div id="chart-year" style="min-height: 220px"></div>
+            </div>
+        </div>
+
+        <!-- TABLE -->
+        <div class="card">
+            <div class="tbl-hd">
+                <div>
+                    <div class="card-title">รายละเอียดหมู่บ้านทั้งหมด</div>
+                    <div class="card-sub" style="margin-bottom: 0">
+                        คลิกหัวตารางเพื่อเรียงลำดับ
+                    </div>
+                </div>
+                <div class="tbl-search">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="m21 21-4.35-4.35" />
+                    </svg>
+                    <input type="text" id="tbl-search" placeholder="ค้นหาหมู่บ้าน..." oninput="renderTable()" />
+                </div>
+            </div>
+            <div class="tbl-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable('id')">
+                                #<span class="sort-ico">↕</span>
+                            </th>
+                            <th onclick="sortTable('year')">
+                                ปี<span class="sort-ico">↕</span>
+                            </th>
+                            <th onclick="sortTable('village_name')">
+                                ชื่อหมู่บ้าน<span class="sort-ico">↕</span>
+                            </th>
+                            <th onclick="sortTable('moo')">
+                                หมู่ที่<span class="sort-ico">↕</span>
+                            </th>
+                            <th onclick="sortTable('subdistrict')">
+                                ตำบล<span class="sort-ico">↕</span>
+                            </th>
+                            <th onclick="sortTable('district')">
+                                อำเภอ<span class="sort-ico">↕</span>
+                            </th>
+                            <th onclick="sortTable('province')">
+                                จังหวัด<span class="sort-ico">↕</span>
+                            </th>
+                            <th onclick="sortTable('agency')">
+                                หน่วยงาน<span class="sort-ico">↕</span>
+                            </th>
+                            <th>พิกัด</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbl-body"></tbody>
+                </table>
+            </div>
+            <div class="tbl-footer">
+                <span class="tbl-info" id="tbl-info"></span>
+                <div class="tbl-pager" id="tbl-pager"></div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        หมู่บ้านเครือข่ายเฝ้าระวังช้างป่า &nbsp;·&nbsp; อุทยานแห่งชาติแก่งกระจาน
+        &nbsp;·&nbsp; ข้อมูลจาก Supabase
+    </footer>
+
+    <script>
+        const SUPABASE_URL = "https://xzuzpkzxyimcvgninskt.supabase.co";
+        const SUPABASE_KEY =
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6dXpwa3p4eWltY3Znbmluc2t0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MjcwMTksImV4cCI6MjA5NjMwMzAxOX0.P8uSZ4dlhCXyEfSOntD65eTAbYsJWkQ3SQFSsbmJm7k";
+
+        let RAW = [];
+        let MAP_INSTANCE = null;
+        let MAP_LAYER = null;
+        let tableSort = { col: "id", dir: "asc" };
+        let tablePage = 1;
+        const PAGE_SIZE = 12;
+        const CHARTS = {};
+
+        const CHART_DEFAULTS = {
+            fontFamily: "'IBM Plex Sans Thai','Sarabun',sans-serif",
+            toolbar: { show: false },
+            animations: { speed: 350, animateGradually: { enabled: false } },
+        };
+
+        fetch(`${SUPABASE_URL}/rest/v1/village_network?select=*&order=id.asc`, {
+            headers: {
+                apikey: SUPABASE_KEY,
+                Authorization: `Bearer ${SUPABASE_KEY}`,
+            },
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                document.getElementById("loading-screen").style.display = "none";
+                RAW = data.filter((r) => r.id);
+                buildFilters();
+                buildInsights(RAW);
+                buildKPIs(RAW);
+                initMap(RAW);
+                initProvinceChart(RAW);
+                initYearChart(RAW);
+                renderTable();
+                document.getElementById("filter-summary").innerHTML =
+                    `แสดง <strong>${RAW.length}</strong> จาก ${RAW.length} รายการ`;
+            });
+
+        /* FILTER */
+        function getFiltered() {
+            const pv = document.getElementById("f-province").value;
+            const dt = document.getElementById("f-district").value;
+            const sd = document.getElementById("f-subdistrict").value;
+            const yr = document.getElementById("f-year").value;
+            return RAW.filter(
+                (r) =>
+                    (!pv || r.province === pv) &&
+                    (!dt || r.district === dt) &&
+                    (!sd || r.subdistrict === sd) &&
+                    (!yr || String(r.year) === yr),
+            );
+        }
+
+        function buildFilters() {
+            const provinces = [...new Set(RAW.map(r => r.province).filter(Boolean))].sort();
+            const districts = [...new Set(RAW.map(r => r.district).filter(Boolean))].sort();
+            const subdistricts = [...new Set(RAW.map(r => r.subdistrict).filter(Boolean))].sort();
+            const years = [...new Set(RAW.map(r => r.year).filter(Boolean))].sort();
+
+            const pSel = document.getElementById('f-province');
+            provinces.forEach(p => { const o = document.createElement('option'); o.value = p; o.textContent = p; pSel.appendChild(o); });
+
+            const dSel = document.getElementById('f-district');
+            districts.forEach(d => { const o = document.createElement('option'); o.value = d; o.textContent = d; dSel.appendChild(o); });
+
+            const sSel = document.getElementById('f-subdistrict');
+            subdistricts.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; sSel.appendChild(o); });
+
+            const ySel = document.getElementById('f-year');
+            years.forEach(y => { const o = document.createElement('option'); o.value = y; o.textContent = y; ySel.appendChild(o); });
+        }
+
+        function onProvinceChange() {
+            const pv = document.getElementById("f-province").value;
+            const districts = [
+                ...new Set(
+                    RAW.filter((r) => !pv || r.province === pv)
+                        .map((r) => r.district)
+                        .filter(Boolean),
+                ),
+            ].sort();
+            const dSel = document.getElementById("f-district");
+            dSel.innerHTML = '<option value="">ทั้งหมด</option>';
+            districts.forEach((d) => {
+                const o = document.createElement("option");
+                o.value = d;
+                o.textContent = d;
+                dSel.appendChild(o);
+            });
+            document.getElementById("f-subdistrict").innerHTML =
+                '<option value="">ทั้งหมด</option>';
+            refresh();
+        }
+
+        function onDistrictChange() {
+            const pv = document.getElementById("f-province").value;
+            const dt = document.getElementById("f-district").value;
+            const subdistricts = [
+                ...new Set(
+                    RAW.filter(
+                        (r) => (!pv || r.province === pv) && (!dt || r.district === dt),
+                    )
+                        .map((r) => r.subdistrict)
+                        .filter(Boolean),
+                ),
+            ].sort();
+            const sSel = document.getElementById("f-subdistrict");
+            sSel.innerHTML = '<option value="">ทั้งหมด</option>';
+            subdistricts.forEach((s) => {
+                const o = document.createElement("option");
+                o.value = s;
+                o.textContent = s;
+                sSel.appendChild(o);
+            });
+            refresh();
+        }
+
+        function resetAll() {
+            document.getElementById('f-province').value = '';
+            document.getElementById('f-year').value = '';
+
+            const dSel = document.getElementById('f-district');
+            dSel.innerHTML = '<option value="">ทั้งหมด</option>';
+            [...new Set(RAW.map(r => r.district).filter(Boolean))].sort()
+                .forEach(d => { const o = document.createElement('option'); o.value = d; o.textContent = d; dSel.appendChild(o); });
+
+            const sSel = document.getElementById('f-subdistrict');
+            sSel.innerHTML = '<option value="">ทั้งหมด</option>';
+            [...new Set(RAW.map(r => r.subdistrict).filter(Boolean))].sort()
+                .forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; sSel.appendChild(o); });
+
+            refresh();
+        }
+
+        function countBy(arr, fn) {
+            const m = {};
+            arr.forEach((r) => {
+                const k = fn(r);
+                m[k] = (m[k] || 0) + 1;
+            });
+            return m;
+        }
+
+        /* INSIGHTS */
+        function buildInsights(d) {
+            const withCoord = d.filter((r) => r.lat && r.lon).length;
+            const provinces = new Set(d.map((r) => r.province).filter(Boolean))
+                .size;
+            const pvMap = countBy(d, (r) => r.province || "ไม่ระบุ");
+            const topPv = Object.entries(pvMap).sort((a, b) => b[1] - a[1])[0];
+            const items = [
+                {
+                    ico: "🏘️",
+                    cls: "info",
+                    strong: `${d.length} หมู่บ้าน`,
+                    span: `ในเครือข่ายเฝ้าระวัง`,
+                },
+                {
+                    ico: "🗺️",
+                    cls: "warn",
+                    strong: `${provinces} จังหวัด`,
+                    span: topPv ? `มากสุดคือ ${topPv[0]} (${topPv[1]} หมู่บ้าน)` : "",
+                },
+            ];
+            document.getElementById("insights-bar").innerHTML = items
+                .map(
+                    (i) => `
+            <div class="insight">
+              <div class="insight-ico ${i.cls}">${i.ico}</div>
+              <div class="insight-txt"><strong>${i.strong}</strong><span>${i.span}</span></div>
+            </div>`,
+                )
+                .join("");
+        }
+
+        /* KPI */
+        function buildKPIs(d) {
+            const withCoord = d.filter((r) => r.lat && r.lon).length;
+            const provinces = new Set(d.map((r) => r.province).filter(Boolean))
+                .size;
+            const districts = new Set(d.map((r) => r.district).filter(Boolean))
+                .size;
+            document.getElementById("kpi-row").innerHTML = `
+            <div class="kpi b"><div class="kpi-ico">🏘️</div><div class="kpi-lbl">หมู่บ้านทั้งหมด</div><div class="kpi-val">${d.length}</div><div class="kpi-sub">รายการที่กรองแล้ว</div></div>
+            <div class="kpi a"><div class="kpi-ico">🗺️</div><div class="kpi-lbl">จังหวัด</div><div class="kpi-val">${provinces}</div><div class="kpi-sub">จังหวัด</div></div>
+            <div class="kpi r"><div class="kpi-ico">📌</div><div class="kpi-lbl">อำเภอ</div><div class="kpi-val">${districts}</div><div class="kpi-sub">อำเภอ</div></div>
+        `;
+        }
+
+        /* MAP */
+        function initMap(d) {
+            const pts = d.filter((r) => r.lat && r.lon);
+            document.getElementById("chip-map").textContent = pts.length + " จุด";
+
+            const center = pts.length > 0 ? [pts[0].lat, pts[0].lon] : [13.0, 99.5];
+            MAP_INSTANCE = L.map("map").setView(center, pts.length > 0 ? 10 : 8);
+            L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                attribution: "© OpenStreetMap",
+            }).addTo(MAP_INSTANCE);
+
+            MAP_LAYER = L.layerGroup().addTo(MAP_INSTANCE);
+            addMarkers(pts);
+
+            if (pts.length > 1) {
+                const bounds = L.latLngBounds(pts.map((r) => [r.lat, r.lon]));
+                MAP_INSTANCE.fitBounds(bounds, { padding: [40, 40] });
+            }
+        }
+
+        function addMarkers(pts) {
+            pts.forEach((r) => {
+                const icon = L.divIcon({
+                    className: '',
+                    html: `<div style="width:20px;height:20px;background:#1a6b42;border-radius:50% 50% 50% 0;transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;">
+                           <div style="width:10px;height:10px;background:#fff;border-radius:50%;transform:rotate(45deg)"></div>
+                           </div>`,
+                    iconSize: [8, 8],
+                    iconAnchor: [14, 28]
+                });
+                L.marker([r.lat, r.lon], { icon })
+                    .bindPopup(
+                        `
+                    <strong>${r.village_name || "—"}</strong><br>
+                    หมู่ ${r.moo || "—"} ต.${r.subdistrict || "—"}<br>
+                    อ.${r.district || "—"} จ.${r.province || "—"}<br>
+                    <span style="color:#7a927f;font-size:11px">${r.agency || ""}</span>
+                `,
+                    )
+                    .addTo(MAP_LAYER);
+            });
+        }
+
+        function updateMap(d) {
+            if (!MAP_INSTANCE) return;
+            const pts = d.filter(r => r.lat && r.lon);
+            document.getElementById('chip-map').textContent = pts.length + ' จุด';
+            MAP_LAYER.clearLayers();
+            addMarkers(pts);
+            if (pts.length > 1) {
+                const bounds = L.latLngBounds(pts.map(r => [r.lat, r.lon]));
+                MAP_INSTANCE.fitBounds(bounds, { padding: [40, 40], maxZoom: 18 });
+            }
+        }
+
+
+        /* CHART: PROVINCE */
+
+        function initProvinceChart(d) {
+            const m = countBy(d, (r) => r.province || "ไม่ระบุ");
+            const cats = Object.keys(m).sort((a, b) => m[b] - m[a]);
+            const vals = cats.map((c) => m[c]);
+            const colorMap = {
+                "เพชรบุรี": "#59b0f7",
+                "ประจวบคีรีขันธ์": "#f7cf40",
+            };
+
+            const colors = cats.map(c => colorMap[c] || "#1a6b42");
+
+            CHARTS.province = new ApexCharts(
+                document.getElementById("chart-province"),
+                {
+                    ...CHART_DEFAULTS,
+                    series: [{ name: "จำนวนหมู่บ้าน", data: vals }],
+                    chart: {
+                        type: "bar",
+                        height: 220,
+                        fontFamily: CHART_DEFAULTS.fontFamily,
+                        toolbar: { show: false },
+                    },
+                    plotOptions: {
+                        bar: { horizontal: true, borderRadius: 5, barHeight: "60%", distributed: true },
+                    },
+                    xaxis: {
+                        categories: cats,
+                        labels: {
+                            style: {
+                                fontSize: "11px",
+                                fontFamily: CHART_DEFAULTS.fontFamily,
+                            },
+                        },
+                    },
+                    yaxis: {
+                        labels: {
+                            style: {
+                                fontSize: "11px",
+                                fontFamily: CHART_DEFAULTS.fontFamily,
+                            },
+                            maxWidth: 160,
+                        },
+                    },
+                    colors: colors,
+                    legend: { show: false },
+                    dataLabels: {
+                        enabled: true,
+                        offsetX: 8,
+                        style: {
+                            fontSize: "11px",
+                            fontFamily: CHART_DEFAULTS.fontFamily,
+                            colors: ["#475569"],
+                        },
+                        formatter: (v) => v + " หมู่บ้าน",
+                    },
+                    grid: {
+                        borderColor: "#f0f0ee",
+                        xaxis: { lines: { show: true } },
+                        yaxis: { lines: { show: false } },
+                    },
+                    tooltip: { y: { formatter: (v) => v + " หมู่บ้าน" } },
+                },
+            );
+            CHARTS.province.render();
+        }
+
+        function updateProvinceChart(d) {
+            if (!CHARTS.province) return;
+            const m = countBy(d, (r) => r.province || "ไม่ระบุ");
+            const cats = Object.keys(m).sort((a, b) => m[b] - m[a]);
+            const colorMap = {
+                "เพชรบุรี": "#59b0f7",
+                "ประจวบคีรีขันธ์": "#f7cf40",
+            };
+            const colors = cats.map(c => colorMap[c] || "#1a6b42");
+            CHARTS.province.updateOptions({
+                series: [{ data: cats.map((c) => m[c]) }],
+                xaxis: { categories: cats },
+                colors: colors,
+            });
+        }
+
+        /* CHART: YEAR */
+        function initYearChart(d) {
+            const years = [...new Set(d.map((r) => r.year).filter(Boolean))].sort();
+            const vals = years.map((y) => d.filter((r) => r.year === y).length);
+            CHARTS.year = new ApexCharts(document.getElementById("chart-year"), {
+                ...CHART_DEFAULTS,
+                series: [{ name: "จำนวนหมู่บ้าน", data: vals }],
+                chart: {
+                    type: "area",
+                    height: 220,
+                    fontFamily: CHART_DEFAULTS.fontFamily,
+                    toolbar: { show: false },
+                    zoom: { enabled: false },
+                },
+                stroke: { curve: "smooth", width: 2.5 },
+                fill: {
+                    type: "gradient",
+                    gradient: {
+                        shadeIntensity: 0.6,
+                        opacityFrom: 0.35,
+                        opacityTo: 0.02,
+                        stops: [0, 90, 100],
+                    },
+                },
+                colors: ["#1a4faa"],
+                xaxis: {
+                    categories: years.map(String),
+                    labels: {
+                        style: {
+                            fontSize: "11px",
+                            fontFamily: CHART_DEFAULTS.fontFamily,
+                        },
+                    },
+                },
+                yaxis: {
+                    labels: {
+                        style: {
+                            fontSize: "11px",
+                            fontFamily: CHART_DEFAULTS.fontFamily,
+                        },
+                    },
+                    min: 0,
+                },
+                grid: { borderColor: "#f0f0ee" },
+                markers: {
+                    size: 4,
+                    colors: ["#1a4faa"],
+                    strokeColors: "#fff",
+                    strokeWidth: 2,
+                    hover: { size: 6 },
+                },
+                dataLabels: { enabled: false },
+                tooltip: { y: { formatter: (v) => v + " หมู่บ้าน" } },
+            });
+            CHARTS.year.render();
+        }
+
+        function updateYearChart(d) {
+            if (!CHARTS.year) return;
+            const years = [...new Set(d.map((r) => r.year).filter(Boolean))].sort();
+            const vals = years.map((y) => d.filter((r) => r.year === y).length);
+            CHARTS.year.updateOptions({
+                series: [{ data: vals }],
+                xaxis: { categories: years.map(String) },
+            });
+        }
+
+        /* TABLE */
+        function sortTable(col) {
+            if (tableSort.col === col)
+                tableSort.dir = tableSort.dir === "asc" ? "desc" : "asc";
+            else {
+                tableSort.col = col;
+                tableSort.dir = "asc";
+            }
+            tablePage = 1;
+            renderTable();
+        }
+
+        function renderTable() {
+            const d = getFiltered();
+            const q = (
+                document.getElementById("tbl-search").value || ""
+            ).toLowerCase();
+            let rows = q
+                ? d.filter((r) =>
+                    [r.village_name, r.subdistrict, r.district, r.province, r.agency]
+                        .join(" ")
+                        .toLowerCase()
+                        .includes(q),
+                )
+                : d;
+            rows = [...rows].sort((a, b) => {
+                let va = a[tableSort.col],
+                    vb = b[tableSort.col];
+                if (typeof va === "string" || typeof vb === "string") {
+                    va = String(va ?? "").toLowerCase();
+                    vb = String(vb ?? "").toLowerCase();
+                }
+                const cmp = va < vb ? -1 : va > vb ? 1 : 0;
+                return tableSort.dir === "asc" ? cmp : -cmp;
+            });
+            document.querySelectorAll("th").forEach((th) => {
+                th.classList.remove("sorted");
+                const ico = th.querySelector(".sort-ico");
+                if (ico) ico.textContent = "↕";
+            });
+            const thEl = document.querySelector(
+                `th[onclick="sortTable('${tableSort.col}')"]`,
+            );
+            if (thEl) {
+                thEl.classList.add("sorted");
+                const ico = thEl.querySelector(".sort-ico");
+                if (ico) ico.textContent = tableSort.dir === "asc" ? "↑" : "↓";
+            }
+            const total = rows.length,
+                pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+            if (tablePage > pages) tablePage = pages;
+            const slice = rows.slice(
+                (tablePage - 1) * PAGE_SIZE,
+                tablePage * PAGE_SIZE,
+            );
+            document.getElementById("tbl-body").innerHTML = slice.length
+                ? slice
+                    .map(
+                        (r) => `
+            <tr>
+              <td style="color:var(--c-ink3);font-size:11.5px">${r.id}</td>
+              <td style="font-family:var(--ff-mono);font-size:12px">${r.year || "—"}</td>
+              <td><strong style="font-size:13px;color:var(--c-ink)">${r.village_name || "—"}</strong></td>
+              <td style="text-align:center">${r.moo || "—"}</td>
+              <td>${r.subdistrict || "—"}</td>
+              <td>${r.district || "—"}</td>
+              <td>${r.province || "—"}</td>
+              <td style="font-size:12px;color:var(--c-ink3)">${r.agency || "—"}</td>
+              <td style="font-family:var(--ff-mono);font-size:11px;color:var(--c-ink3)">${r.lat && r.lon ? `${r.lat.toFixed(4)}, ${r.lon.toFixed(4)}` : "—"}</td>
+            </tr>`,
+                    )
+                    .join("")
+                : `<tr><td colspan="9" class="no-data-msg">ไม่พบข้อมูลที่ตรงกับเงื่อนไข</td></tr>`;
+            const start = (tablePage - 1) * PAGE_SIZE + 1,
+                end = Math.min(tablePage * PAGE_SIZE, total);
+            document.getElementById("tbl-info").textContent =
+                `แสดง ${start}–${end} จาก ${total} รายการ`;
+            const pager = document.getElementById("tbl-pager");
+            let btns = `<button class="pg-btn" onclick="changePage(-1)" ${tablePage <= 1 ? "disabled" : ""}>←</button>`;
+            const range = 5,
+                half = Math.floor(range / 2);
+            let startP = Math.max(1, tablePage - half),
+                endP = Math.min(pages, startP + range - 1);
+            if (endP - startP < range - 1) startP = Math.max(1, endP - range + 1);
+            for (let i = startP; i <= endP; i++)
+                btns += `<button class="pg-btn ${i === tablePage ? "curr" : ""}" onclick="gotoPage(${i})">${i}</button>`;
+            btns += `<button class="pg-btn" onclick="changePage(1)" ${tablePage >= pages ? "disabled" : ""}>→</button>`;
+            pager.innerHTML = btns;
+        }
+        function changePage(d) {
+            tablePage += d;
+            renderTable();
+        }
+        function gotoPage(p) {
+            tablePage = p;
+            renderTable();
+        }
+
+        /* REFRESH */
+        function refresh() {
+            const d = getFiltered();
+            buildInsights(d);
+            buildKPIs(d);
+            updateMap(d);
+            updateProvinceChart(d);
+            updateYearChart(d);
+            renderTable();
+            document.getElementById("filter-summary").innerHTML =
+                `แสดง <strong>${d.length}</strong> จาก ${RAW.length} รายการ`;
+        }
+    </script>
+</body>
+
+</html>
