@@ -788,10 +788,11 @@
                         <label>สถานะการเยียวยา<span class="req">*</span></label>
                         <select id="c-compensation_status">
                             <option value="">-- เลือกสถานะ --</option>
+                            <option>รอเอกสารจากผู้เสียหาย</option>
                             <option>จ่ายเงินแล้ว</option>
-                            <option>ยังไม่จ่าย</option>
+                            <option>รออนุมัติเบิกจ่าย</option>
                             <option>ไม่ขอรับการเยียวยา</option>
-                            <option>รอเจ้าหน้าที่ศูนย์ช้างลงข้อมูล</option>
+
                         </select>
                     </div>
                 </div>
@@ -800,7 +801,17 @@
                 <div class="form-grid">
                     <div class="form-group">
                         <label>ชื่อ-นามสกุล<span class="req">*</span></label>
-                        <input type="text" id="c-name" placeholder="นาย/นาง/นางสาว ชื่อ นามสกุล" />
+                        <div style="display:flex;gap:6px">
+                            <select id="c-prefix" style="width:120px;flex-shrink:0" onchange="autoGender('c')">
+                                <option value="">-- คำนำหน้า --</option>
+                                <option>นาย</option>
+                                <option>นาง</option>
+                                <option>นางสาว</option>
+                                <option>เด็กชาย</option>
+                                <option>เด็กหญิง</option>
+                            </select>
+                            <input type="text" id="c-name" placeholder="ชื่อ นามสกุล" />
+                        </div>
                     </div>
                     <div class="form-group">
                         <label>เพศ<span class="req">*</span></label>
@@ -834,20 +845,20 @@
 
                     <div class="form-group">
                         <label>ตำบล</label>
-                        <select id="c-subdistrict-sel" onchange="onSubdistrictChange('c')" disabled>
+                        <select id="c-subdistrict-sel" onchange="onSubdistrictChange('c')">
                             <option value="">-- เลือกตำบล --</option>
                         </select>
                     </div>
 
                     <div class="form-group">
                         <label>อำเภอ</label>
-                        <select id="c-district-sel" onchange="onDistrictChange('c')" disabled>
+                        <select id="c-district-sel" onchange="onDistrictChange('c')">
                             <option value="">-- เลือกอำเภอ --</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label>จังหวัด</label>
-                        <select id="c-province-sel" onchange="onProvinceChange('c')" disabled>
+                        <select id="c-province-sel" onchange="onProvinceChange('c')">
                             <option value="">-- เลือกจังหวัด --</option>
                         </select>
                     </div>
@@ -855,13 +866,25 @@
 
 
                     <div class="form-group">
-                        <label>Latitude</label>
-                        <input type="number" id="c-lat" placeholder="12.xxxxx" step="0.000001" />
+                        <label>UTM Easting</label>
+                        <input type="number" id="c-utm-e" placeholder="เช่น 5XXXXX" oninput="autoConvertUTM()" />
                     </div>
                     <div class="form-group">
-                        <label>Longitude</label>
-                        <input type="number" id="c-lon" placeholder="99.xxxxx" step="0.000001" />
+                        <label>UTM Northing</label>
+                        <input type="number" id="c-utm-n" placeholder="เช่น 13XXXXX" oninput="autoConvertUTM()" />
                     </div>
+                    <div class="form-group">
+                        <label>Latitude (แปลงอัตโนมัติ)</label>
+                        <input type="text" id="c-lat-display" readonly placeholder="Latitude"
+                            style="background:#f5f5f5;cursor:default" />
+                    </div>
+                    <div class="form-group">
+                        <label>Longitude (แปลงอัตโนมัติ)</label>
+                        <input type="text" id="c-lon-display" readonly placeholder="Longitude"
+                            style="background:#f5f5f5;cursor:default" />
+                    </div>
+                    <input type="hidden" id="c-lat" />
+                    <input type="hidden" id="c-lon" />
 
 
                 </div>
@@ -974,17 +997,26 @@
                             <option>ถนน/เส้นทาง</option>
                         </select>
                     </div>
-                    <div class="form-group full">
-                        <label>สถานที่เกิดเหตุ</label><input type="text" id="ca-location" placeholder="ระบุสถานที่" />
-                    </div>
                 </div>
 
                 <div class="section-title">ข้อมูลผู้ได้รับผลกระทบ</div>
                 <div class="form-grid">
+
                     <div class="form-group">
-                        <label>ชื่อ-นามสกุล<span class="req">*</span></label><input type="text" id="ca-name"
-                            placeholder="นาย/นาง/นางสาว ชื่อ นามสกุล" />
+                        <label>ชื่อ-นามสกุล<span class="req">*</span></label>
+                        <div style="display:flex;gap:6px">
+                            <select id="ca-prefix" style="width:120px;flex-shrink:0" onchange="autoGender('ca')">
+                                <option value="">-- คำนำหน้า --</option>
+                                <option>นาย</option>
+                                <option>นาง</option>
+                                <option>นางสาว</option>
+                                <option>เด็กชาย</option>
+                                <option>เด็กหญิง</option>
+                            </select>
+                            <input type="text" id="ca-name" placeholder="ชื่อ นามสกุล" />
+                        </div>
                     </div>
+
                     <div class="form-group">
                         <label>เพศ</label>
                         <select id="ca-gender">
@@ -993,6 +1025,7 @@
                             <option>หญิง</option>
                         </select>
                     </div>
+
                     <div class="form-group">
                         <label>อายุ (ปี)</label><input type="number" id="ca-age" placeholder="อายุ" min="0" max="120" />
                     </div>
@@ -1000,6 +1033,10 @@
 
                 <div class="section-title">สถานที่</div>
                 <div class="form-grid g3">
+                    <div class="form-group full">
+                        <label>สถานที่เกิดเหตุ</label><input type="text" id="ca-location"
+                            placeholder="ระบุสถานที่ เช่น ที่ร้านอาหาร หมู่ 1 , ลานกางเต๊น" />
+                    </div>
                     <div class="form-group">
                         <label>ตำบล</label>
                         <div class="addr-search-wrap">
@@ -1279,6 +1316,44 @@
             return parseInt(s.split("-")[0]);
         }
 
+        function autoConvertUTM() {
+            const E = parseFloat(document.getElementById('c-utm-e').value);
+            const N = parseFloat(document.getElementById('c-utm-n').value);
+            if (!E || !N) return;
+            const zone = 47;
+            const a = 6378137.0, f = 1 / 298.257223563;
+            const b = a * (1 - f), e2 = (a * a - b * b) / (a * a);
+            const e1 = (1 - Math.sqrt(1 - e2)) / (1 + Math.sqrt(1 - e2));
+            const x = E - 500000, y = N, k0 = 0.9996;
+            const M = y / k0;
+            const mu = M / (a * (1 - e2 / 4 - 3 * e2 * e2 / 64 - 5 * e2 * e2 * e2 / 256));
+            const phi1 = mu
+                + (3 * e1 / 2 - 27 * e1 * e1 * e1 / 32) * Math.sin(2 * mu)
+                + (21 * e1 * e1 / 16 - 55 * e1 * e1 * e1 * e1 / 32) * Math.sin(4 * mu)
+                + (151 * e1 * e1 * e1 / 96) * Math.sin(6 * mu);
+            const N1 = a / Math.sqrt(1 - e2 * Math.sin(phi1) * Math.sin(phi1));
+            const T1 = Math.tan(phi1) * Math.tan(phi1);
+            const C1 = e2 / (1 - e2) * Math.cos(phi1) * Math.cos(phi1);
+            const R1 = a * (1 - e2) / Math.pow(1 - e2 * Math.sin(phi1) * Math.sin(phi1), 1.5);
+            const D = x / (N1 * k0);
+            const lat = phi1 - (N1 * Math.tan(phi1) / R1) * (
+                D * D / 2
+                - (5 + 3 * T1 + 10 * C1 - 4 * C1 * C1 - 9 * e2 / (1 - e2)) * D * D * D * D / 24
+                + (61 + 90 * T1 + 298 * C1 + 45 * T1 * T1 - 252 * e2 / (1 - e2) - 3 * C1 * C1) * D * D * D * D * D * D / 720
+            );
+            const lon0 = (zone - 1) * 6 - 180 + 3;
+            const lon = (lon0 * Math.PI / 180 + (
+                D - (1 + 2 * T1 + C1) * D * D * D / 6
+                + (5 - 2 * C1 + 28 * T1 - 3 * C1 * C1 + 8 * e2 / (1 - e2) + 24 * T1 * T1) * D * D * D * D * D / 120
+            ) / Math.cos(phi1)) * 180 / Math.PI;
+            const latDeg = (lat * 180 / Math.PI).toFixed(6);
+            const lonDeg = lon.toFixed(6);
+            document.getElementById('c-lat').value = latDeg;
+            document.getElementById('c-lon').value = lonDeg;
+            document.getElementById('c-lat-display').value = latDeg;
+            document.getElementById('c-lon-display').value = lonDeg;
+        }
+
         function showAlert(type, msg = "") {
             hideAlerts();
             if (type === "success") {
@@ -1294,22 +1369,40 @@
             document.getElementById("alert-error").classList.remove("show");
         }
 
+        function autoGender(prefix) {
+            const p = val(`${prefix}-prefix`);
+            const gSel = document.getElementById(`${prefix}-gender`);
+            if (!gSel) return;
+            if (p === 'นาย' || p === 'เด็กชาย') {
+                gSel.value = 'ชาย';
+            } else if (p === 'นาง' || p === 'นางสาว' || p === 'เด็กหญิง') {
+                gSel.value = 'หญิง';
+            }
+        }
+
         async function submitCompensation() {
-            const name = val("c-name"),
-                incident_date = val("c-incident_date"),
+            const prefix = val("c-prefix");
+            const nameOnly = val("c-name");
+            const name = prefix && prefix !== 'อื่นๆ' ? `${prefix}${nameOnly}` : nameOnly;
+            const incident_date = val("c-incident_date"),
                 compensation_case = val("c-compensation_case"),
                 compensation_status = val("c-compensation_status"),
                 fiscal_year = val("c-fiscal_year");
-            if (
-                !name ||
-                !incident_date ||
-                !compensation_case ||
-                !compensation_status ||
-                !fiscal_year
-            ) {
+            if (!name || !incident_date || !compensation_case || !compensation_status || !fiscal_year) {
                 showAlert("error", "กรุณากรอกข้อมูลที่จำเป็นให้ครบ (*)");
                 return;
             }
+
+            // เก็บค่าไว้ก่อนทำอะไรทั้งนั้น
+            const savedName = name;
+            const savedDate = incident_date;
+            const savedGender = val('c-gender');
+            const savedAge = val('c-age');
+            const savedSubdistrict = val('c-subdistrict');
+            const savedDistrict = val('c-district');
+            const savedProvince = val('c-province');
+            const savedCase = compensation_case;
+
             const btn = document.getElementById("btn-compensation");
             btn.disabled = true;
             btn.innerHTML = "<span>⏳ กำลังบันทึก...</span>";
@@ -1322,14 +1415,14 @@
                     year_ad: getYearAD(incident_date),
                     fiscal_year: parseInt(fiscal_year),
                     name,
-                    gender: val("c-gender") || null,
+                    gender: savedGender || null,
                     age: intVal("c-age"),
                     lat: numVal("c-lat"),
                     lon: numVal("c-lon"),
                     village: val("c-village") || null,
-                    subdistrict: val("c-subdistrict") || null,
-                    district: val("c-district") || null,
-                    province: val("c-province") || null,
+                    subdistrict: savedSubdistrict || null,
+                    district: savedDistrict || null,
+                    province: savedProvince || null,
                     compensation_case,
                     requested_amount: numVal("c-requested_amount"),
                     submission_date: val("c-submission_date") || null,
@@ -1341,22 +1434,41 @@
                     payment_detail: val("c-payment_detail") || null,
                     remark: val("c-remark") || null,
                 });
-                // ← เพิ่มตรงนี้
-                const damageRows = getDamageRows();
-                console.log('damage rows:', damageRows);
 
+                const damageRows = getDamageRows();
                 if (damageRows.length > 0) {
-                    const { data, error } = await sb.from('damage_items').insert(
-                        damageRows.map(r => ({ ...r, compensation_id: id }))
-                    );
-                    console.log('insert data:', data);
-                    console.log('insert error:', error);  // ← ดูตรงนี้สำคัญมาก
+                    await sb.from('damage_items').insert(damageRows.map(r => ({ ...r, compensation_id: id })));
                 }
 
-                showAlert('success');
                 resetForm('compensation');
-                // ล้างตารางความเสียหายด้วย
                 document.getElementById('damage-tbody').innerHTML = '';
+
+                if (savedCase === 'บาดเจ็บ' || savedCase === 'เสียชีวิต') {
+                    setTimeout(() => {
+                        switchTab('casualty');
+                        document.getElementById('ca-incident_date').value = savedDate;
+                        document.getElementById('ca-name').value = savedName;
+                        document.getElementById('ca-gender').value = savedGender;
+                        document.getElementById('ca-age').value = savedAge;
+                        document.getElementById('ca-casualty_type').value = savedCase === 'เสียชีวิต' ? 'เสียชีวิต' : 'บาดเจ็บ';
+                        document.getElementById('ca-count').value = '1';
+                        document.getElementById('ca-subdistrict').value = savedSubdistrict;
+                        document.getElementById('ca-district').value = savedDistrict;
+                        document.getElementById('ca-province').value = savedProvince;
+                        if (document.getElementById('ca-subdistrict-search'))
+                            document.getElementById('ca-subdistrict-search').value = savedSubdistrict;
+                        if (document.getElementById('ca-district-display'))
+                            document.getElementById('ca-district-display').value = savedDistrict;
+                        if (document.getElementById('ca-province-display'))
+                            document.getElementById('ca-province-display').value = savedProvince;
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                        showAlert('success');
+                        document.getElementById('alert-success').textContent =
+                            '✅ บันทึกข้อมูลเยียวยาแล้ว — กรุณากรอกข้อมูลบาดเจ็บ/ตายด้านล่างนี้ด้วย';
+                    }, 300);
+                } else {
+                    showAlert('success');
+                }
 
             } catch (e) {
                 showAlert("error", e.message);
@@ -1414,8 +1526,10 @@
         }
 
         async function submitCasualty() {
-            const name = val("ca-name"),
-                incident_date = val("ca-incident_date"),
+            const prefix = val("ca-prefix");
+            const nameOnly = val("ca-name");
+            const name = prefix && prefix !== 'อื่นๆ' ? `${prefix}${nameOnly}` : nameOnly;
+            const incident_date = val("ca-incident_date"),
                 casualty_type = val("ca-casualty_type"),
                 count = val("ca-count");
             if (!name || !incident_date || !casualty_type || !count) {
@@ -1446,6 +1560,7 @@
                     remark_2: val("ca-remark_2") || null,
                 });
                 showAlert("success");
+                document.getElementById('alert-success').textContent = '✅ บันทึกข้อมูลสำเร็จแล้ว';
                 resetForm("casualty");
             } catch (e) {
                 showAlert("error", e.message);
@@ -1498,6 +1613,8 @@
 
         async function loadAddress() {
             const { data, error } = await sb.from('address').select('*');
+            console.log('address count:', data?.length);
+            console.log('provinces:', [...new Set(data?.map(r => r.provinceth))]);
             if (!error && data) {
                 ADDRESS_DATA = data;
                 buildProvinceDropdowns();

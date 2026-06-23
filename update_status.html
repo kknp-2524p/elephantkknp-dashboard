@@ -521,15 +521,15 @@
             <div class="edit-body">
                 <div class="field-label">เปลี่ยนสถานะเป็น</div>
                 <div class="status-options">
+                    <button class="status-opt s-pend" onclick="selectStatus('รออนุมัติเบิกจ่าย')">
+                        <span class="opt-dot" style="background:#d97706"></span>
+                        <span class="opt-label">⏳ รออนุมัติเบิกจ่าย</span>
+                        <span class="opt-desc">รอดำเนินการอนุมัติ</span>
+                    </button>
                     <button class="status-opt s-paid" onclick="selectStatus('จ่ายเงินแล้ว')">
                         <span class="opt-dot" style="background:#059669"></span>
                         <span class="opt-label">✓ จ่ายเงินแล้ว</span>
                         <span class="opt-desc">บันทึกว่าจ่ายเงินเรียบร้อย</span>
-                    </button>
-                    <button class="status-opt s-pend" onclick="selectStatus('ยังไม่จ่าย')">
-                        <span class="opt-dot" style="background:#d97706"></span>
-                        <span class="opt-label">⏳ ยังไม่จ่าย</span>
-                        <span class="opt-desc">รอดำเนินการจ่ายเงิน</span>
                     </button>
                     <button class="status-opt s-waive" onclick="selectStatus('ไม่ขอรับการเยียวยา')">
                         <span class="opt-dot" style="background:#9ca3af"></span>

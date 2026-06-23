@@ -1635,7 +1635,7 @@
             const dateStr = now.toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
 
             const paid = data.filter(r => r.compensation_status === 'จ่ายเงินแล้ว');
-            const pend = data.filter(r => r.compensation_status === 'ยังไม่จ่าย');
+            const pend = data.filter(r => r.compensation_status === 'รออนุมัติเบิกจ่าย');
             const totalAmt = data.reduce((a, r) => a + r.requested_amount, 0);
             const paidAmt = paid.reduce((a, r) => a + r.requested_amount, 0);
 
@@ -1644,7 +1644,7 @@
             ${[
                     { lbl: 'กรณีทั้งหมด', val: data.length, sub: 'รายการ', color: '#1a4faa' },
                     { lbl: 'จ่ายเงินแล้ว', val: paid.length, sub: '฿' + paidAmt.toLocaleString('th-TH'), color: '#059669' },
-                    { lbl: 'รอการจ่าย', val: pend.length, sub: '฿' + pend.reduce((a, r) => a + r.requested_amount, 0).toLocaleString('th-TH'), color: '#d97706' },
+                    { lbl: 'รออนุมัติเบิกจ่าย', val: pend.length, sub: '฿' + pend.reduce((a, r) => a + r.requested_amount, 0).toLocaleString('th-TH'), color: '#d97706' },
                     { lbl: 'มูลค่ารวม', val: '฿' + (totalAmt >= 1000000 ? (totalAmt / 1000000).toFixed(2) + 'M' : totalAmt.toLocaleString('th-TH')), sub: 'บาท', color: '#dc2626' },
                 ].map(k => `
                 <div style="border:1px solid #dde3d9;border-radius:8px;padding:10px 12px;border-top:3px solid ${k.color}">
@@ -1660,7 +1660,7 @@
             <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
                 ${[
                     { label: 'จ่ายเงินแล้ว', count: paid.length, color: '#059669' },
-                    { label: 'รอการจ่าย', count: pend.length, color: '#d97706' },
+                    { label: 'รออนุมัติเบิกจ่าย', count: pend.length, color: '#d97706' },
                     { label: 'ไม่ขอรับ', count: data.filter(r => r.compensation_status === 'ไม่ขอรับการเยียวยา').length, color: '#9ca3af' },
                 ].map(s => {
                     const pct = data.length > 0 ? Math.round(s.count / data.length * 100) : 0;
@@ -1786,6 +1786,7 @@
             paid: "#059669",
             pend: "#d97706",
             waive: "#9ca3af",
+            wait_doc: "#3b82f6",
             inj: "#3b82f6",
             die: "#ef4444",
             crop: "#16a34a",
@@ -1946,7 +1947,7 @@
         }
 
         function buildInsights(d) {
-            const pend = d.filter((r) => r.compensation_status === "ยังไม่จ่าย"),
+            const pend = d.filter((r) => r.compensation_status === "รออนุมัติเบิกจ่าย"),
                 pendAmt = pend.reduce((a, r) => a + r.requested_amount, 0);
             document.getElementById("insights-bar").innerHTML = [
                 {
@@ -1977,7 +1978,7 @@
 
         function buildKPIs(d) {
             const paid = d.filter((r) => r.compensation_status === "จ่ายเงินแล้ว"),
-                pend = d.filter((r) => r.compensation_status === "ยังไม่จ่าย"),
+                pend = d.filter((r) => r.compensation_status === "รออนุมัติเบิกจ่าย"),
                 pA = paid.reduce(
                     (a, r) => a + (parseFloat(r.requested_amount) || 0),
                     0,
@@ -2076,6 +2077,7 @@
         async function updateMap(d) {
             if (!MAP_INSTANCE) return;
             const pts = d.filter((r) => r.lat && r.lon);
+            console.log('updateMap pts:', pts.length);
             document.getElementById("chip-map").textContent = pts.length + " จุด";
             MAP_LAYER.clearLayers();
             for (const r of pts) {
@@ -2090,11 +2092,12 @@
             return {
                 series: [
                     d.filter((r) => r.compensation_status === "จ่ายเงินแล้ว").length,
-                    d.filter((r) => r.compensation_status === "ยังไม่จ่าย").length,
+                    d.filter((r) => r.compensation_status === "รออนุมัติเบิกจ่าย").length,
+                    d.filter(r => r.compensation_status === 'รอเอกสารจากผู้เสียหาย').length,
                     d.filter((r) => r.compensation_status === "ไม่ขอรับการเยียวยา")
                         .length,
                 ],
-                labels: ["จ่ายเงินแล้ว", "ยังไม่จ่าย", "ไม่ขอรับ"],
+                labels: ["จ่ายเงินแล้ว", "รออนุมัติเบิกจ่าย", 'รอเอกสาร', "ไม่ขอรับ"],
             };
         }
         function initStatusChart(d) {
@@ -2111,7 +2114,7 @@
                         toolbar: { show: false },
                     },
                     labels,
-                    colors: [C.paid, C.pend, C.waive],
+                    colors: [C.paid, C.pend, C.wait_doc, C.waive],
                     plotOptions: {
                         pie: {
                             donut: {
@@ -2289,8 +2292,10 @@
                 m = parseInt(p[1]),
                 y = parseInt(p[2]);
             if (!d || !m || !y) return null;
-            return { m, y };
+            // แปลง ค.ศ. → พ.ศ.
+            return { m, y: y + 543 };
         }
+
         function getMonthlyData(d) {
             const cm = {};
             d.forEach((r) => {
@@ -2400,7 +2405,7 @@
                             formatter: v => Math.round(v)
                         },
                         min: 0,
-                        stepSize: 3
+                        stepSize: 10
                     },
                     grid: { borderColor: "#f0f0ee", padding: { left: 4, right: 4 } },
                     markers: {
@@ -2472,7 +2477,7 @@
                     d
                         .filter(
                             (r) =>
-                                r.fiscal_year === y && r.compensation_status === "ยังไม่จ่าย",
+                                r.fiscal_year === y && r.compensation_status === "รออนุมัติเบิกจ่าย",
                         )
                         .reduce((a, r) => a + r.requested_amount, 0),
                 ),
@@ -2486,7 +2491,7 @@
                     ...CD,
                     series: [
                         { name: "จ่ายแล้ว", data: pS },
-                        { name: "ยังไม่จ่าย", data: eS },
+                        { name: "รออนุมัติเบิกจ่าย", data: eS },
                     ],
                     chart: {
                         type: "bar",
@@ -2534,7 +2539,7 @@
             CHARTS.amount.updateOptions({
                 series: [
                     { name: "จ่ายแล้ว", data: pS },
-                    { name: "ยังไม่จ่าย", data: eS },
+                    { name: "รออนุมัติเบิกจ่าย", data: eS },
                 ],
                 xaxis: { categories: cats },
             });
@@ -2621,12 +2626,12 @@
         function statusBadge(s) {
             const m = {
                 จ่ายเงินแล้ว: "b-paid",
-                ยังไม่จ่าย: "b-pend",
+                รออนุมัติเบิกจ่าย: "b-pend",
                 ไม่ขอรับการเยียวยา: "b-waive",
             },
                 l = {
                     จ่ายเงินแล้ว: "✓ จ่ายแล้ว",
-                    ยังไม่จ่าย: "⏳ รอจ่าย",
+                    รออนุมัติเบิกจ่าย: "⏳ รอจ่าย",
                     ไม่ขอรับการเยียวยา: "✗ ไม่ขอรับ",
                 };
             return `<span class="badge ${m[s] || "b-waive"}">${l[s] || s}</span>`;
@@ -2692,7 +2697,23 @@
                 ? slice
                     .map(
                         (r) =>
-                            `<tr><td style="color:var(--c-ink3);font-size:11px">${r.id || "—"}</td><td style="white-space:nowrap;font-size:11.5px">${r.incident_date || "—"}</td><td><strong style="font-size:12.5px;color:var(--c-ink)">${r.name || "—"}</strong></td><td>${r.gender === "ชาย" ? "👨 ชาย" : r.gender === "หญิง" ? "👩 หญิง" : "—"}</td><td>${typeBadge(r.compensation_case || "")}</td><td class="amt ${r.compensation_status === "จ่ายเงินแล้ว" ? "paid-amt" : "pend-amt"}">${r.requested_amount > 0 ? "฿" + r.requested_amount.toLocaleString("th-TH") : "—"}</td><td style="text-align:center;font-family:var(--ff-mono);font-size:12px">${r.fiscal_year || "—"}</td><td>${statusBadge(r.compensation_status || "")}</td></tr>`,
+                            `<tr>
+                                <td style="color:var(--c-ink3);font-size:11px">
+                                    ${r.id || "—"}</td><td style="white-space:nowrap;font-size:11.5px">
+                                        ${(() => {
+                                if (!r.incident_date) return '—'; const p = r.incident_date.split('/');
+                                if (p.length !== 3) return r.incident_date; return `${p[0]}/${p[1]}/${parseInt(p[2]) + 543}`;
+                            })()}
+                                            </td>
+                                        <td>
+                                            <strong style="font-size:12.5px;color:var(--c-ink)">${r.name || "—"}</strong>
+                                            </td>
+                                            <td>${r.gender === "ชาย" ? "👨 ชาย" : r.gender === "หญิง" ? "👩 หญิง" : "—"}</td>
+                                            <td>${typeBadge(r.compensation_case || "")}</td>
+                                            <td class="amt ${r.compensation_status === "จ่ายเงินแล้ว" ? "paid-amt" : "pend-amt"}" > ${r.requested_amount > 0 ? "฿" + r.requested_amount.toLocaleString("th-TH") : "—"}</td >
+                                            <td style="text-align:center;font-family:var(--ff-mono);font-size:12px">${r.fiscal_year || "—"}</td>
+                                            <td>${statusBadge(r.compensation_status || "")}</td>
+                                            </tr>`,
                     )
                     .join("")
                 : `<tr><td colspan="8" class="no-data-msg">ไม่พบข้อมูลที่ตรงกับเงื่อนไข</td></tr>`;
@@ -2710,6 +2731,8 @@
                 btns += `<button class="pg-btn ${i === tablePage ? "curr" : ""}" onclick="gotoPage(${i})">${i}</button>`;
             btns += `<button class="pg-btn" onclick="changePage(1)" ${tablePage >= pages ? "disabled" : ""}>→</button>`;
             document.getElementById("tbl-pager").innerHTML = btns;
+
+            console.log('incident_date sample:', rows[0]?.incident_date);
         }
         function changePage(d) {
             tablePage += d;
@@ -2779,7 +2802,7 @@
             // Status dropdown
             const statuses = [
                 { val: "จ่ายเงินแล้ว", label: "✓ จ่ายแล้ว" },
-                { val: "ยังไม่จ่าย", label: "⏳ รอจ่าย" },
+                { val: "รออนุมัติเบิกจ่าย", label: "⏳ รอจ่าย" },
                 { val: "ไม่ขอรับการเยียวยา", label: "✗ ไม่ขอรับ" },
             ];
 
