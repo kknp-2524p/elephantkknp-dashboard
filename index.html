@@ -1357,6 +1357,7 @@
                 <a href="elephant_death.html" class="nav-link">🐘 ช้างตาย</a>
                 <a href="village_network.html" class="nav-link">🏘️ หมู่บ้านเครือข่าย</a>
                 <a href="form.html" class="nav-link">📝 กรอกข้อมูล</a>
+                <span id="update-ts">—</span>
             </div>
         </div>
     </header>
@@ -2077,7 +2078,7 @@
         async function updateMap(d) {
             if (!MAP_INSTANCE) return;
             const pts = d.filter((r) => r.lat && r.lon);
-            console.log('updateMap pts:', pts.length);
+            // console.log('updateMap pts:', pts.length);
             document.getElementById("chip-map").textContent = pts.length + " จุด";
             MAP_LAYER.clearLayers();
             for (const r of pts) {
@@ -2286,17 +2287,22 @@
 
         function parseDate(s) {
             if (!s) return null;
-            const p = s.split("/");
+            const p = s.split('/');
             if (p.length !== 3) return null;
-            const d = parseInt(p[0]),
-                m = parseInt(p[1]),
-                y = parseInt(p[2]);
+            const d = parseInt(p[0]);
+            const m = parseInt(p[1]);
+            let y = parseInt(p[2]);
             if (!d || !m || !y) return null;
-            // แปลง ค.ศ. → พ.ศ.
-            return { m, y: y + 543 };
+
+            // แปลง ค.ศ. → พ.ศ. เสมอ
+            if (y < 2500) y = y + 543;
+
+            return { m, y };
         }
 
         function getMonthlyData(d) {
+            // console.log('getMonthlyData input length:', d.length);
+            // console.log('sample incident_date:', d[0]?.incident_date);
             const cm = {};
             d.forEach((r) => {
                 const p = parseDate(r.incident_date);
@@ -2732,7 +2738,7 @@
             btns += `<button class="pg-btn" onclick="changePage(1)" ${tablePage >= pages ? "disabled" : ""}>→</button>`;
             document.getElementById("tbl-pager").innerHTML = btns;
 
-            console.log('incident_date sample:', rows[0]?.incident_date);
+            // console.log('incident_date sample:', rows[0]?.incident_date);
         }
         function changePage(d) {
             tablePage += d;
@@ -2751,8 +2757,8 @@
 
 
 
-            console.log('MONTH_VALS:', MONTH_VALS);
-            console.log('RAW sample:', RAW.slice(0, 3).map(r => r.incident_date));
+            // console.log('MONTH_VALS:', MONTH_VALS);
+            // console.log('RAW sample:', RAW.slice(0, 3).map(r => r.incident_date));
 
 
             function buildMonthDD() {
@@ -2761,7 +2767,7 @@
                 RAW.forEach(r => {
                     if (!r.incident_date) return;
                     const parts = r.incident_date.split('/');
-                    console.log('incident_date raw:', r.incident_date);
+                    // console.log('incident_date raw:', r.incident_date);
                     if (parts.length !== 3) return;
                     let m = parseInt(parts[1]);
                     let y = parseInt(parts[2]);
