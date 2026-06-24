@@ -1302,10 +1302,10 @@
             const v = val(id);
             return v !== "" ? parseInt(v) : null;
         }
-        function thaiDateFromInput(s) {
-            if (!s) return "";
-            const [y, m, d] = s.split("-");
-            return `${d}/${m}/${parseInt(y) + 543}`;
+        function thaiDateFromInput(dateStr) {
+            if (!dateStr) return '';
+            const [y, m, d] = dateStr.split('-');
+            return `${d}/${m}/${y}`; // ← เก็บเป็น ค.ศ. เลย ไม่บวก 543
         }
         function getYearBE(s) {
             if (!s) return null;
@@ -1398,6 +1398,8 @@
             const savedDate = incident_date;
             const savedGender = val('c-gender');
             const savedAge = val('c-age');
+            const savedPrefix = val('c-prefix');
+            const savedNameOnly = val('c-name');
             const savedSubdistrict = val('c-subdistrict');
             const savedDistrict = val('c-district');
             const savedProvince = val('c-province');
@@ -1447,7 +1449,9 @@
                     setTimeout(() => {
                         switchTab('casualty');
                         document.getElementById('ca-incident_date').value = savedDate;
-                        document.getElementById('ca-name').value = savedName;
+                        document.getElementById('ca-prefix').value = savedPrefix;
+                        document.getElementById('ca-name').value = savedNameOnly;
+                        autoGender('ca');
                         document.getElementById('ca-gender').value = savedGender;
                         document.getElementById('ca-age').value = savedAge;
                         document.getElementById('ca-casualty_type').value = savedCase === 'เสียชีวิต' ? 'เสียชีวิต' : 'บาดเจ็บ';
