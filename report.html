@@ -1,0 +1,1070 @@
+<!doctype html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>พิมพ์รายงาน</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Sarabun:wght@300;400;600;700&display=swap"
+        rel="stylesheet" />
+    <style>
+        :root {
+            --c-bg: #f0f3ef;
+            --c-card: #fff;
+            --c-green: #1a6b42;
+            --c-green-lt: #d4eddf;
+            --c-border: #dde3d9;
+            --c-ink: #111b14;
+            --c-ink2: #3d5045;
+            --c-ink3: #7a927f;
+            --ff: "IBM Plex Sans Thai", "Sarabun", sans-serif;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--ff);
+            background: var(--c-bg);
+            color: var(--c-ink);
+            font-size: 14px;
+            line-height: 1.65;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        button,
+        select,
+        input {
+            font-family: var(--ff);
+            cursor: pointer;
+        }
+
+        /* SCREEN UI */
+        .screen {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 1.5rem 1rem 3rem;
+        }
+
+        .page-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--c-ink);
+            margin-bottom: 4px;
+        }
+
+        .page-sub {
+            font-size: 12px;
+            color: var(--c-ink3);
+            margin-bottom: 1.5rem;
+        }
+
+        .setting-card {
+            background: var(--c-card);
+            border-radius: 16px;
+            padding: 1.25rem 1.5rem;
+            box-shadow:
+                0 1px 3px rgba(13, 36, 22, 0.06),
+                0 6px 18px rgba(13, 36, 22, 0.04);
+            border: 1px solid var(--c-border);
+            margin-bottom: 1rem;
+        }
+
+        .setting-title {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--c-green);
+            margin-bottom: 0.875rem;
+            padding-bottom: 6px;
+            border-bottom: 2px solid var(--c-green-lt);
+        }
+
+        .setting-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.875rem;
+        }
+
+        @media (max-width: 600px) {
+            .setting-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .setting-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .setting-group.full {
+            grid-column: 1/-1;
+        }
+
+        .setting-group label {
+            font-size: 10.5px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--c-ink3);
+        }
+
+        .setting-group input,
+        .setting-group select {
+            padding: 9px 12px;
+            border: 1.5px solid var(--c-border);
+            border-radius: 8px;
+            font-size: 13px;
+            color: var(--c-ink);
+            background: var(--c-bg);
+            outline: none;
+            width: 100%;
+        }
+
+        .setting-group input:focus,
+        .setting-group select:focus {
+            border-color: var(--c-green);
+            background: #fff;
+        }
+
+        /* CHECKBOX OPTIONS */
+        .check-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        @media (max-width: 600px) {
+            .check-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border: 1.5px solid var(--c-border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+            background: transparent;
+        }
+
+        .check-item:hover {
+            border-color: var(--c-green);
+            background: var(--c-green-lt);
+        }
+
+        .check-item.checked {
+            border-color: var(--c-green);
+            background: var(--c-green-lt);
+        }
+
+        .check-item input {
+            accent-color: var(--c-green);
+            width: 15px;
+            height: 15px;
+            flex-shrink: 0;
+        }
+
+        .check-item span {
+            font-size: 13px;
+            color: var(--c-ink2);
+        }
+
+        /* LOGO UPLOAD */
+        .logo-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .logo-preview {
+            width: 60px;
+            height: 60px;
+            border: 2px dashed var(--c-border);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            background: var(--c-bg);
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .logo-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .btn-upload {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1.5px solid var(--c-border);
+            background: transparent;
+            font-size: 12px;
+            color: var(--c-ink3);
+            transition: all 0.15s;
+        }
+
+        .btn-upload:hover {
+            border-color: var(--c-green);
+            color: var(--c-green);
+        }
+
+        /* BUTTONS */
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-print {
+            padding: 12px 28px;
+            background: var(--c-green);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 44px;
+        }
+
+        .btn-print:hover {
+            background: #155a36;
+        }
+
+        .btn-preview {
+            padding: 12px 20px;
+            background: transparent;
+            color: var(--c-ink2);
+            border: 1.5px solid var(--c-border);
+            border-radius: 10px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.15s;
+            min-height: 44px;
+        }
+
+        .btn-preview:hover {
+            border-color: var(--c-green);
+            color: var(--c-green);
+        }
+
+        /* PREVIEW MODAL */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 2rem 1rem;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal-box {
+            background: #fff;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 800px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            margin: auto;
+        }
+
+        .modal-hd {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-hd span {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--c-ink);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #94a3b8;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 6px;
+            line-height: 1;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .modal-footer {
+            padding: 12px 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        /* ═══════════════════════════════════
+   PRINT DOCUMENT STYLES
+═══════════════════════════════════ */
+        .doc {
+            font-family: "Sarabun", "IBM Plex Sans Thai", sans-serif;
+            font-size: 14pt;
+            line-height: 1.8;
+            color: #000;
+            background: #fff;
+        }
+
+        .doc-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border-bottom: 3px double #000;
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+        }
+
+        .doc-logo {
+            width: 70px;
+            height: 70px;
+            flex-shrink: 0;
+            object-fit: contain;
+        }
+
+        .doc-logo-placeholder {
+            width: 70px;
+            height: 70px;
+            flex-shrink: 0;
+            border: 1px solid #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10pt;
+            color: #999;
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        .doc-agency {
+            flex: 1;
+        }
+
+        .doc-agency-name {
+            font-size: 13pt;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+
+        .doc-agency-sub {
+            font-size: 11pt;
+            color: #444;
+            margin-top: 2px;
+        }
+
+        .doc-title-block {
+            text-align: center;
+            margin: 16px 0;
+        }
+
+        .doc-title {
+            font-size: 15pt;
+            font-weight: 700;
+            text-decoration: underline;
+        }
+
+        .doc-subtitle {
+            font-size: 12pt;
+            margin-top: 4px;
+            color: #333;
+        }
+
+        .doc-date {
+            font-size: 11pt;
+            color: #555;
+            margin-top: 4px;
+        }
+
+        .doc-section {
+            margin: 16px 0;
+        }
+
+        .doc-section-title {
+            font-size: 13pt;
+            font-weight: 700;
+            background: #f0f0f0;
+            padding: 4px 10px;
+            border-left: 4px solid #1a6b42;
+            margin-bottom: 8px;
+        }
+
+        /* KPI BOXES */
+        .doc-kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 12px 0;
+        }
+
+        .doc-kpi {
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 10px 14px;
+            text-align: center;
+        }
+
+        .doc-kpi-val {
+            font-size: 22pt;
+            font-weight: 700;
+            color: #1a6b42;
+            line-height: 1;
+        }
+
+        .doc-kpi-lbl {
+            font-size: 10pt;
+            color: #555;
+            margin-top: 3px;
+        }
+
+        /* TABLE */
+        .doc-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11pt;
+            margin: 10px 0;
+        }
+
+        .doc-table th {
+            background: #1a6b42;
+            color: #fff;
+            padding: 7px 10px;
+            text-align: left;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .doc-table td {
+            padding: 6px 10px;
+            border-bottom: 1px solid #ddd;
+            vertical-align: top;
+        }
+
+        .doc-table tr:nth-child(even) td {
+            background: #f9f9f9;
+        }
+
+        .doc-table tfoot td {
+            font-weight: 700;
+            background: #f0f0f0;
+            border-top: 2px solid #ccc;
+        }
+
+        /* SUMMARY TABLE */
+        .doc-sum-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11pt;
+            margin: 10px 0;
+        }
+
+        .doc-sum-table th {
+            background: #1a6b42;
+            color: #fff;
+            padding: 7px 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .doc-sum-table td {
+            padding: 7px 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .doc-sum-table tfoot td {
+            font-weight: 700;
+            background: #f0f4f0;
+            border-top: 2px solid #1a6b42;
+        }
+
+        /* SIGNATURE */
+        .doc-sig {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .doc-sig-box {
+            text-align: center;
+        }
+
+        .doc-sig-line {
+            border-top: 1px solid #000;
+            margin: 50px 20px 6px;
+        }
+
+        .doc-sig-name {
+            font-size: 12pt;
+            font-weight: 600;
+        }
+
+        .doc-sig-pos {
+            font-size: 11pt;
+            color: #444;
+        }
+
+        .doc-sig-date {
+            font-size: 11pt;
+            color: #555;
+            margin-top: 3px;
+        }
+
+        .doc-note {
+            font-size: 10pt;
+            color: #666;
+            margin-top: 12px;
+            font-style: italic;
+        }
+
+        /* PRINT */
+        @media print {
+            body {
+                background: #fff;
+            }
+
+            .screen-only {
+                display: none !important;
+            }
+
+            .modal-overlay {
+                display: block !important;
+                position: static;
+                background: none;
+                padding: 0;
+                overflow: visible;
+            }
+
+            .modal-box {
+                box-shadow: none;
+                border-radius: 0;
+                max-width: 100%;
+            }
+
+            .modal-hd,
+            .modal-footer {
+                display: none !important;
+            }
+
+            .modal-body {
+                padding: 0;
+            }
+
+            .doc-table {
+                font-size: 6pt;
+            }
+
+            .doc-table th {
+                padding: 4px 6px;
+                font-weight: 500;
+            }
+
+            .doc-table td {
+                padding: 3px 6px;
+            }
+
+            .doc-sum-table {
+                font-size: 6pt;
+            }
+
+            .doc-sum-table th {
+                padding: 5px 8px;
+                font-weight: 500;
+            }
+
+            .doc-sum-table td {
+                padding: 5px 8px;
+            }
+
+            .doc-kpi-val {
+                font-size: 16pt;
+            }
+
+            .doc {
+                font-size: 10pt;
+            }
+
+            .doc-title {
+                font-size: 13pt;
+            }
+
+            .doc-section-title {
+                font-size: 10pt;
+                padding: 3px 8px;
+            }
+
+            @page {
+                size: A4;
+                margin: 1.5cm 2cm;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- MODAL PREVIEW -->
+    <div class="modal-overlay" id="modal" onclick="if (event.target === this) closeModal();">
+        <div class="modal-box">
+            <div class="modal-hd screen-only">
+                <span>ตัวอย่างรายงาน</span>
+                <button class="modal-close" onclick="closeModal()">✕</button>
+            </div>
+            <div class="modal-body" id="doc-body"></div>
+            <div class="modal-footer screen-only">
+                <button class="btn-preview" onclick="closeModal()">ปิด</button>
+                <button class="btn-print" onclick="window.print()">
+                    🖨️ พิมพ์ / บันทึก PDF
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN UI -->
+    <div class="screen screen-only">
+        <div class="page-title">🖨️ พิมพ์รายงาน</div>
+        <div class="page-sub">ตั้งค่ารายงานแล้วกดแสดงตัวอย่างก่อนพิมพ์</div>
+
+        <!-- หัวรายงาน -->
+        <div class="setting-card">
+            <div class="setting-title">หัวรายงาน</div>
+            <div class="setting-grid">
+                <div class="setting-group full">
+                    <label>ชื่อหน่วยงาน (บรรทัด 1)</label>
+                    <input type="text" id="agency1" value="อุทยานแห่งชาติแก่งกระจาน" />
+                </div>
+                <div class="setting-group full">
+                    <label>ชื่อหน่วยงาน (บรรทัด 2)</label>
+                    <input type="text" id="agency2" value="กรมอุทยานแห่งชาติ สัตว์ป่า และพันธุ์พืช" />
+                </div>
+                <div class="setting-group full">
+                    <label>ชื่อรายงาน</label>
+                    <input type="text" id="report-title" value="สรุปสถิติการเยียวยาผลกระทบจากช้างป่า" />
+                </div>
+                <div class="setting-group">
+                    <label>ช่วงเวลา / ปีงบประมาณ</label>
+                    <input type="text" id="report-period" placeholder="เช่น ปีงบประมาณ 2568" />
+                </div>
+                <div class="setting-group">
+                    <label>วันที่จัดทำ</label>
+                    <input type="date" id="report-date" />
+                </div>
+            </div>
+        </div>
+
+        <!-- เนื้อหา -->
+        <div class="setting-card">
+            <div class="setting-title">เนื้อหารายงาน</div>
+            <div class="check-grid">
+                <label class="check-item checked" onclick="toggleCheck(this)">
+                    <input type="checkbox" checked value="kpi" />
+                    <span>📊 สรุปยอดรวม (KPI)</span>
+                </label>
+                <label class="check-item checked" onclick="toggleCheck(this)">
+                    <input type="checkbox" checked value="by-type" />
+                    <span>📋 แยกตามประเภทกรณี</span>
+                </label>
+                <label class="check-item checked" onclick="toggleCheck(this)">
+                    <input type="checkbox" checked value="by-status" />
+                    <span>💰 แยกตามสถานะการจ่าย</span>
+                </label>
+                <label class="check-item" onclick="toggleCheck(this)">
+                    <input type="checkbox" value="by-year" />
+                    <span>📅 แยกตามปีงบประมาณ</span>
+                </label>
+                <label class="check-item" onclick="toggleCheck(this)">
+                    <input type="checkbox" value="table" />
+                    <span>📄 ตารางรายชื่อทั้งหมด</span>
+                </label>
+                <label class="check-item checked" onclick="toggleCheck(this)">
+                    <input type="checkbox" checked value="signature" />
+                    <span>✍️ ช่องลายเซ็น</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- ลายเซ็น -->
+        <div class="setting-card" id="sig-settings">
+            <div class="setting-title">ช่องลายเซ็น</div>
+            <div class="setting-grid">
+                <div class="setting-group">
+                    <label>ชื่อผู้จัดทำ</label>
+                    <input type="text" id="sig1-name" placeholder="ชื่อ-นามสกุล" />
+                </div>
+                <div class="setting-group">
+                    <label>ตำแหน่ง</label>
+                    <input type="text" id="sig1-pos" placeholder="ตำแหน่ง" />
+                </div>
+                <div class="setting-group">
+                    <label>ชื่อผู้ตรวจสอบ</label>
+                    <input type="text" id="sig2-name" placeholder="ชื่อ-นามสกุล" />
+                </div>
+                <div class="setting-group">
+                    <label>ตำแหน่ง</label>
+                    <input type="text" id="sig2-pos" placeholder="ตำแหน่ง" />
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-row">
+            <button class="btn-print" onclick="generateReport()">
+                👁️ แสดงตัวอย่าง
+            </button>
+            <button class="btn-preview" onclick="history.back()">← กลับ</button>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://xzuzpkzxyimcvgninskt.supabase.co";
+        const SUPABASE_KEY =
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6dXpwa3p4eWltY3Znbmluc2t0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MjcwMTksImV4cCI6MjA5NjMwMzAxOX0.P8uSZ4dlhCXyEfSOntD65eTAbYsJWkQ3SQFSsbmJm7k";
+
+        let RAW = [];
+        let logoDataUrl = "";
+
+        // โหลดข้อมูล
+        fetch(`${SUPABASE_URL}/rest/v1/compensation?select=*&order=id.asc`, {
+            headers: {
+                apikey: SUPABASE_KEY,
+                Authorization: `Bearer ${SUPABASE_KEY}`,
+            },
+        })
+            .then((r) => r.json())
+            .then((data) => {
+                RAW = data
+                    .filter((r) => r.id && r.name)
+                    .map((r) => ({
+                        ...r,
+                        requested_amount: parseFloat(r.requested_amount) || 0,
+                        fiscal_year: parseInt(r.fiscal_year) || 0,
+                    }));
+            });
+
+        // ตั้งวันที่วันนี้
+        document.getElementById("report-date").value = new Date()
+            .toISOString()
+            .split("T")[0];
+
+        function previewLogo(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                logoDataUrl = e.target.result;
+                const prev = document.getElementById("logo-preview");
+                prev.innerHTML = `<img src="${logoDataUrl}" alt="logo"/>`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function toggleCheck(label) {
+            const cb = label.querySelector("input");
+            cb.checked = !cb.checked;
+            label.classList.toggle("checked", cb.checked);
+            // ซ่อน/แสดง sig settings
+            const sigChecked = document.querySelector(
+                'input[value="signature"]',
+            ).checked;
+            document.getElementById("sig-settings").style.display = sigChecked
+                ? "block"
+                : "none";
+        }
+
+        function getChecked() {
+            return [...document.querySelectorAll(".check-item input:checked")].map(
+                (cb) => cb.value,
+            );
+        }
+
+        function fmtAmt(v) {
+            if (!v || v === 0) return "—";
+            return "฿" + v.toLocaleString("th-TH", { minimumFractionDigits: 2 });
+        }
+        function fmtDate(s) {
+            if (!s) return "—";
+            // แปลง ค.ศ. → พ.ศ. ถ้าจำเป็น
+            const p = s.split("/");
+            if (p.length === 3) {
+                let y = parseInt(p[2]);
+                if (y < 2500) y += 543;
+                return `${p[0]}/${p[1]}/${y}`;
+            }
+            return s;
+        }
+        function inputDateToThai(s) {
+            if (!s) return "—";
+            const [y, m, d] = s.split("-");
+            const months = [
+                "มกราคม",
+                "กุมภาพันธ์",
+                "มีนาคม",
+                "เมษายน",
+                "พฤษภาคม",
+                "มิถุนายน",
+                "กรกฎาคม",
+                "สิงหาคม",
+                "กันยายน",
+                "ตุลาคม",
+                "พฤศจิกายน",
+                "ธันวาคม",
+            ];
+            return `${parseInt(d)} ${months[parseInt(m) - 1]} ${parseInt(y) + 543}`;
+        }
+
+        function generateReport() {
+            const checked = getChecked();
+            const d = RAW; // ใช้ข้อมูลทั้งหมด (เพิ่ม filter ได้ทีหลัง)
+
+            const agency1 = document.getElementById("agency1").value;
+            const agency2 = document.getElementById("agency2").value;
+            const title = document.getElementById("report-title").value;
+            const period = document.getElementById("report-period").value;
+            const reportDate = document.getElementById("report-date").value;
+
+            const paidAmt = d
+                .filter((r) => r.compensation_status === "จ่ายเงินแล้ว")
+                .reduce((a, r) => a + r.requested_amount, 0);
+            const pendAmt = d
+                .filter((r) => r.compensation_status === "รออนุมัติเบิกจ่าย")
+                .reduce((a, r) => a + r.requested_amount, 0);
+            const totalAmt = d.reduce((a, r) => a + r.requested_amount, 0);
+
+            let html = `<div class="doc">`;
+
+            // HEADER
+            html += `<div class="doc-header">`;
+            html += `<img src="favicon.ico" class="doc-logo" alt="logo"/>`;  // ← แทนที่ if/else ทั้งหมด
+            html += `<div class="doc-agency">
+    <div class="doc-agency-name">${agency1}</div>
+    <div class="doc-agency-sub">${agency2}</div>
+</div></div>`;
+
+            // TITLE
+            html += `<div class="doc-title-block">
+        <div class="doc-title">${title}</div>
+        ${period ? `<div class="doc-subtitle">${period}</div>` : ""}
+        <div class="doc-date">ณ วันที่ ${inputDateToThai(reportDate)}</div>
+    </div>`;
+
+            // KPI
+            if (checked.includes("kpi")) {
+                html += `<div class="doc-section">
+        <div class="doc-section-title">สรุปยอดรวม</div>
+        <div class="doc-kpi-grid">
+            <div class="doc-kpi"><div class="doc-kpi-val">${d.length}</div><div class="doc-kpi-lbl">กรณีทั้งหมด</div></div>
+            <div class="doc-kpi"><div class="doc-kpi-val">${d.filter((r) => r.compensation_status === "จ่ายเงินแล้ว").length}</div><div class="doc-kpi-lbl">จ่ายเงินแล้ว</div></div>
+            <div class="doc-kpi"><div class="doc-kpi-val">${d.filter((r) => r.compensation_status === "รออนุมัติเบิกจ่าย").length}</div><div class="doc-kpi-lbl">รอการจ่าย</div></div>
+            <div class="doc-kpi"><div class="doc-kpi-val">${d.filter((r) => r.compensation_status === "รอเอกสารจากผู้เสียหาย").length}</div><div class="doc-kpi-lbl">รอเอกสาร</div></div>
+        </div>
+        <table class="doc-sum-table">
+            <thead><tr><th>รายการ</th><th style="text-align:right">จำนวน (ราย)</th><th style="text-align:right">จำนวนเงิน (บาท)</th></tr></thead>
+           <tbody>
+    <tr><td>จ่ายเงินแล้ว</td>
+        <td style="text-align:right">${d.filter(r => r.compensation_status === 'จ่ายเงินแล้ว').length}</td>
+        <td style="text-align:right">${paidAmt.toLocaleString('th-TH', { minimumFractionDigits: 2 })}</td>
+    </tr>
+    <tr><td>รออนุมัติเบิกจ่าย</td>
+        <td style="text-align:right">${d.filter(r => r.compensation_status === 'รออนุมัติเบิกจ่าย').length}</td>
+        <td style="text-align:right">${pendAmt.toLocaleString('th-TH', { minimumFractionDigits: 2 })}</td>
+    </tr>
+    <tr><td>รอเอกสารจากผู้เสียหาย</td>
+        <td style="text-align:right">${d.filter(r => r.compensation_status === 'รอเอกสารจากผู้เสียหาย').length}</td>
+        <td style="text-align:right">${d.filter(r => r.compensation_status === 'รอเอกสารจากผู้เสียหาย').reduce((a, r) => a + r.requested_amount, 0).toLocaleString('th-TH', { minimumFractionDigits: 2 })}</td>
+    </tr>
+    <tr><td>ไม่ขอรับการเยียวยา</td>
+        <td style="text-align:right">${d.filter(r => r.compensation_status === 'ไม่ขอรับการเยียวยา').length}</td>
+        <td style="text-align:right">—</td>
+    </tr>
+</tbody>
+            <tfoot><tr><td>รวมทั้งสิ้น</td><td style="text-align:right">${d.length}</td><td style="text-align:right">${totalAmt.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</td></tr></tfoot>
+        </table>
+        </div>`;
+            }
+
+            // BY TYPE
+            if (checked.includes("by-type")) {
+                const types = [...new Set(d.map((r) => r.compensation_case))].filter(
+                    Boolean,
+                );
+                html += `<div class="doc-section">
+        <div class="doc-section-title">แยกตามประเภทกรณีเยียวยา</div>
+        <table class="doc-sum-table">
+            <thead><tr><th>ประเภทกรณี</th><th style="text-align:right">จำนวน (ราย)</th><th style="text-align:right">จำนวนเงิน (บาท)</th></tr></thead>
+            <tbody>
+                ${types
+                        .map((t) => {
+                            const rows = d.filter((r) => r.compensation_case === t);
+                            const amt = rows.reduce(
+                                (a, r) => a + r.requested_amount,
+                                0,
+                            );
+                            return `<tr><td>${t}</td><td style="text-align:right">${rows.length}</td><td style="text-align:right">${amt.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</td></tr>`;
+                        })
+                        .join("")}
+            </tbody>
+            <tfoot><tr><td>รวม</td><td style="text-align:right">${d.length}</td><td style="text-align:right">${totalAmt.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</td></tr></tfoot>
+        </table>
+        </div>`;
+            }
+
+            // BY STATUS
+            if (checked.includes("by-status")) {
+                const statuses = ["จ่ายเงินแล้ว", "รออนุมัติเบิกจ่าย", 'รอเอกสารจากผู้เสียหาย', "ไม่ขอรับการเยียวยา"];
+                html += `<div class="doc-section">
+        <div class="doc-section-title">แยกตามสถานะการจ่ายเงิน</div>
+        <table class="doc-sum-table">
+            <thead><tr><th>สถานะ</th><th style="text-align:right">จำนวน (ราย)</th><th style="text-align:right">จำนวนเงิน (บาท)</th></tr></thead>
+            <tbody>
+                ${statuses
+                        .map((s) => {
+                            const rows = d.filter((r) => r.compensation_status === s);
+                            const amt = rows.reduce(
+                                (a, r) => a + r.requested_amount,
+                                0,
+                            );
+                            return `<tr><td>${s}</td><td style="text-align:right">${rows.length}</td><td style="text-align:right">${amt > 0 ? amt.toLocaleString("th-TH", { minimumFractionDigits: 2 }) : "—"}</td></tr>`;
+                        })
+                        .join("")}
+            </tbody>
+            <tfoot><tr><td>รวม</td><td style="text-align:right">${d.length}</td><td style="text-align:right">${totalAmt.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</td></tr></tfoot>
+        </table>
+        </div>`;
+            }
+
+            // BY YEAR
+            if (checked.includes("by-year")) {
+                const years = [...new Set(d.map((r) => r.fiscal_year))]
+                    .filter(Boolean)
+                    .sort();
+                html += `<div class="doc-section">
+        <div class="doc-section-title">แยกตามปีงบประมาณ</div>
+        <table class="doc-sum-table">
+            <thead><tr><th>ปีงบประมาณ</th><th style="text-align:right">จำนวน (ราย)</th><th style="text-align:right">จำนวนเงิน (บาท)</th></tr></thead>
+            <tbody>
+                ${years
+                        .map((y) => {
+                            const rows = d.filter((r) => r.fiscal_year === y);
+                            const amt = rows.reduce(
+                                (a, r) => a + r.requested_amount,
+                                0,
+                            );
+                            return `<tr><td>${y}</td><td style="text-align:right">${rows.length}</td><td style="text-align:right">${amt.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</td></tr>`;
+                        })
+                        .join("")}
+            </tbody>
+            <tfoot><tr><td>รวม</td><td style="text-align:right">${d.length}</td><td style="text-align:right">${totalAmt.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</td></tr></tfoot>
+        </table>
+        </div>`;
+            }
+
+            // TABLE
+            if (checked.includes("table")) {
+                html += `<div class="doc-section">
+        <div class="doc-section-title">รายชื่อผู้ขอรับการเยียวยาทั้งหมด</div>
+        <table class="doc-table">
+            <thead><tr>
+                <th>#</th><th>วันที่เกิดเหตุ</th><th>ชื่อ-นามสกุล</th>
+                <th>ประเภทกรณี</th><th style="text-align:right">จำนวนเงิน (฿)</th>
+                <th>ปีงบ</th><th>สถานะ</th>
+            </tr></thead>
+            <tbody>
+                ${d
+                        .map(
+                            (r, i) => `<tr>
+                    <td>${i + 1}</td>
+                    <td style="white-space:nowrap">${fmtDate(r.incident_date)}</td>
+                    <td>${r.name || "—"}</td>
+                    <td>${r.compensation_case || "—"}</td>
+                    <td style="text-align:right">${r.requested_amount > 0 ? r.requested_amount.toLocaleString("th-TH") : "—"}</td>
+                    <td style="text-align:center">${r.fiscal_year || "—"}</td>
+                    <td>${r.compensation_status || "—"}</td>
+                </tr>`,
+                        )
+                        .join("")}
+            </tbody>
+            <tfoot><tr>
+                <td colspan="4" style="text-align:right">รวมทั้งสิ้น</td>
+                <td style="text-align:right">${totalAmt.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</td>
+                <td colspan="2"></td>
+            </tr></tfoot>
+        </table>
+        <div class="doc-note">* จำนวนเงินแสดงเฉพาะรายที่มีการระบุจำนวนเงิน</div>
+        </div>`;
+            }
+
+            // SIGNATURE
+            if (checked.includes("signature")) {
+                const sig1Name = document.getElementById('sig1-name').value
+                    ? `(${document.getElementById('sig1-name').value})`
+                    : '(...................................)';
+                const sig1Pos =
+                    document.getElementById("sig1-pos").value || "ตำแหน่ง";
+                const sig2Name = document.getElementById('sig2-name').value
+                    ? `(${document.getElementById('sig2-name').value})`
+                    : '(...................................)';
+                const sig2Pos =
+                    document.getElementById("sig2-pos").value || "ตำแหน่ง";
+                html += `<div class="doc-sig">
+            <div class="doc-sig-box">
+                <div class="doc-sig-line"></div>
+                <div class="doc-sig-name">${sig1Name}</div>
+                <div class="doc-sig-pos">${sig1Pos}</div>
+                <div class="doc-sig-date">วันที่ .......... / .......... / ..........</div>
+            </div>
+            <div class="doc-sig-box">
+                <div class="doc-sig-line"></div>
+                <div class="doc-sig-name">${sig2Name}</div>
+                <div class="doc-sig-pos">${sig2Pos}</div>
+                <div class="doc-sig-date">วันที่ .......... / .......... / ..........</div>
+            </div>
+        </div>`;
+            }
+
+            html += `</div>`;
+
+            document.getElementById("doc-body").innerHTML = html;
+            document.getElementById("modal").classList.add("open");
+        }
+
+        function closeModal() {
+            document.getElementById("modal").classList.remove("open");
+        }
+    </script>
+</body>
+
+</html>

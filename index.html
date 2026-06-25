@@ -994,6 +994,11 @@
             color: #4c1d95;
         }
 
+        .b-live {
+            background: #dbeeff;
+            color: #1a4faa
+        }
+
         .amt {
             font-family: var(--ff-mono);
             font-size: 12px;
@@ -1552,7 +1557,7 @@
             </div>
         </div>
 
-        <button onclick="openReport()" class="fab-print">
+        <button onclick="window.location.href='report.html'" class="fab-print">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" height="22" width="22">
                 <path fill="white"
                     d="M17 8H7V6h10v2zm2 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-2 7H7v-4h10v4zm3-11H4c-1.1 0-2 .9-2 2v6h4v4h12v-4h4v-6c0-1.1-.9-2-2-2z" />
@@ -1678,7 +1683,7 @@
             ${(() => {
                     const types = {};
                     data.forEach(r => { types[r.compensation_case] = (types[r.compensation_case] || 0) + 1; });
-                    const colors = { 'เสียชีวิต': '#ef4444', 'บาดเจ็บ': '#3b82f6', 'พืชผลทางการเกษตร': '#16a34a', 'ทรัพย์สิน': '#ea580c', 'ทรัพย์สิน+พืชผลทางการเกษตร': '#8b5cf6' };
+                    const colors = { 'เสียชีวิต': '#8b17ff', 'บาดเจ็บ': '#be85ff', 'พืชผลทางการเกษตร': '#8eed58', 'ทรัพย์สิน': '#ffe121', ปศุสัตว์: "b-live", 'ทรัพย์สิน+พืชผลทางการเกษตร': '#ed66e6' };
                     return Object.entries(types).sort((a, b) => b[1] - a[1]).map(([t, c]) => {
                         const pct = Math.round(c / data.length * 100);
                         const col = colors[t] || '#64748b';
@@ -1788,11 +1793,12 @@
             pend: "#d97706",
             waive: "#9ca3af",
             wait_doc: "#3b82f6",
-            inj: "#3b82f6",
             die: "#ef4444",
-            crop: "#16a34a",
-            prop: "#ea580c",
-            mix: "#8b5cf6",
+            inj: "#be85ff",
+            crop: "#8eed58",
+            prop: "#ffe121",
+            mix: "#ed66e6",
+            anim: '#66b3ed',
         };
         const TYPE_C = {
             เสียชีวิต: C.die,
@@ -1800,13 +1806,15 @@
             พืชผลทางการเกษตร: C.crop,
             ทรัพย์สิน: C.prop,
             "ทรัพย์สิน+พืชผลทางการเกษตร": C.mix,
+            ปศุสัตว์: C.anim,
         };
         const CASE_COLOR = {
             เสียชีวิต: "#ef4444",
-            บาดเจ็บ: "#f97316",
-            พืชผลทางการเกษตร: "#16a34a",
-            ทรัพย์สิน: "#9ca3af",
-            "ทรัพย์สิน+พืชผลทางการเกษตร": "#aa56ff",
+            บาดเจ็บ: "#be85ff",
+            พืชผลทางการเกษตร: "#8eed58",
+            ทรัพย์สิน: "#ffe121",
+            "ทรัพย์สิน+พืชผลทางการเกษตร": "#ed66e6",
+            ปศุสัตว์: "#66b3ed",
         };
         const CD = {
             fontFamily: "'IBM Plex Sans Thai','Sarabun',sans-serif",
@@ -2191,7 +2199,7 @@
                         maxWidth: 130,
                     },
                 },
-                colors,
+                colors: cats.map(t => CASE_COLOR[t] || '#64748b'),
                 legend: { show: false },
                 dataLabels: {
                     enabled: true,
@@ -2227,6 +2235,7 @@
             "พืชผลทางการเกษตร",
             "ทรัพย์สิน",
             "ทรัพย์สิน+พืชผลทางการเกษตร",
+            "ปศุสัตว์",
         ];
         function getYearData(d) {
             const fys = [...new Set(d.map((r) => r.fiscal_year))].sort();
@@ -2626,6 +2635,7 @@
                 พืชผลทางการเกษตร: "b-crop",
                 ทรัพย์สิน: "b-prop",
                 "ทรัพย์สิน+พืชผลทางการเกษตร": "b-mix",
+                ปศุสัตว์: "b-live",
             };
             return `<span class="badge ${m[t] || "b-waive"}">${t}</span>`;
         }
