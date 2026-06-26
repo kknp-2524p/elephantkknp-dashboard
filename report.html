@@ -684,6 +684,28 @@
                     <label>วันที่จัดทำ</label>
                     <input type="date" id="report-date" />
                 </div>
+                <div class="setting-group">
+                    <label>กรองช่วงเวลา</label>
+                    <select id="date-filter" onchange="updatePeriodHint()">
+                        <option value="all">ทั้งหมด</option>
+                        <option value="this-month">เดือนนี้</option>
+                        <option value="last-month">เดือนที่แล้ว</option>
+                        <option value="this-year">ปีนี้ (ค.ศ.)</option>
+                        <option value="custom">กำหนดเอง</option>
+                    </select>
+                </div>
+                <div id="custom-range" style="display:none;grid-column:1/-1">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.875rem">
+                        <div class="setting-group">
+                            <label>วันที่เริ่มต้น</label>
+                            <input type="date" id="date-from" />
+                        </div>
+                        <div class="setting-group">
+                            <label>วันที่สิ้นสุด</label>
+                            <input type="date" id="date-to" />
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -792,6 +814,68 @@
             reader.readAsDataURL(file);
         }
 
+        function updatePeriodHint() {
+            const v = document.getElementById('date-filter').value;
+            document.getElementById('custom-range').style.display = v === 'custom' ? 'block' : 'none';
+
+            const now = new Date();
+            const months = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
+                'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+
+            const periodInput = document.getElementById('report-period');
+
+            if (v === 'this-month') {
+                const m = months[now.getMonth()];
+                const y = now.getFullYear() + 543;
+                periodInput.value = `ข้อมูลเดือน${m} พ.ศ. ${y}`;
+            } else if (v === 'last-month') {
+                const last = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+                const m = months[last.getMonth()];
+                const y = last.getFullYear() + 543;
+                periodInput.value = `ข้อมูลเดือน${m} พ.ศ. ${y}`;
+            } else if (v === 'this-year') {
+                const y = now.getFullYear() + 543;
+                periodInput.value = `ข้อมูลปี พ.ศ. ${y}`;
+            } else if (v === 'all') {
+                periodInput.value = '';
+            }
+            // custom ไม่ auto fill ให้พิมพ์เองครับ
+        }
+
+        function getFilteredByDate(d) {
+            const v = document.getElementById('date-filter').value;
+            if (v === 'all') return d;
+
+            const now = new Date();
+            let from, to;
+
+            if (v === 'this-month') {
+                from = new Date(now.getFullYear(), now.getMonth(), 1);
+                to = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            } else if (v === 'last-month') {
+                from = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+                to = new Date(now.getFullYear(), now.getMonth(), 0);
+            } else if (v === 'this-year') {
+                from = new Date(now.getFullYear(), 0, 1);
+                to = new Date(now.getFullYear(), 11, 31);
+            } else if (v === 'custom') {
+                from = document.getElementById('date-from').value ? new Date(document.getElementById('date-from').value) : null;
+                to = document.getElementById('date-to').value ? new Date(document.getElementById('date-to').value) : null;
+            }
+
+            return d.filter(r => {
+                if (!r.incident_date) return false;
+                const p = r.incident_date.split('/');
+                if (p.length !== 3) return false;
+                let y = parseInt(p[2]);
+                if (y > 2500) y -= 543; // แปลง พ.ศ. → ค.ศ.
+                const date = new Date(y, parseInt(p[1]) - 1, parseInt(p[0]));
+                if (from && date < from) return false;
+                if (to && date > to) return false;
+                return true;
+            });
+        }
+
         function toggleCheck(label) {
             const cb = label.querySelector("input");
             cb.checked = !cb.checked;
@@ -848,7 +932,7 @@
 
         function generateReport() {
             const checked = getChecked();
-            const d = RAW; // ใช้ข้อมูลทั้งหมด (เพิ่ม filter ได้ทีหลัง)
+            const d = getFilteredByDate(RAW); // ← เปลี่ยนจาก const d = RAW;
 
             const agency1 = document.getElementById("agency1").value;
             const agency2 = document.getElementById("agency2").value;
@@ -878,7 +962,7 @@
             html += `<div class="doc-title-block">
         <div class="doc-title">${title}</div>
         ${period ? `<div class="doc-subtitle">${period}</div>` : ""}
-        <div class="doc-date">ณ วันที่ ${inputDateToThai(reportDate)}</div>
+        <div class="doc-date">ข้อมูล ณ วันที่ ${inputDateToThai(reportDate)}</div>
     </div>`;
 
             // KPI

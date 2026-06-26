@@ -1483,7 +1483,7 @@
                 <div id="chart-amount" style="min-height: 200px"></div>
             </div>
             <div class="card">
-                <div class="card-hd"><span class="card-title">สัดส่วนเพศ</span></div>
+                <div class="card-hd"><span class="card-title">สัดส่วนช่วงอายุ</span></div>
                 <div class="card-sub">ผู้ขอรับการเยียวยา</div>
                 <div id="chart-gender" style="min-height: 200px"></div>
             </div>
@@ -2560,42 +2560,45 @@
             });
         }
 
-        function getGenderData(d) {
-            const m = countBy(d, (r) => r.gender);
-            return { series: Object.values(m), labels: Object.keys(m) };
+        function getAgeData(d) {
+            const ranges = [
+                { label: 'เด็ก (ต่ำกว่า 18 ปี)', min: 1, max: 17 },
+                { label: 'วัยทำงาน (18-59 ปี)', min: 18, max: 59 },
+                { label: 'ผู้สูงอายุ (60 ปีขึ้นไป)', min: 60, max: 999 },
+                { label: 'ไม่ระบุอายุ', min: null, max: null },
+            ];
+            const series = ranges.map(r => {
+                if (r.min === null) return d.filter(x => !x.age || x.age === null).length;
+                return d.filter(x => x.age && x.age >= r.min && x.age <= r.max).length;
+            });
+            return { series, labels: ranges.map(r => r.label) };
         }
+
         function initGenderChart(d) {
-            const { series, labels } = getGenderData(d);
-            CHARTS.gender = new ApexCharts(
-                document.getElementById("chart-gender"),
-                {
-                    ...CD,
-                    series,
-                    labels,
-                    chart: {
-                        type: "pie",
-                        height: 200,
-                        fontFamily: CD.fontFamily,
-                        toolbar: { show: false },
-                    },
-                    colors: ["#1a4faa", "#db2777"],
-                    legend: {
-                        position: "bottom",
-                        fontSize: "11px",
-                        fontFamily: CD.fontFamily,
-                    },
-                    dataLabels: {
-                        enabled: true,
-                        formatter: (v, o) =>
-                            o.w.config.labels[o.seriesIndex] + "\n" + Math.round(v) + "%",
-                        style: { fontSize: "10.5px", fontFamily: CD.fontFamily },
-                    },
-                    stroke: { width: 2, colors: ["#fff"] },
-                    tooltip: { y: { formatter: (v) => v + " ราย" } },
+            const { series, labels } = getAgeData(d);
+            CHARTS.gender = new ApexCharts(document.getElementById('chart-gender'), {
+                ...CD,
+                series,
+                labels,
+                chart: { type: 'pie', height: 200, fontFamily: CD.fontFamily, toolbar: { show: false } },
+                colors: ['#3b82f6', '#8b5cf6', '#1a6b42', '#d97706', '#9ca3af'],
+                legend: { position: 'bottom', fontSize: '11px', fontFamily: CD.fontFamily },
+                dataLabels: {
+                    enabled: true,
+                    formatter: (v, o) => o.w.config.labels[o.seriesIndex] + '\n' + Math.round(v) + '%',
+                    style: { fontSize: '10.5px', fontFamily: CD.fontFamily },
                 },
-            );
+                stroke: { width: 2, colors: ['#fff'] },
+                tooltip: { y: { formatter: v => v + ' ราย' } },
+            });
             CHARTS.gender.render();
         }
+
+        function updateGenderChart(d) {
+            const { series, labels } = getAgeData(d);
+            CHARTS.gender.updateOptions({ series, labels });
+        }
+
         function updateGenderChart(d) {
             const { series, labels } = getGenderData(d);
             CHARTS.gender.updateOptions({ series, labels });

@@ -710,6 +710,11 @@
             t.className = `toast ${type} show`;
             setTimeout(() => t.className = 'toast', 3000);
         }
+
+        body: JSON.stringify({
+            compensation_status: newStatus,
+            updated_at: new Date().toISOString()
+        })
     </script>
 </body>
 
