@@ -726,8 +726,9 @@
                 </div>
                 <div class="hdr-right">
                     <span id="user-email"></span>
-                    <button onclick="doLogout()" class="nav-link">ออก</button>
+                    <a href="edit.html" class="nav-link">✏️ แก้ไขข้อมูล</a>
                     <a href="index.html" class="nav-link">← หน้าหลัก</a>
+                    <button onclick="doLogout()" class="nav-link">ออก</button>
                 </div>
             </div>
         </header>
@@ -955,7 +956,6 @@
                 align-items: center;
                 flex-wrap: wrap;
               ">
-                        <a href="update_status.html" class="btn-secondary">✏️ อัปเดทสถานะ</a>
                         <button class="btn-submit" id="btn-compensation" onclick="submitCompensation()">
                             <span>💾 บันทึก</span>
                         </button>
@@ -1406,6 +1406,20 @@
             const savedCase = compensation_case;
 
             const btn = document.getElementById("btn-compensation");
+
+            const { data: { user } } = await sb.auth.getUser();
+            const userEmail = user?.email || null;
+
+            if (damageRows.length > 0) {
+                await sb.from('damage_items').insert(
+                    damageRows.map(r => ({
+                        ...r,
+                        compensation_id: id,
+                        created_by: userEmail,
+                        updated_at: new Date().toISOString()
+                    }))
+                );
+            }
             btn.disabled = true;
             btn.innerHTML = "<span>⏳ กำลังบันทึก...</span>";
             try {
@@ -1435,11 +1449,19 @@
                     payment_method: val("c-payment_method") || null,
                     payment_detail: val("c-payment_detail") || null,
                     remark: val("c-remark") || null,
+                    created_by: userEmail,
+                    updated_at: new Date().toISOString(),
                 });
 
                 const damageRows = getDamageRows();
                 if (damageRows.length > 0) {
-                    await sb.from('damage_items').insert(damageRows.map(r => ({ ...r, compensation_id: id })));
+                    await sb.from('damage_items').insert(
+                        damageRows.map(r => ({
+                            ...r,
+                            compensation_id: id,
+                            created_by: userEmail,
+                            updated_at: new Date().toISOString()
+                        })));
                 }
 
                 resetForm('compensation');
@@ -1540,6 +1562,8 @@
                 showAlert("error", "กรุณากรอกข้อมูลที่จำเป็นให้ครบ (*)");
                 return;
             }
+            const { data: { user } } = await sb.auth.getUser();
+            const userEmail = user?.email || null;
             const btn = document.getElementById("btn-casualty");
             btn.disabled = true;
             btn.innerHTML = "<span>⏳ กำลังบันทึก...</span>";
@@ -1562,6 +1586,8 @@
                     count: parseInt(count),
                     remark: val("ca-remark") || null,
                     remark_2: val("ca-remark_2") || null,
+                    created_by: userEmail,
+                    updated_at: new Date().toISOString(),
                 });
                 showAlert("success");
                 document.getElementById('alert-success').textContent = '✅ บันทึกข้อมูลสำเร็จแล้ว';
@@ -1582,6 +1608,8 @@
                 showAlert("error", "กรุณากรอกข้อมูลที่จำเป็นให้ครบ (*)");
                 return;
             }
+            const { data: { user } } = await sb.auth.getUser();
+            const userEmail = user?.email || null;
             const btn = document.getElementById("btn-elephant");
             btn.disabled = true;
             btn.innerHTML = "<span>⏳ กำลังบันทึก...</span>";
@@ -1602,6 +1630,8 @@
                     count: parseInt(count),
                     cause,
                     detail: val("e-detail") || null,
+                    created_by: userEmail,
+                    updated_at: new Date().toISOString(),
                 });
                 showAlert("success");
                 resetForm("elephant");

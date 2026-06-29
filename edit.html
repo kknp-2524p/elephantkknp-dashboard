@@ -1,0 +1,1328 @@
+<!doctype html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>แก้ไขข้อมูลเยียวยา — แก่งกระจาน</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --green: #2d6a4f;
+            --green-dark: #1b4332;
+            --green-soft: #d8f3dc;
+            --bg: #f1f5f2;
+            --line: #d7e3da;
+            --text: #1f2d27;
+            --muted: #6b7a72;
+            --danger: #c0392b;
+            --warn: #b7791f;
+        }
+
+        body {
+            font-family: "Sarabun", "Segoe UI", Tahoma, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* LOGIN */
+        .login-wrap {
+            display: none;
+            min-height: 100vh;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .login-wrap.show {
+            display: flex;
+        }
+
+        .login-card {
+            background: #fff;
+            border-radius: 18px;
+            padding: 2.2rem;
+            width: 100%;
+            max-width: 380px;
+            box-shadow: 0 12px 40px rgba(27, 67, 50, 0.15);
+            text-align: center;
+        }
+
+        .login-ico {
+            font-size: 2.6rem;
+        }
+
+        .login-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-top: 0.4rem;
+        }
+
+        .login-sub {
+            color: var(--muted);
+            margin-bottom: 1.4rem;
+        }
+
+        .login-field {
+            text-align: left;
+            margin-bottom: 0.9rem;
+        }
+
+        .login-field label {
+            font-size: 0.85rem;
+            color: var(--muted);
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+
+        .login-field input,
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.6rem 0.75rem;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            background: #fff;
+        }
+
+        .login-field input:focus,
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--green);
+            box-shadow: 0 0 0 3px var(--green-soft);
+        }
+
+        .login-err {
+            display: none;
+            color: var(--danger);
+            font-size: 0.85rem;
+            margin-bottom: 0.7rem;
+        }
+
+        .login-btn {
+            width: 100%;
+            background: var(--green);
+            color: #fff;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .login-btn:hover {
+            background: var(--green-dark);
+        }
+
+        /* HEADER */
+        .hdr {
+            background: var(--green-dark);
+            color: #fff;
+            padding: 0.9rem 1rem;
+        }
+
+        .hdr-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .hdr-left {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .hdr-badge {
+            font-size: 1.6rem;
+            background: rgba(255, 255, 255, 0.12);
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hdr-title h1 {
+            font-size: 1.1rem;
+        }
+
+        .hdr-title p {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .hdr-right {
+            display: flex;
+            gap: 0.6rem;
+            align-items: center;
+            font-size: 0.85rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.14);
+            border: none;
+            padding: 0.4rem 0.7rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.28);
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 1.2rem auto;
+            padding: 0 1rem;
+        }
+
+        /* TOOLBAR */
+        .toolbar {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .toolbar input,
+        .toolbar select {
+            padding: 0.55rem 0.75rem;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 0.92rem;
+            background: #fff;
+        }
+
+        .toolbar .search {
+            flex: 1;
+            min-width: 220px;
+        }
+
+        .count-badge {
+            margin-left: auto;
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+
+        /* TABLE */
+        .table-card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 4px 18px rgba(27, 67, 50, 0.07);
+            overflow: hidden;
+        }
+
+        .table-scroll {
+            overflow-x: auto;
+        }
+
+        table.data {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            min-width: 920px;
+        }
+
+        table.data th {
+            background: var(--green-soft);
+            color: var(--green-dark);
+            text-align: left;
+            padding: 0.8rem 1rem;
+            font-weight: 600;
+            font-size: 0.86rem;
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        table.data td {
+            padding: 0.7rem 1rem;
+            border-top: 1px solid var(--line);
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+
+        /* แถบสลับสี + hover */
+        table.data tbody tr:nth-child(even) td {
+            background: #fafdfb;
+        }
+
+        table.data tbody tr:hover td {
+            background: #eef7f1;
+        }
+
+        td.col-id {
+            color: var(--muted);
+            font-variant-numeric: tabular-nums;
+        }
+
+        td.col-name {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        td.col-amt {
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+            font-weight: 600;
+        }
+
+        th.col-amt {
+            text-align: right;
+        }
+
+        td.col-year {
+            text-align: center;
+            font-variant-numeric: tabular-nums;
+            color: var(--muted);
+        }
+
+        th.col-year {
+            text-align: center;
+        }
+
+        .muted-dash {
+            color: #c2ccc6;
+        }
+
+        .gender-tag {
+            font-size: 0.85rem;
+        }
+
+        .pill {
+            display: inline-block;
+            padding: 0.2rem 0.65rem;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            background: #eef2f0;
+            color: var(--muted);
+            white-space: nowrap;
+        }
+
+        .pill.paid {
+            background: #e0f3e6;
+            color: #1b7a3d;
+        }
+
+        .pill.wait {
+            background: #fdf1d8;
+            color: var(--warn);
+        }
+
+        .pill.none {
+            background: #f1f3f2;
+            color: #9aa6a0;
+        }
+
+        /* คอลัมน์ปุ่มแก้ไข ปักไว้ขวาสุด ไม่โดนตัด */
+        th.col-action,
+        td.col-action {
+            position: sticky;
+            right: 0;
+            background: #fff;
+            text-align: center;
+            box-shadow: -6px 0 8px -6px rgba(0, 0, 0, 0.12);
+        }
+
+        th.col-action {
+            background: var(--green-soft);
+        }
+
+        table.data tbody tr:nth-child(even) td.col-action {
+            background: #fafdfb;
+        }
+
+        table.data tbody tr:hover td.col-action {
+            background: #eef7f1;
+        }
+
+        .btn-edit {
+            background: var(--green);
+            color: #fff;
+            border: none;
+            padding: 0.42rem 0.9rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            font-family: inherit;
+            white-space: nowrap;
+            transition: background 0.15s;
+        }
+
+        .btn-edit:hover {
+            background: var(--green-dark);
+        }
+
+        .empty,
+        .loading {
+            padding: 2.5rem;
+            text-align: center;
+            color: var(--muted);
+        }
+
+        /* MODAL */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(20, 35, 28, 0.55);
+            z-index: 50;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+        }
+
+        .modal {
+            background: #fff;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 820px;
+            margin: 1.5rem 0;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-head {
+            padding: 1.1rem 1.4rem;
+            border-bottom: 1px solid var(--line);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: #fff;
+            border-radius: 16px 16px 0 0;
+            z-index: 2;
+        }
+
+        .modal-head h2 {
+            font-size: 1.15rem;
+            color: var(--green-dark);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--muted);
+            line-height: 1;
+        }
+
+        .modal-body {
+            padding: 1.2rem 1.4rem;
+        }
+
+        .section-title {
+            font-weight: 700;
+            color: var(--green-dark);
+            margin: 1.1rem 0 0.6rem;
+            font-size: 0.95rem;
+            border-left: 3px solid var(--green);
+            padding-left: 0.5rem;
+        }
+
+        .section-title:first-child {
+            margin-top: 0;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.8rem;
+        }
+
+        .form-grid.g3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            font-size: 0.82rem;
+            color: var(--muted);
+            margin-bottom: 0.25rem;
+        }
+
+        .form-group textarea {
+            min-height: 64px;
+            resize: vertical;
+        }
+
+        .locked input {
+            background: #eef0ee !important;
+            cursor: not-allowed;
+            color: #555;
+        }
+
+        .lock-tag {
+            font-size: 0.7rem;
+            color: #fff;
+            background: var(--muted);
+            border-radius: 6px;
+            padding: 0.05rem 0.4rem;
+            margin-left: 0.35rem;
+        }
+
+        /* damage table in modal */
+        .damage-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+        }
+
+        .damage-table th {
+            text-align: left;
+            color: var(--muted);
+            font-weight: 600;
+            padding: 0.3rem 0.4rem;
+            font-size: 0.8rem;
+        }
+
+        .damage-table td {
+            padding: 0.25rem 0.4rem;
+        }
+
+        .damage-table input,
+        .damage-table select {
+            width: 100%;
+            padding: 0.45rem 0.5rem;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.88rem;
+        }
+
+        .btn-add-row {
+            background: var(--green-soft);
+            color: var(--green-dark);
+            border: 1px dashed var(--green);
+            padding: 0.45rem 0.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+
+        .btn-del-row {
+            background: #fdeceb;
+            color: var(--danger);
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .modal-foot {
+            padding: 1rem 1.4rem;
+            border-top: 1px solid var(--line);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.6rem;
+            position: sticky;
+            bottom: 0;
+            background: #fff;
+            border-radius: 0 0 16px 16px;
+        }
+
+        .btn-cancel {
+            background: #eef0ee;
+            color: var(--text);
+            border: none;
+            padding: 0.65rem 1.2rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.95rem;
+        }
+
+        .btn-save {
+            background: var(--green);
+            color: #fff;
+            border: none;
+            padding: 0.65rem 1.4rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .btn-save:hover {
+            background: var(--green-dark);
+        }
+
+        .btn-save:disabled {
+            opacity: 0.6;
+            cursor: default;
+        }
+
+        /* ALERT */
+        .alert {
+            display: none;
+            padding: 0.8rem 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            font-size: 0.92rem;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-success {
+            background: #e0f3e6;
+            color: #1b7a3d;
+        }
+
+        .alert-error {
+            background: #fdeceb;
+            color: var(--danger);
+        }
+
+        footer {
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.82rem;
+            padding: 1.5rem;
+        }
+
+        @media (max-width: 640px) {
+
+            .form-grid,
+            .form-grid.g3 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- LOGIN -->
+    <div class="login-wrap" id="login-screen">
+        <div class="login-card">
+            <div class="login-ico">🌿</div>
+            <div class="login-title">เข้าสู่ระบบ</div>
+            <div class="login-sub">อุทยานแห่งชาติแก่งกระจาน</div>
+            <div class="login-field">
+                <label>Email</label>
+                <input type="email" id="login-email" placeholder="email@example.com"
+                    onkeydown="if (event.key === 'Enter') doLogin();" />
+            </div>
+            <div class="login-field">
+                <label>รหัสผ่าน</label>
+                <input type="password" id="login-password" placeholder="••••••••"
+                    onkeydown="if (event.key === 'Enter') doLogin();" />
+            </div>
+            <div class="login-err" id="login-error"></div>
+            <button class="login-btn" id="btn-login" onclick="doLogin()">
+                เข้าสู่ระบบ
+            </button>
+        </div>
+    </div>
+
+    <!-- APP -->
+    <div id="app-screen" style="display: none">
+        <header class="hdr">
+            <div class="hdr-inner">
+                <div class="hdr-left">
+                    <div class="hdr-badge">📋</div>
+                    <div class="hdr-title">
+                        <h1>แก้ไขข้อมูลเยียวยา — แก่งกระจาน</h1>
+                        <p>เลือกแถวที่ต้องการแล้วกดแก้ไข</p>
+                    </div>
+                </div>
+                <div class="hdr-right">
+                    <span id="user-email"></span>
+                    <a href="form.html" class="nav-link">+ กรอกข้อมูล</a>
+                    <a href="index.html" class="nav-link">← หน้าหลัก</a>
+                    <button onclick="doLogout()" class="nav-link">ออก</button>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <div class="alert alert-success" id="alert-success">
+                ✅ บันทึกการแก้ไขเรียบร้อยแล้ว
+            </div>
+            <div class="alert alert-error" id="alert-error">
+                ❌ เกิดข้อผิดพลาด: <span id="error-msg"></span>
+            </div>
+
+            <div class="toolbar">
+                <input class="search" id="search" placeholder="🔍 ค้นหาชื่อ / ตำบล / อำเภอ..."
+                    oninput="renderTable()" />
+                <select id="filter-status" onchange="renderTable()">
+                    <option value="">ทุกสถานะ</option>
+                    <option>รอเอกสารจากผู้เสียหาย</option>
+                    <option>จ่ายเงินแล้ว</option>
+                    <option>รออนุมัติเบิกจ่าย</option>
+                    <option>ไม่ขอรับการเยียวยา</option>
+                </select>
+                <select id="filter-year" onchange="renderTable()">
+                    <option value="">ทุกปีงบฯ</option>
+                    <option>2567</option>
+                    <option>2568</option>
+                    <option>2569</option>
+                    <option>2570</option>
+                </select>
+                <span class="count-badge" id="count-badge"></span>
+            </div>
+
+            <div class="table-card">
+                <div class="table-scroll">
+                    <table class="data">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>วันที่เกิดเหตุ</th>
+                                <th>ชื่อ-นามสกุล</th>
+                                <th>เพศ</th>
+                                <th>กรณี</th>
+                                <th>สถานะ</th>
+                                <th class="col-amt">จำนวนเงิน (฿)</th>
+                                <th>ตำบล / อำเภอ</th>
+                                <th class="col-year">ปีงบฯ</th>
+                                <th class="col-action">แก้ไข</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody"></tbody>
+                    </table>
+                </div>
+                <div class="loading" id="loading">กำลังโหลดข้อมูล...</div>
+                <div class="empty" id="empty" style="display: none">ไม่พบข้อมูล</div>
+            </div>
+        </main>
+        <footer>อุทยานแห่งชาติแก่งกระจาน · ระบบแก้ไขข้อมูล</footer>
+    </div>
+
+    <!-- EDIT MODAL -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal">
+            <div class="modal-head">
+                <h2>✏️ แก้ไขข้อมูลเยียวยา</h2>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="section-title">ข้อมูลผู้รับการเยียวยา (ล็อก)</div>
+                <div class="form-grid g3">
+                    <div class="form-group locked">
+                        <label>ID <span class="lock-tag">ล็อก</span></label>
+                        <input type="text" id="m-id" readonly />
+                    </div>
+                    <div class="form-group locked">
+                        <label>ชื่อ-นามสกุล <span class="lock-tag">ล็อก</span></label>
+                        <input type="text" id="m-name" readonly />
+                    </div>
+                    <div class="form-group locked">
+                        <label>เพศ <span class="lock-tag">ล็อก</span></label>
+                        <input type="text" id="m-gender" readonly />
+                    </div>
+                </div>
+
+                <div class="section-title">ข้อมูลเหตุการณ์</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>วันที่เกิดเหตุ</label>
+                        <input type="date" id="m-incident_date" />
+                    </div>
+                    <div class="form-group">
+                        <label>ปีงบประมาณ</label>
+                        <select id="m-fiscal_year">
+                            <option value="">-- เลือกปี --</option>
+                            <option>2567</option>
+                            <option>2568</option>
+                            <option>2569</option>
+                            <option>2570</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>กรณีเยียวยา</label>
+                        <select id="m-compensation_case">
+                            <option value="">-- เลือกประเภท --</option>
+                            <option>เสียชีวิต</option>
+                            <option>บาดเจ็บ</option>
+                            <option>พืชผลทางการเกษตร</option>
+                            <option>ทรัพย์สิน</option>
+                            <option>ทรัพย์สิน+พืชผลทางการเกษตร</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>สถานะการเยียวยา</label>
+                        <select id="m-compensation_status">
+                            <option value="">-- เลือกสถานะ --</option>
+                            <option>รอเอกสารจากผู้เสียหาย</option>
+                            <option>จ่ายเงินแล้ว</option>
+                            <option>รออนุมัติเบิกจ่าย</option>
+                            <option>ไม่ขอรับการเยียวยา</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>อายุ (ปี)</label>
+                        <input type="number" id="m-age" min="0" max="120" />
+                    </div>
+                    <div class="form-group">
+                        <label>จำนวนเงินที่ขอเยียวยา (฿)</label>
+                        <input type="number" id="m-requested_amount" min="0" step="0.01" />
+                    </div>
+                </div>
+
+                <div class="section-title">ที่อยู่</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>หมู่บ้าน</label>
+                        <input type="text" id="m-village" />
+                    </div>
+                    <div class="form-group">
+                        <label>ตำบล</label>
+                        <input type="text" id="m-subdistrict" />
+                    </div>
+                    <div class="form-group">
+                        <label>อำเภอ</label>
+                        <input type="text" id="m-district" />
+                    </div>
+                    <div class="form-group">
+                        <label>จังหวัด</label>
+                        <input type="text" id="m-province" />
+                    </div>
+                    <div class="form-group">
+                        <label>Latitude</label>
+                        <input type="text" id="m-lat" />
+                    </div>
+                    <div class="form-group">
+                        <label>Longitude</label>
+                        <input type="text" id="m-lon" />
+                    </div>
+                </div>
+
+                <div class="section-title">รายการความเสียหาย</div>
+                <table class="damage-table">
+                    <thead>
+                        <tr>
+                            <th>รายการ</th>
+                            <th style="width: 90px">จำนวน</th>
+                            <th style="width: 120px">หน่วย</th>
+                            <th style="width: 40px"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="m-damage-tbody"></tbody>
+                </table>
+                <button type="button" class="btn-add-row" onclick="addDamageRow()">
+                    + เพิ่มรายการ
+                </button>
+
+                <div class="section-title">ข้อมูลการจ่ายเงิน</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>วันที่ส่งเรื่อง</label>
+                        <input type="date" id="m-submission_date" />
+                    </div>
+                    <div class="form-group">
+                        <label>วันที่จ่ายเงิน</label>
+                        <input type="date" id="m-payment_date" />
+                    </div>
+                    <div class="form-group">
+                        <label>รูปแบบการจ่ายเงิน</label>
+                        <select id="m-payment_method">
+                            <option value="">-- เลือก --</option>
+                            <option>โอนเข้าบัญชี</option>
+                            <option>เช็คเงินสด</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>เยียวยาครั้งที่ 2 (฿)</label>
+                        <input type="number" id="m-second_compensation" min="0" step="0.01" />
+                    </div>
+                    <div class="form-group">
+                        <label>วันที่จ่ายเงินครั้งที่ 2</label>
+                        <input type="date" id="m-second_payment_date" />
+                    </div>
+                    <div class="form-group">
+                        <label>รายละเอียดการจ่ายเงิน</label>
+                        <input type="text" id="m-payment_detail" />
+                    </div>
+                    <div class="form-group full">
+                        <label>หมายเหตุ</label>
+                        <textarea id="m-remark"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-foot">
+                <button class="btn-cancel" onclick="closeModal()">ยกเลิก</button>
+                <button class="btn-save" id="btn-save" onclick="saveEdit()">
+                    💾 บันทึกการแก้ไข
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://xzuzpkzxyimcvgninskt.supabase.co";
+        const SUPABASE_KEY =
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6dXpwa3p4eWltY3Znbmluc2t0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MjcwMTksImV4cCI6MjA5NjMwMzAxOX0.P8uSZ4dlhCXyEfSOntD65eTAbYsJWkQ3SQFSsbmJm7k";
+        const { createClient } = supabase;
+        const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let ROWS = []; // compensation records
+        let editingId = null; // id being edited
+
+        // ---------- AUTH ----------
+        window.addEventListener("load", async () => {
+            const {
+                data: { session },
+            } = await sb.auth.getSession();
+            if (session) showApp(session.user.email);
+            else showLogin();
+        });
+
+        function showLogin() {
+            document.getElementById("login-screen").classList.add("show");
+            document.getElementById("app-screen").style.display = "none";
+        }
+        function showApp(email) {
+            document.getElementById("login-screen").classList.remove("show");
+            document.getElementById("app-screen").style.display = "block";
+            document.getElementById("user-email").textContent = email;
+            loadData();
+        }
+        async function doLogin() {
+            const email = document.getElementById("login-email").value.trim();
+            const password = document.getElementById("login-password").value;
+            const btn = document.getElementById("btn-login");
+            const err = document.getElementById("login-error");
+            if (!email || !password) {
+                err.textContent = "กรุณากรอก email และรหัสผ่าน";
+                err.style.display = "block";
+                return;
+            }
+            btn.disabled = true;
+            btn.textContent = "กำลังเข้าสู่ระบบ...";
+            err.style.display = "none";
+            const { data, error } = await sb.auth.signInWithPassword({
+                email,
+                password,
+            });
+            if (error) {
+                err.textContent = "email หรือรหัสผ่านไม่ถูกต้อง";
+                err.style.display = "block";
+                btn.disabled = false;
+                btn.textContent = "เข้าสู่ระบบ";
+            } else {
+                showApp(data.user.email);
+            }
+        }
+        async function doLogout() {
+            await sb.auth.signOut();
+            showLogin();
+        }
+
+        // ---------- HELPERS ----------
+        function thaiToInputDate(s) {
+            // DB stores incident_date as "DD/MM/YYYY" (ค.ศ.). Convert to YYYY-MM-DD for <input type=date>
+            if (!s) return "";
+            if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10); // already ISO
+            const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+            if (!m) return "";
+            const d = m[1].padStart(2, "0"),
+                mo = m[2].padStart(2, "0"),
+                y = m[3];
+            return `${y}-${mo}-${d}`;
+        }
+        function inputToThaiDate(s) {
+            if (!s) return null;
+            const [y, m, d] = s.split("-");
+            return `${d}/${m}/${y}`; // เก็บเป็น ค.ศ. ตามระบบเดิม
+        }
+        function isoOrNull(s) {
+            // for submission/payment dates: keep YYYY-MM-DD as-is
+            return s && /^\d{4}-\d{2}-\d{2}/.test(s) ? s.slice(0, 10) : s || null;
+        }
+        function getYearBE(s) {
+            return s ? parseInt(s.split("-")[0]) + 543 : null;
+        }
+        function getYearAD(s) {
+            return s ? parseInt(s.split("-")[0]) : null;
+        }
+        function fmtMoney(v) {
+            if (v === null || v === undefined || v === "") return "-";
+            return Number(v).toLocaleString("th-TH", {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2,
+            });
+        }
+        // แสดงวันที่: เติมเลข 0 ให้ครบ + แปลง ค.ศ. → พ.ศ. ให้ตรงกับหน้า Dashboard
+        function fmtDateDisplay(s) {
+            if (!s) return "";
+            const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+            if (!m) return s;
+            const d = m[1].padStart(2, "0");
+            const mo = m[2].padStart(2, "0");
+            let y = parseInt(m[3]);
+            if (y < 2500) y += 543; // เก็บเป็น ค.ศ. → โชว์เป็น พ.ศ.
+            return `${d}/${mo}/${y}`;
+        }
+        function genderTag(g) {
+            if (g === "ชาย") return '<span class="gender-tag">👨 ชาย</span>';
+            if (g === "หญิง") return '<span class="gender-tag">👩 หญิง</span>';
+            return '<span class="muted-dash">-</span>';
+        }
+        function dash(v) {
+            return v === null || v === undefined || v === ""
+                ? '<span class="muted-dash">-</span>'
+                : esc(v);
+        }
+        function esc(s) {
+            return (s ?? "")
+                .toString()
+                .replace(
+                    /[&<>"]/g,
+                    (c) =>
+                        ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c],
+                );
+        }
+        function setVal(id, v) {
+            const el = document.getElementById(id);
+            if (el) el.value = v ?? "";
+        }
+        function getVal(id) {
+            const el = document.getElementById(id);
+            return el ? el.value.trim() : "";
+        }
+        function numOrNull(id) {
+            const v = getVal(id);
+            return v !== "" ? parseFloat(v) : null;
+        }
+        function intOrNull(id) {
+            const v = getVal(id);
+            return v !== "" ? parseInt(v) : null;
+        }
+
+        // ---------- LOAD + RENDER ----------
+        async function loadData() {
+            document.getElementById("loading").style.display = "block";
+            document.getElementById("empty").style.display = "none";
+            const { data, error } = await sb
+                .from("compensation")
+                .select("*")
+                .order("id", { ascending: false });
+            document.getElementById("loading").style.display = "none";
+            if (error) {
+                showAlert("error", error.message);
+                return;
+            }
+            ROWS = data || [];
+            renderTable();
+        }
+
+        function renderTable() {
+            const q = document.getElementById("search").value.trim().toLowerCase();
+            const fStatus = document.getElementById("filter-status").value;
+            const fYear = document.getElementById("filter-year").value;
+            const tbody = document.getElementById("tbody");
+
+            let list = ROWS.filter((r) => {
+                if (fStatus && r.compensation_status !== fStatus) return false;
+                if (fYear && String(r.fiscal_year) !== fYear) return false;
+                if (q) {
+                    const hay =
+                        `${r.name || ""} ${r.subdistrict || ""} ${r.district || ""} ${r.province || ""} ${r.village || ""}`.toLowerCase();
+                    if (!hay.includes(q)) return false;
+                }
+                return true;
+            });
+
+            document.getElementById("count-badge").textContent =
+                `ทั้งหมด ${list.length} รายการ`;
+            document.getElementById("empty").style.display = list.length
+                ? "none"
+                : "block";
+
+            tbody.innerHTML = list
+                .map((r) => {
+                    let cls = "pill";
+                    if (r.compensation_status === "จ่ายเงินแล้ว") cls += " paid";
+                    else if (r.compensation_status === "ไม่ขอรับการเยียวยา")
+                        cls += " none";
+                    else if (
+                        r.compensation_status &&
+                        r.compensation_status.includes("รอ")
+                    )
+                        cls += " wait";
+                    const loc = [r.subdistrict, r.district].filter(Boolean).join(" / ");
+                    const amt =
+                        r.requested_amount && Number(r.requested_amount) > 0
+                            ? "฿" + fmtMoney(r.requested_amount)
+                            : '<span class="muted-dash">-</span>';
+                    return `<tr>
+                    <td class="col-id">${r.id}</td>
+                    <td>${dash(fmtDateDisplay(r.incident_date))}</td>
+                    <td class="col-name">${dash(r.name)}</td>
+                    <td>${genderTag(r.gender)}</td>
+                    <td>${dash(r.compensation_case)}</td>
+                    <td><span class="${cls}">${esc(r.compensation_status) || "-"}</span></td>
+                    <td class="col-amt">${amt}</td>
+                    <td>${dash(loc)}</td>
+                    <td class="col-year">${dash(r.fiscal_year)}</td>
+                    <td class="col-action"><button class="btn-edit" onclick="openEdit(${r.id})">✏️ แก้ไข</button></td>
+                </tr>`;
+                })
+                .join("");
+        }
+
+        // ---------- EDIT MODAL ----------
+        async function openEdit(id) {
+            const r = ROWS.find((x) => x.id === id);
+            if (!r) return;
+            editingId = id;
+
+            // locked
+            setVal("m-id", r.id);
+            setVal("m-name", r.name);
+            setVal("m-gender", r.gender);
+
+            // editable
+            setVal("m-incident_date", thaiToInputDate(r.incident_date));
+            setVal("m-fiscal_year", r.fiscal_year);
+            setVal("m-compensation_case", r.compensation_case);
+            setVal("m-compensation_status", r.compensation_status);
+            setVal("m-age", r.age);
+            setVal("m-requested_amount", r.requested_amount);
+            setVal("m-village", r.village);
+            setVal("m-subdistrict", r.subdistrict);
+            setVal("m-district", r.district);
+            setVal("m-province", r.province);
+            setVal("m-lat", r.lat);
+            setVal("m-lon", r.lon);
+            setVal("m-submission_date", isoOrNull(r.submission_date) || "");
+            setVal("m-payment_date", isoOrNull(r.payment_date) || "");
+            setVal("m-payment_method", r.payment_method);
+            setVal("m-second_compensation", r.second_compensation);
+            setVal("m-second_payment_date", isoOrNull(r.second_payment_date) || "");
+            setVal("m-payment_detail", r.payment_detail);
+            setVal("m-remark", r.remark);
+
+            // damage items
+            const tbody = document.getElementById("m-damage-tbody");
+            tbody.innerHTML = "";
+            const { data: items } = await sb
+                .from("damage_items")
+                .select("*")
+                .eq("compensation_id", id);
+            (items || []).forEach((it) =>
+                addDamageRow(it.item_name, it.quantity, it.unit),
+            );
+
+            hideAlerts();
+            document.getElementById("modal").classList.add("show");
+            document.body.style.overflow = "hidden";
+        }
+
+        function closeModal() {
+            document.getElementById("modal").classList.remove("show");
+            document.body.style.overflow = "";
+            editingId = null;
+        }
+
+        // damage rows in modal
+        const UNITS = [
+            "ไร่",
+            "ตัน",
+            "กิโลกรัม",
+            "ตัว",
+            "อัน",
+            "ต้น",
+            "ลิตร",
+            "ถุง",
+            "กล่อง",
+        ];
+        function addDamageRow(name = "", qty = "", unit = "") {
+            const tbody = document.getElementById("m-damage-tbody");
+            const tr = document.createElement("tr");
+            const isCustom = unit && !UNITS.includes(unit);
+            const opts = UNITS.map(
+                (u) => `<option ${unit === u ? "selected" : ""}>${u}</option>`,
+            ).join("");
+            tr.innerHTML = `
+                <td><input type="text" placeholder="เช่น สับปะรด" value="${esc(name)}"/></td>
+                <td><input type="number" placeholder="0" min="0" step="0.01" value="${qty ?? ""}"/></td>
+                <td>
+                    <select onchange="toggleCustomUnit(this)">
+                        <option value="">-- หน่วย --</option>
+                        ${opts}
+                        <option value="other" ${isCustom ? "selected" : ""}>อื่นๆ...</option>
+                    </select>
+                    <input type="text" class="custom-unit" placeholder="ระบุหน่วย"
+                        value="${isCustom ? esc(unit) : ""}"
+                        style="display:${isCustom ? "block" : "none"};margin-top:4px"/>
+                </td>
+                <td><button class="btn-del-row" onclick="this.closest('tr').remove()">✕</button></td>`;
+            tbody.appendChild(tr);
+        }
+        function toggleCustomUnit(sel) {
+            const ci = sel.nextElementSibling;
+            ci.style.display = sel.value === "other" ? "block" : "none";
+            if (sel.value !== "other") ci.value = "";
+        }
+        function getDamageRows() {
+            return [...document.querySelectorAll("#m-damage-tbody tr")]
+                .map((tr) => {
+                    const inputs = tr.querySelectorAll("input");
+                    const sel = tr.querySelector("select");
+                    const custom = tr.querySelector(".custom-unit");
+                    const unit =
+                        sel.value === "other" ? custom.value.trim() : sel.value;
+                    return {
+                        item_name: inputs[0].value.trim(),
+                        quantity: parseFloat(inputs[1].value) || null,
+                        unit,
+                    };
+                })
+                .filter((r) => r.item_name);
+        }
+
+        // ---------- SAVE ----------
+        async function saveEdit() {
+            if (editingId === null) return;
+            const btn = document.getElementById("btn-save");
+            btn.disabled = true;
+            btn.textContent = "⏳ กำลังบันทึก...";
+            try {
+                const {
+                    data: { user },
+                } = await sb.auth.getUser();
+                const userEmail = user?.email || null;
+                const incident = getVal("m-incident_date");
+
+                const payload = {
+                    // id / name / gender ไม่แก้ (ล็อก)
+                    incident_date: inputToThaiDate(incident),
+                    year_be: getYearBE(incident),
+                    year_ad: getYearAD(incident),
+                    fiscal_year: getVal("m-fiscal_year")
+                        ? parseInt(getVal("m-fiscal_year"))
+                        : null,
+                    age: intOrNull("m-age"),
+                    requested_amount: numOrNull("m-requested_amount"),
+                    lat: numOrNull("m-lat"),
+                    lon: numOrNull("m-lon"),
+                    village: getVal("m-village") || null,
+                    subdistrict: getVal("m-subdistrict") || null,
+                    district: getVal("m-district") || null,
+                    province: getVal("m-province") || null,
+                    compensation_case: getVal("m-compensation_case") || null,
+                    compensation_status: getVal("m-compensation_status") || null,
+                    submission_date: getVal("m-submission_date") || null,
+                    payment_date: getVal("m-payment_date") || null,
+                    second_compensation: numOrNull("m-second_compensation"),
+                    second_payment_date: getVal("m-second_payment_date") || null,
+                    payment_method: getVal("m-payment_method") || null,
+                    payment_detail: getVal("m-payment_detail") || null,
+                    remark: getVal("m-remark") || null,
+                    updated_at: new Date().toISOString(),
+                };
+
+                const { error } = await sb
+                    .from("compensation")
+                    .update(payload)
+                    .eq("id", editingId);
+                if (error) throw new Error(error.message);
+
+                // damage items: ลบของเดิมแล้วใส่ใหม่
+                await sb
+                    .from("damage_items")
+                    .delete()
+                    .eq("compensation_id", editingId);
+                const dmg = getDamageRows();
+                if (dmg.length > 0) {
+                    const { error: e2 } = await sb.from("damage_items").insert(
+                        dmg.map((r) => ({
+                            ...r,
+                            compensation_id: editingId,
+                            created_by: userEmail,
+                            updated_at: new Date().toISOString(),
+                        })),
+                    );
+                    if (e2) throw new Error(e2.message);
+                }
+
+                // อัปเดต cache แล้ว render ใหม่
+                Object.assign(
+                    ROWS.find((x) => x.id === editingId),
+                    payload,
+                );
+                closeModal();
+                renderTable();
+                showAlert("success");
+            } catch (e) {
+                showAlert("error", e.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "💾 บันทึกการแก้ไข";
+            }
+        }
+
+        // ---------- ALERTS ----------
+        function showAlert(type, msg = "") {
+            hideAlerts();
+            if (type === "success") {
+                document.getElementById("alert-success").classList.add("show");
+            } else {
+                document.getElementById("error-msg").textContent = msg;
+                document.getElementById("alert-error").classList.add("show");
+            }
+            window.scrollTo({ top: 0, behavior: "smooth" });
+            if (type === "success") setTimeout(hideAlerts, 4000);
+        }
+        function hideAlerts() {
+            document.getElementById("alert-success").classList.remove("show");
+            document.getElementById("alert-error").classList.remove("show");
+        }
+
+        // ปิด modal เมื่อคลิกพื้นหลัง
+        document.getElementById("modal").addEventListener("click", (e) => {
+            if (e.target.id === "modal") closeModal();
+        });
+    </script>
+</body>
+
+</html>
