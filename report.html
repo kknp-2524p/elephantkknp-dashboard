@@ -559,6 +559,25 @@
                 background: #fff;
             }
 
+            /* ให้ตารางรายชื่อขึ้นหน้าใหม่เสมอ หัวจะได้ไม่ค้างท้ายหน้าก่อน */
+            .table-section {
+                break-before: page;
+            }
+
+            /* ← ใส่ที่กล่องครอบตาราง */
+
+            /* หัวตารางซ้ำทุกหน้าที่ตารางยาวข้ามหน้า */
+            thead {
+                display: table-header-group;
+            }
+
+            /* ไม่ตัดกลางแถว */
+            tr,
+            td,
+            th {
+                break-inside: avoid;
+            }
+
             .screen-only {
                 display: none !important;
             }
