@@ -948,6 +948,10 @@ tr:last-child td {
     color: #92400e;
 }
 
+.b-docwait {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
 .b-waive {
     background: var(--c-slate-lt);
     color: #475569;

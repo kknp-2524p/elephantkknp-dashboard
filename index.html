@@ -90,6 +90,75 @@
                     <div class="pills" id="status-pills"></div>
                 </div>
                 <div class="filter-group">
+                    <label>ตำบล</label>
+                    <div class="dd-wrap" id="subdistrict-dd-wrap">
+                        <button class="dd-btn" id="subdistrict-dd-btn" onclick="toggleLocDD('subdistrict')">
+                            <span id="subdistrict-dd-label">ทุกตำบล</span><span>▾</span>
+                        </button>
+                        <div class="dd-panel" id="subdistrict-dd-panel">
+                            <div class="dd-panel-hdr">
+                                <span>เลือกตำบล</span>
+                                <button class="dd-panel-close" onclick="closeLocDD('subdistrict')">✕</button>
+                            </div>
+                            <div class="dd-search">
+                                <input type="text" id="subdistrict-dd-search" placeholder="ค้นหาตำบล..."
+                                    oninput="buildLocList('subdistrict')" />
+                            </div>
+                            <div class="dd-list" id="subdistrict-dd-list"></div>
+                            <div class="dd-footer">
+                                <button onclick="selectAllLoc('subdistrict')">เลือกทั้งหมด</button>
+                                <button onclick="clearLoc('subdistrict')">ล้าง</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <label>อำเภอ</label>
+                    <div class="dd-wrap" id="district-dd-wrap">
+                        <button class="dd-btn" id="district-dd-btn" onclick="toggleLocDD('district')">
+                            <span id="district-dd-label">ทุกอำเภอ</span><span>▾</span>
+                        </button>
+                        <div class="dd-panel" id="district-dd-panel">
+                            <div class="dd-panel-hdr">
+                                <span>เลือกอำเภอ</span>
+                                <button class="dd-panel-close" onclick="closeLocDD('district')">✕</button>
+                            </div>
+                            <div class="dd-search">
+                                <input type="text" id="district-dd-search" placeholder="ค้นหาอำเภอ..."
+                                    oninput="buildLocList('district')" />
+                            </div>
+                            <div class="dd-list" id="district-dd-list"></div>
+                            <div class="dd-footer">
+                                <button onclick="selectAllLoc('district')">เลือกทั้งหมด</button>
+                                <button onclick="clearLoc('district')">ล้าง</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <label>จังหวัด</label>
+                    <div class="dd-wrap" id="province-dd-wrap">
+                        <button class="dd-btn" id="province-dd-btn" onclick="toggleLocDD('province')">
+                            <span id="province-dd-label">ทุกจังหวัด</span><span>▾</span>
+                        </button>
+                        <div class="dd-panel" id="province-dd-panel">
+                            <div class="dd-panel-hdr">
+                                <span>เลือกจังหวัด</span>
+                                <button class="dd-panel-close" onclick="closeLocDD('province')">✕</button>
+                            </div>
+                            <div class="dd-search">
+                                <input type="text" id="province-dd-search" placeholder="ค้นหาจังหวัด..."
+                                    oninput="buildLocList('province')" />
+                            </div>
+                            <div class="dd-list" id="province-dd-list"></div>
+                            <div class="dd-footer">
+                                <button onclick="selectAllLoc('province')">เลือกทั้งหมด</button>
+                                <button onclick="clearLoc('province')">ล้าง</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="filter-group">
                     <label>ชื่อ-นามสกุล</label>
                     <div class="dd-wrap" id="name-dd-wrap">
                         <button class="dd-btn" id="name-dd-btn" onclick="toggleDD()">
@@ -578,7 +647,8 @@
         let MAP_INSTANCE = null,
             MAP_LAYER = null,
             HEAT_LAYER = null,
-            showHeat = false;
+            showHeat = false,
+            MAP_TOKEN = 0;
 
         function getFiltered() {
             return RAW.filter(r => {
@@ -753,7 +823,6 @@
         async function makeDot(r) {
             const color = CASE_COLOR[r.compensation_case] || '#64748b';
 
-            // ดึง damage_items ของรายการนี้
             let damageHTML = '';
             if (r.compensation_case && r.compensation_case.includes('พืชผล') || r.compensation_case === 'ทรัพย์สิน' || r.compensation_case === 'ทรัพย์สิน+พืชผลทางการเกษตร') {
                 const { data } = await fetch(`${SUPABASE_URL}/rest/v1/damage_items?compensation_id=eq.${r.id}&select=item_name,quantity,unit`, {
@@ -798,10 +867,9 @@
                 attribution: "© OpenStreetMap",
             }).addTo(MAP_INSTANCE);
             MAP_LAYER = L.layerGroup().addTo(MAP_INSTANCE);
-            for (const r of pts) {
-                const marker = await makeDot(r);
-                marker.addTo(MAP_LAYER);
-            }
+            const myToken = ++MAP_TOKEN;
+            const markers = await Promise.all(pts.map((r) => makeDot(r)));
+            if (myToken === MAP_TOKEN) markers.forEach((m) => m.addTo(MAP_LAYER));
             HEAT_LAYER = L.heatLayer(
                 pts.map((r) => [r.lat, r.lon, 1]),
                 {
@@ -830,19 +898,19 @@
                 }
             };
             document.getElementById("map").appendChild(btn);
-            /* แก้ tile เพี้ยนบนมือถือ */
             setTimeout(() => MAP_INSTANCE.invalidateSize(), 300);
         }
         async function updateMap(d) {
             if (!MAP_INSTANCE) return;
+            const myToken = ++MAP_TOKEN;
             const pts = d.filter((r) => r.lat && r.lon);
-            // console.log('updateMap pts:', pts.length);
             document.getElementById("chip-map").textContent = pts.length + " จุด";
+            // สร้าง marker ทั้งหมดก่อน (ดึงข้อมูลความเสียหายแบบขนาน)
+            const markers = await Promise.all(pts.map((r) => makeDot(r)));
+            // ถ้ามีการกรองใหม่แทรกเข้ามาระหว่างรอ ให้ทิ้งผลรอบเก่า
+            if (myToken !== MAP_TOKEN) return;
             MAP_LAYER.clearLayers();
-            for (const r of pts) {
-                const marker = await makeDot(r);
-                marker.addTo(MAP_LAYER);
-            }
+            markers.forEach((m) => m.addTo(MAP_LAYER));
             if (HEAT_LAYER)
                 HEAT_LAYER.setLatLngs(pts.map((r) => [r.lat, r.lon, 1]));
         }
@@ -937,7 +1005,7 @@
                     toolbar: { show: false },
                 },
                 plotOptions: {
-                    bar: { horizontal: true, borderRadius: 4, barHeight: "60%", distributed: true }, // ← เพิ่ม distributed: true
+                    bar: { horizontal: true, borderRadius: 4, barHeight: "60%", distributed: true },
                 },
                 xaxis: {
                     categories: cats,
@@ -1053,15 +1121,12 @@
             let y = parseInt(p[2]);
             if (!d || !m || !y) return null;
 
-            // แปลง ค.ศ. → พ.ศ. เสมอ
             if (y < 2500) y = y + 543;
 
             return { m, y };
         }
 
         function getMonthlyData(d) {
-            // console.log('getMonthlyData input length:', d.length);
-            // console.log('sample incident_date:', d[0]?.incident_date);
             const cm = {};
             d.forEach((r) => {
                 const p = parseDate(r.incident_date);
@@ -1349,11 +1414,6 @@
             CHARTS.gender.updateOptions({ series, labels });
         }
 
-        function updateGenderChart(d) {
-            const { series, labels } = getGenderData(d);
-            CHARTS.gender.updateOptions({ series, labels });
-        }
-
         function refresh() {
             const d = getFiltered();
             buildInsights(d);
@@ -1396,11 +1456,13 @@
             const m = {
                 จ่ายเงินแล้ว: "b-paid",
                 รออนุมัติเบิกจ่าย: "b-pend",
+                รอเอกสารจากผู้เสียหาย: "b-docwait",
                 ไม่ขอรับการเยียวยา: "b-waive",
             },
                 l = {
                     จ่ายเงินแล้ว: "✓ จ่ายแล้ว",
                     รออนุมัติเบิกจ่าย: "⏳ รอจ่าย",
+                    รอเอกสารจากผู้เสียหาย: "📄 รอเอกสาร",
                     ไม่ขอรับการเยียวยา: "✗ ไม่ขอรับ",
                 };
             return `<span class="badge ${m[s] || "b-waive"}">${l[s] || s}</span>`;
@@ -1500,8 +1562,6 @@
                 btns += `<button class="pg-btn ${i === tablePage ? "curr" : ""}" onclick="gotoPage(${i})">${i}</button>`;
             btns += `<button class="pg-btn" onclick="changePage(1)" ${tablePage >= pages ? "disabled" : ""}>→</button>`;
             document.getElementById("tbl-pager").innerHTML = btns;
-
-            // console.log('incident_date sample:', rows[0]?.incident_date);
         }
 
         function changePage(d) {
@@ -1519,23 +1579,15 @@
 
         function buildFilters() {
 
-
-
-            // console.log('MONTH_VALS:', MONTH_VALS);
-            // console.log('RAW sample:', RAW.slice(0, 3).map(r => r.incident_date));
-
-
             function buildMonthDD() {
-                // หา เดือน-ปี ที่มีข้อมูลจริงใน DB
                 const monthSet = new Set();
                 RAW.forEach(r => {
                     if (!r.incident_date) return;
                     const parts = r.incident_date.split('/');
-                    // console.log('incident_date raw:', r.incident_date);
                     if (parts.length !== 3) return;
                     let m = parseInt(parts[1]);
                     let y = parseInt(parts[2]);
-                    if (y > 2500) y = y - 543; // แปลง พ.ศ. → ค.ศ.
+                    if (y > 2500) y = y - 543;
                     if (!m || !y) return;
                     monthSet.add(`${y}-${String(m).padStart(2, '0')}`);
                 });
@@ -1553,15 +1605,10 @@
         </label>`;
                 }).join('');
 
-                // ลง wrapper
                 const target = document.getElementById('month-dd-wrap');
                 if (target) updateGenericBtn('month', 'ทุกเดือน');
-
-
             }
 
-
-            // Year dropdown
             const fys = [...new Set(RAW.map((r) => r.fiscal_year))].sort();
             buildGenericDD(
                 "year",
@@ -1569,7 +1616,6 @@
                 fys.map((y) => ({ val: String(y), label: `ปี ${y}` })),
             );
 
-            // Status dropdown
             const statuses = [
                 { val: "จ่ายเงินแล้ว", label: "✓ จ่ายแล้ว" },
                 { val: "รออนุมัติเบิกจ่าย", label: "⏳ รอจ่าย" },
@@ -1579,7 +1625,6 @@
             buildMonthDD();
             buildGenericDD("status", "ทุกสถานะ", statuses);
 
-            // Name dropdown (มีอยู่แล้ว)
             buildDDList();
         }
 
@@ -1591,7 +1636,7 @@
             const labelId = `${type}-dd-label`;
             const panelId = `${type}-dd-panel`;
             const listId = `${type}-dd-list`;
-            const overlayId = "dd-overlay"; // ใช้ overlay เดิม
+            const overlayId = "dd-overlay";
 
             document.getElementById(type === "year" ? "year-pills" : "status-pills")
                 .outerHTML;
@@ -1633,7 +1678,6 @@
             </div>
         </div>`;
 
-            // ใส่ wrapper กลับลง DOM
             const targetId = isYear ? "year-pills" : "status-pills";
             const target = document.getElementById(targetId);
             if (target) target.replaceWith(wrapper);
@@ -1659,7 +1703,6 @@
         }
         function closeGenericDD(type) {
             document.getElementById(`${type}-dd-panel`).classList.remove("open");
-            // ปิด overlay เฉพาะถ้าไม่มี panel อื่นเปิดอยู่
             const anyOpen = ["year", "status", "name"].some((t) =>
                 document.getElementById(`${t}-dd-panel`)?.classList.contains("open"),
             );
@@ -1699,7 +1742,6 @@
                         cb.closest("label").querySelector("span").textContent.trim(),
                     );
                 });
-            // ง่ายกว่า — sync จาก val ที่เก็บใน onchange attribute
             document
                 .getElementById(`${type}-dd-list`)
                 .querySelectorAll("label.dd-item")
@@ -1722,7 +1764,6 @@
             let cnt = btn.querySelector('.dd-count');
             if (FSet.size) {
                 if (type === 'month') {
-                    // แสดงชื่อเดือนแทน key
                     const [y, m] = [...FSet][0].split('-');
                     lbl.textContent = FSet.size === 1
                         ? `${MONTH_NAMES[parseInt(m) - 1]} ${parseInt(y) + 543}`
@@ -1744,7 +1785,129 @@
             }
         }
 
+        /* ===== ตัวกรอง ตำบล / อำเภอ / จังหวัด (เลือกอิสระ หลายค่า) ===== */
+        F.subdistricts = new Set();
+        F.districts = new Set();
+        F.provinces = new Set();
 
+        const LOC_CFG = {
+            subdistrict: { field: 'subdistrict', set: 'subdistricts', ph: 'ทุกตำบล' },
+            district: { field: 'district', set: 'districts', ph: 'ทุกอำเภอ' },
+            province: { field: 'province', set: 'provinces', ph: 'ทุกจังหวัด' },
+        };
+
+        function locOptions(type) {
+            const f = LOC_CFG[type].field;
+            return [...new Set(RAW.map(r => r[f]).filter(Boolean))]
+                .sort((a, b) => a.localeCompare(b, 'th'));
+        }
+
+        function buildLocList(type) {
+            const set = F[LOC_CFG[type].set];
+            const sEl = document.getElementById(`${type}-dd-search`);
+            const q = (sEl ? sEl.value : '').toLowerCase();
+            const opts = locOptions(type).filter(v => v.toLowerCase().includes(q));
+            const list = document.getElementById(`${type}-dd-list`);
+            if (!list) return;
+            list.innerHTML = opts.length
+                ? opts.map(v => `<label class="dd-item"><input type="checkbox" ${set.has(v) ? 'checked' : ''} onchange="toggleLoc('${type}','${v.replace(/'/g, "\\'")}',this.checked)"><span>${v}</span></label>`).join('')
+                : '<div style="padding:12px;font-size:12px;color:var(--c-ink3)">ไม่พบข้อมูล</div>';
+        }
+
+        function toggleLoc(type, val, checked) {
+            const set = F[LOC_CFG[type].set];
+            checked ? set.add(val) : set.delete(val);
+            updateLocBtn(type);
+            refresh();
+        }
+
+        function selectAllLoc(type) {
+            locOptions(type).forEach(v => F[LOC_CFG[type].set].add(v));
+            buildLocList(type);
+            updateLocBtn(type);
+            refresh();
+        }
+
+        function clearLoc(type) {
+            F[LOC_CFG[type].set].clear();
+            buildLocList(type);
+            updateLocBtn(type);
+            refresh();
+        }
+
+        function toggleLocDD(type) {
+            const p = document.getElementById(`${type}-dd-panel`);
+            if (!p) return;
+            const wasOpen = p.classList.contains('open');
+            closeAllDD();
+            if (!wasOpen) {
+                buildLocList(type);
+                p.classList.add('open');
+                document.getElementById('dd-overlay').classList.add('open');
+            }
+        }
+
+        function closeLocDD(type) {
+            document.getElementById(`${type}-dd-panel`).classList.remove('open');
+            if (!document.querySelector('.dd-panel.open'))
+                document.getElementById('dd-overlay').classList.remove('open');
+        }
+
+        function closeAllDD() {
+            document.querySelectorAll('.dd-panel.open').forEach(p => p.classList.remove('open'));
+            const o = document.getElementById('dd-overlay');
+            if (o) o.classList.remove('open');
+        }
+
+        function updateLocBtn(type) {
+            const cfg = LOC_CFG[type];
+            const set = F[cfg.set];
+            const btn = document.getElementById(`${type}-dd-btn`);
+            const lbl = document.getElementById(`${type}-dd-label`);
+            if (!btn) return;
+            let cnt = btn.querySelector('.dd-count');
+            if (set.size) {
+                lbl.textContent = set.size === 1 ? [...set][0] : `${set.size} รายการ`;
+                btn.classList.add('has-val');
+                if (!cnt) { cnt = document.createElement('span'); cnt.className = 'dd-count'; btn.insertBefore(cnt, btn.lastChild); }
+                cnt.textContent = set.size;
+            } else {
+                lbl.textContent = cfg.ph;
+                btn.classList.remove('has-val');
+                if (cnt) cnt.remove();
+            }
+        }
+
+        function buildLocationFilters() {
+            ['subdistrict', 'district', 'province'].forEach(t => { buildLocList(t); updateLocBtn(t); });
+        }
+
+        (function () {
+            const _getFiltered = getFiltered;
+            getFiltered = function () {
+                return _getFiltered().filter(r =>
+                    (!F.subdistricts.size || F.subdistricts.has(r.subdistrict)) &&
+                    (!F.districts.size || F.districts.has(r.district)) &&
+                    (!F.provinces.size || F.provinces.has(r.province))
+                );
+            };
+            const _buildFilters = buildFilters;
+            buildFilters = function () {
+                _buildFilters();
+                buildLocationFilters();
+            };
+            const _resetAll = resetAll;
+            resetAll = function () {
+                F.subdistricts.clear();
+                F.districts.clear();
+                F.provinces.clear();
+                try { _resetAll(); } catch (e) { /* ข้ามบั๊กเดิม */ }
+                buildLocationFilters();
+                refresh();
+            };
+            const ov = document.getElementById('dd-overlay');
+            if (ov) ov.addEventListener('click', closeAllDD);
+        })();
 
     </script>
 

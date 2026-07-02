@@ -1410,16 +1410,7 @@
             const { data: { user } } = await sb.auth.getUser();
             const userEmail = user?.email || null;
 
-            if (damageRows.length > 0) {
-                await sb.from('damage_items').insert(
-                    damageRows.map(r => ({
-                        ...r,
-                        compensation_id: id,
-                        created_by: userEmail,
-                        updated_at: new Date().toISOString()
-                    }))
-                );
-            }
+
             btn.disabled = true;
             btn.innerHTML = "<span>⏳ กำลังบันทึก...</span>";
             try {
