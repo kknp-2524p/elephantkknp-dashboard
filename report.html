@@ -696,8 +696,10 @@
                     <input type="text" id="report-title" value="สรุปสถิติการเยียวยาผลกระทบจากช้างป่า" />
                 </div>
                 <div class="setting-group">
-                    <label>ช่วงเวลา / ปีงบประมาณ</label>
-                    <input type="text" id="report-period" placeholder="เช่น ปีงบประมาณ 2568" />
+                    <label>ปีงบประมาณ</label>
+                    <select id="report-period">
+                        <option value="">ทั้งหมด (ทุกปีงบ)</option>
+                    </select>
                 </div>
                 <div class="setting-group">
                     <label>วันที่จัดทำ</label>
@@ -713,8 +715,12 @@
                         <option value="custom">กำหนดเอง</option>
                     </select>
                 </div>
-                <div id="custom-range" style="display:none;grid-column:1/-1">
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.875rem">
+                <div id="custom-range" style="display: none; grid-column: 1/-1">
+                    <div style="
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 0.875rem;
+              ">
                         <div class="setting-group">
                             <label>วันที่เริ่มต้น</label>
                             <input type="date" id="date-from" />
@@ -798,6 +804,29 @@
         let RAW = [];
         let logoDataUrl = "";
 
+        // แปลงวันที่ d/m/y (รองรับทั้ง พ.ศ. และ ค.ศ.) → { m, y } เป็น พ.ศ. เสมอ
+        function parseDate(s) {
+            if (!s) return null;
+            const p = s.split("/");
+            if (p.length !== 3) return null;
+            const d = parseInt(p[0]);
+            const m = parseInt(p[1]);
+            let y = parseInt(p[2]);
+            if (!d || !m || !y) return null;
+
+            if (y < 2500) y = y + 543;
+
+            return { m, y };
+        }
+
+        // ปีงบประมาณราชการไทย: ต.ค.-ธ.ค. อยู่ปีงบถัดไป, ม.ค.-ก.ย. อยู่ปีงบเดียวกับปี พ.ศ. นั้น
+        // เช่น ปีงบ 2569 = ต.ค. 2568 ถึง ก.ย. 2569
+        function computeFiscalYear(incidentDate, fallback) {
+            const p = parseDate(incidentDate);
+            if (!p) return fallback || 0;
+            return p.m >= 10 ? p.y + 1 : p.y;
+        }
+
         // โหลดข้อมูล
         fetch(`${SUPABASE_URL}/rest/v1/compensation?select=*&order=id.asc`, {
             headers: {
@@ -805,16 +834,57 @@
                 Authorization: `Bearer ${SUPABASE_KEY}`,
             },
         })
-            .then((r) => r.json())
+            .then((r) => {
+                if (!r.ok) throw new Error(`โหลดข้อมูลไม่สำเร็จ: HTTP ${r.status}`);
+                return r.json();
+            })
             .then((data) => {
                 RAW = data
                     .filter((r) => r.id && r.name)
                     .map((r) => ({
                         ...r,
                         requested_amount: parseFloat(r.requested_amount) || 0,
-                        fiscal_year: parseInt(r.fiscal_year) || 0,
+                        // ปีงบประมาณอิงจาก incident_date ล้วน ๆ ไม่พึ่งค่าเดิมใน DB
+                        fiscal_year: computeFiscalYear(r.incident_date, 0),
                     }));
+                console.log(`โหลดข้อมูลสำเร็จ: ${RAW.length} รายการ`);
+                populateFiscalYearOptions();
+            })
+            .catch((err) => {
+                console.error("โหลดข้อมูลรายงานล้มเหลว:", err);
+                const sel = document.getElementById("report-period");
+                if (sel)
+                    sel.innerHTML = `<option value="">⚠️ โหลดข้อมูลไม่สำเร็จ</option>`;
             });
+
+        // เติมตัวเลือกปีงบประมาณในดรอปดาวน์ — อิงจาก incident_date ของแต่ละแถวโดยตรง (ไม่พึ่งค่าเก่าจาก DB)
+        function populateFiscalYearOptions() {
+            const sel = document.getElementById("report-period");
+
+            console.log(
+                "ตัวอย่าง incident_date จากข้อมูลจริง (5 แถวแรก):",
+                RAW.slice(0, 5).map((r) => r.incident_date),
+            );
+
+            const years = [
+                ...new Set(RAW.map((r) => computeFiscalYear(r.incident_date, 0))),
+            ]
+                .filter(Boolean)
+                .sort((a, b) => b - a);
+
+            console.log("ปีงบประมาณที่พบ (คำนวณจาก incident_date):", years);
+            if (!years.length) {
+                console.warn(
+                    "ไม่พบปีงบประมาณเลย — ดูตัวอย่าง incident_date ด้านบนว่าตรงรูปแบบ d/m/y (เช่น 15/10/2568) หรือไม่",
+                );
+            }
+
+            sel.innerHTML =
+                `<option value="">ทั้งหมด (ทุกปีงบ)</option>` +
+                years
+                    .map((y) => `<option value="${y}">ปีงบประมาณ ${y}</option>`)
+                    .join("");
+        }
 
         // ตั้งวันที่วันนี้
         document.getElementById("report-date").value = new Date()
@@ -834,57 +904,40 @@
         }
 
         function updatePeriodHint() {
-            const v = document.getElementById('date-filter').value;
-            document.getElementById('custom-range').style.display = v === 'custom' ? 'block' : 'none';
-
-            const now = new Date();
-            const months = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
-                'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
-
-            const periodInput = document.getElementById('report-period');
-
-            if (v === 'this-month') {
-                const m = months[now.getMonth()];
-                const y = now.getFullYear() + 543;
-                periodInput.value = `ข้อมูลเดือน${m} พ.ศ. ${y}`;
-            } else if (v === 'last-month') {
-                const last = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-                const m = months[last.getMonth()];
-                const y = last.getFullYear() + 543;
-                periodInput.value = `ข้อมูลเดือน${m} พ.ศ. ${y}`;
-            } else if (v === 'this-year') {
-                const y = now.getFullYear() + 543;
-                periodInput.value = `ข้อมูลปี พ.ศ. ${y}`;
-            } else if (v === 'all') {
-                periodInput.value = '';
-            }
-            // custom ไม่ auto fill ให้พิมพ์เองครับ
+            const v = document.getElementById("date-filter").value;
+            document.getElementById("custom-range").style.display =
+                v === "custom" ? "block" : "none";
+            // หมายเหตุ: ข้อความช่วงเวลาในรายงานตอนนี้มาจากดรอปดาวน์ปีงบประมาณโดยตรง (ดู generateReport)
         }
 
         function getFilteredByDate(d) {
-            const v = document.getElementById('date-filter').value;
-            if (v === 'all') return d;
+            const v = document.getElementById("date-filter").value;
+            if (v === "all") return d;
 
             const now = new Date();
             let from, to;
 
-            if (v === 'this-month') {
+            if (v === "this-month") {
                 from = new Date(now.getFullYear(), now.getMonth(), 1);
                 to = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-            } else if (v === 'last-month') {
+            } else if (v === "last-month") {
                 from = new Date(now.getFullYear(), now.getMonth() - 1, 1);
                 to = new Date(now.getFullYear(), now.getMonth(), 0);
-            } else if (v === 'this-year') {
+            } else if (v === "this-year") {
                 from = new Date(now.getFullYear(), 0, 1);
                 to = new Date(now.getFullYear(), 11, 31);
-            } else if (v === 'custom') {
-                from = document.getElementById('date-from').value ? new Date(document.getElementById('date-from').value) : null;
-                to = document.getElementById('date-to').value ? new Date(document.getElementById('date-to').value) : null;
+            } else if (v === "custom") {
+                from = document.getElementById("date-from").value
+                    ? new Date(document.getElementById("date-from").value)
+                    : null;
+                to = document.getElementById("date-to").value
+                    ? new Date(document.getElementById("date-to").value)
+                    : null;
             }
 
-            return d.filter(r => {
+            return d.filter((r) => {
                 if (!r.incident_date) return false;
-                const p = r.incident_date.split('/');
+                const p = r.incident_date.split("/");
                 if (p.length !== 3) return false;
                 let y = parseInt(p[2]);
                 if (y > 2500) y -= 543; // แปลง พ.ศ. → ค.ศ.
@@ -951,12 +1004,17 @@
 
         function generateReport() {
             const checked = getChecked();
-            const d = getFilteredByDate(RAW); // ← เปลี่ยนจาก const d = RAW;
+            let d = getFilteredByDate(RAW); // ← เปลี่ยนจาก const d = RAW;
+
+            const fySelected = document.getElementById("report-period").value; // '' = ทั้งหมด, หรือปีงบ เช่น '2569'
+            if (fySelected) {
+                d = d.filter((r) => String(r.fiscal_year) === fySelected);
+            }
 
             const agency1 = document.getElementById("agency1").value;
             const agency2 = document.getElementById("agency2").value;
             const title = document.getElementById("report-title").value;
-            const period = document.getElementById("report-period").value;
+            const period = fySelected ? `ปีงบประมาณ ${fySelected}` : "";
             const reportDate = document.getElementById("report-date").value;
 
             const paidAmt = d
@@ -971,7 +1029,7 @@
 
             // HEADER
             html += `<div class="doc-header">`;
-            html += `<img src="favicon.ico" class="doc-logo" alt="logo"/>`;  // ← แทนที่ if/else ทั้งหมด
+            html += `<img src="favicon.ico" class="doc-logo" alt="logo"/>`; // ← แทนที่ if/else ทั้งหมด
             html += `<div class="doc-agency">
     <div class="doc-agency-name">${agency1}</div>
     <div class="doc-agency-sub">${agency2}</div>
@@ -998,19 +1056,22 @@
             <thead><tr><th>รายการ</th><th style="text-align:right">จำนวน (ราย)</th><th style="text-align:right">จำนวนเงิน (บาท)</th></tr></thead>
            <tbody>
     <tr><td>จ่ายเงินแล้ว</td>
-        <td style="text-align:right">${d.filter(r => r.compensation_status === 'จ่ายเงินแล้ว').length}</td>
-        <td style="text-align:right">${paidAmt.toLocaleString('th-TH', { minimumFractionDigits: 2 })}</td>
+        <td style="text-align:right">${d.filter((r) => r.compensation_status === "จ่ายเงินแล้ว").length}</td>
+        <td style="text-align:right">${paidAmt.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</td>
     </tr>
     <tr><td>รออนุมัติเบิกจ่าย</td>
-        <td style="text-align:right">${d.filter(r => r.compensation_status === 'รออนุมัติเบิกจ่าย').length}</td>
-        <td style="text-align:right">${pendAmt.toLocaleString('th-TH', { minimumFractionDigits: 2 })}</td>
+        <td style="text-align:right">${d.filter((r) => r.compensation_status === "รออนุมัติเบิกจ่าย").length}</td>
+        <td style="text-align:right">${pendAmt.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</td>
     </tr>
     <tr><td>รอเอกสารจากผู้เสียหาย</td>
-        <td style="text-align:right">${d.filter(r => r.compensation_status === 'รอเอกสารจากผู้เสียหาย').length}</td>
-        <td style="text-align:right">${d.filter(r => r.compensation_status === 'รอเอกสารจากผู้เสียหาย').reduce((a, r) => a + r.requested_amount, 0).toLocaleString('th-TH', { minimumFractionDigits: 2 })}</td>
+        <td style="text-align:right">${d.filter((r) => r.compensation_status === "รอเอกสารจากผู้เสียหาย").length}</td>
+        <td style="text-align:right">${d
+                        .filter((r) => r.compensation_status === "รอเอกสารจากผู้เสียหาย")
+                        .reduce((a, r) => a + r.requested_amount, 0)
+                        .toLocaleString("th-TH", { minimumFractionDigits: 2 })}</td>
     </tr>
     <tr><td>ไม่ขอรับการเยียวยา</td>
-        <td style="text-align:right">${d.filter(r => r.compensation_status === 'ไม่ขอรับการเยียวยา').length}</td>
+        <td style="text-align:right">${d.filter((r) => r.compensation_status === "ไม่ขอรับการเยียวยา").length}</td>
         <td style="text-align:right">—</td>
     </tr>
 </tbody>
@@ -1047,7 +1108,12 @@
 
             // BY STATUS
             if (checked.includes("by-status")) {
-                const statuses = ["จ่ายเงินแล้ว", "รออนุมัติเบิกจ่าย", 'รอเอกสารจากผู้เสียหาย', "ไม่ขอรับการเยียวยา"];
+                const statuses = [
+                    "จ่ายเงินแล้ว",
+                    "รออนุมัติเบิกจ่าย",
+                    "รอเอกสารจากผู้เสียหาย",
+                    "ไม่ขอรับการเยียวยา",
+                ];
                 html += `<div class="doc-section">
         <div class="doc-section-title">แยกตามสถานะการจ่ายเงิน</div>
         <table class="doc-sum-table">
@@ -1132,14 +1198,14 @@
 
             // SIGNATURE
             if (checked.includes("signature")) {
-                const sig1Name = document.getElementById('sig1-name').value
-                    ? `(${document.getElementById('sig1-name').value})`
-                    : '(...................................)';
+                const sig1Name = document.getElementById("sig1-name").value
+                    ? `(${document.getElementById("sig1-name").value})`
+                    : "(...................................)";
                 const sig1Pos =
                     document.getElementById("sig1-pos").value || "ตำแหน่ง";
-                const sig2Name = document.getElementById('sig2-name').value
-                    ? `(${document.getElementById('sig2-name').value})`
-                    : '(...................................)';
+                const sig2Name = document.getElementById("sig2-name").value
+                    ? `(${document.getElementById("sig2-name").value})`
+                    : "(...................................)";
                 const sig2Pos =
                     document.getElementById("sig2-pos").value || "ตำแหน่ง";
                 html += `<div class="doc-sig">

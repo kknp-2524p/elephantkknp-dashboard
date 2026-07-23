@@ -18,12 +18,19 @@
 </head>
 
 <body>
-
-    <div class="print-header"
-        style="display:none;padding:12px 0 16px;border-bottom:2px solid #1a6b42;margin-bottom:16px">
-        <div style="font-size:18px;font-weight:700;color:#1a6b42">รายงานสถิติการเยียวยาผลกระทบจากช้างป่า</div>
-        <div style="font-size:12px;color:#7a927f;margin-top:4px">อุทยานแห่งชาติแก่งกระจาน</div>
-        <div style="font-size:11px;color:#aaa;margin-top:2px" id="print-date"></div>
+    <div class="print-header" style="
+        display: none;
+        padding: 12px 0 16px;
+        border-bottom: 2px solid #1a6b42;
+        margin-bottom: 16px;
+      ">
+        <div style="font-size: 18px; font-weight: 700; color: #1a6b42">
+            รายงานสถิติการเยียวยาผลกระทบจากช้างป่า
+        </div>
+        <div style="font-size: 12px; color: #7a927f; margin-top: 4px">
+            อุทยานแห่งชาติแก่งกระจาน
+        </div>
+        <div style="font-size: 11px; color: #aaa; margin-top: 2px" id="print-date"></div>
     </div>
 
     <div class="dd-overlay" id="dd-overlay" onclick="closeDD()"></div>
@@ -70,11 +77,15 @@
                         <div class="dd-panel" id="month-dd-panel">
                             <div class="dd-panel-hdr">
                                 <span>เลือกเดือน</span>
-                                <button class="dd-panel-close" onclick="closeGenericDD('month')">✕</button>
+                                <button class="dd-panel-close" onclick="closeGenericDD('month')">
+                                    ✕
+                                </button>
                             </div>
                             <div class="dd-list" id="month-dd-list"></div>
                             <div class="dd-footer">
-                                <button onclick="selectAllGeneric('month', MONTH_VALS)">เลือกทั้งหมด</button>
+                                <button onclick="selectAllGeneric('month', MONTH_VALS)">
+                                    เลือกทั้งหมด
+                                </button>
                                 <button onclick="clearGeneric('month')">ล้าง</button>
                             </div>
                         </div>
@@ -89,7 +100,8 @@
                     <label>สถานะการเยียวยา</label>
                     <div class="pills" id="status-pills"></div>
                 </div>
-                <div class="filter-group">
+
+                <!-- <div class="filter-group">
                     <label>ตำบล</label>
                     <div class="dd-wrap" id="subdistrict-dd-wrap">
                         <button class="dd-btn" id="subdistrict-dd-btn" onclick="toggleLocDD('subdistrict')">
@@ -98,7 +110,9 @@
                         <div class="dd-panel" id="subdistrict-dd-panel">
                             <div class="dd-panel-hdr">
                                 <span>เลือกตำบล</span>
-                                <button class="dd-panel-close" onclick="closeLocDD('subdistrict')">✕</button>
+                                <button class="dd-panel-close" onclick="closeLocDD('subdistrict')">
+                                    ✕
+                                </button>
                             </div>
                             <div class="dd-search">
                                 <input type="text" id="subdistrict-dd-search" placeholder="ค้นหาตำบล..."
@@ -106,7 +120,9 @@
                             </div>
                             <div class="dd-list" id="subdistrict-dd-list"></div>
                             <div class="dd-footer">
-                                <button onclick="selectAllLoc('subdistrict')">เลือกทั้งหมด</button>
+                                <button onclick="selectAllLoc('subdistrict')">
+                                    เลือกทั้งหมด
+                                </button>
                                 <button onclick="clearLoc('subdistrict')">ล้าง</button>
                             </div>
                         </div>
@@ -121,7 +137,9 @@
                         <div class="dd-panel" id="district-dd-panel">
                             <div class="dd-panel-hdr">
                                 <span>เลือกอำเภอ</span>
-                                <button class="dd-panel-close" onclick="closeLocDD('district')">✕</button>
+                                <button class="dd-panel-close" onclick="closeLocDD('district')">
+                                    ✕
+                                </button>
                             </div>
                             <div class="dd-search">
                                 <input type="text" id="district-dd-search" placeholder="ค้นหาอำเภอ..."
@@ -129,7 +147,9 @@
                             </div>
                             <div class="dd-list" id="district-dd-list"></div>
                             <div class="dd-footer">
-                                <button onclick="selectAllLoc('district')">เลือกทั้งหมด</button>
+                                <button onclick="selectAllLoc('district')">
+                                    เลือกทั้งหมด
+                                </button>
                                 <button onclick="clearLoc('district')">ล้าง</button>
                             </div>
                         </div>
@@ -144,7 +164,9 @@
                         <div class="dd-panel" id="province-dd-panel">
                             <div class="dd-panel-hdr">
                                 <span>เลือกจังหวัด</span>
-                                <button class="dd-panel-close" onclick="closeLocDD('province')">✕</button>
+                                <button class="dd-panel-close" onclick="closeLocDD('province')">
+                                    ✕
+                                </button>
                             </div>
                             <div class="dd-search">
                                 <input type="text" id="province-dd-search" placeholder="ค้นหาจังหวัด..."
@@ -152,12 +174,14 @@
                             </div>
                             <div class="dd-list" id="province-dd-list"></div>
                             <div class="dd-footer">
-                                <button onclick="selectAllLoc('province')">เลือกทั้งหมด</button>
+                                <button onclick="selectAllLoc('province')">
+                                    เลือกทั้งหมด
+                                </button>
                                 <button onclick="clearLoc('province')">ล้าง</button>
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
                 <div class="filter-group">
                     <label>ชื่อ-นามสกุล</label>
                     <div class="dd-wrap" id="name-dd-wrap">
@@ -234,7 +258,9 @@
                 <div id="chart-amount" style="min-height: 200px"></div>
             </div>
             <div class="card">
-                <div class="card-hd"><span class="card-title">สัดส่วนช่วงอายุ</span></div>
+                <div class="card-hd">
+                    <span class="card-title">สัดส่วนช่วงอายุ</span>
+                </div>
                 <div class="card-sub">ผู้ขอรับการเยียวยา</div>
                 <div id="chart-gender" style="min-height: 200px"></div>
             </div>
@@ -309,35 +335,38 @@
         </div>
 
         <!-- EDIT MODAL -->
-        <div class="edit-modal-overlay" id="edit-modal-overlay" onclick="if(event.target===this)closeEditModal()">
+        <div class="edit-modal-overlay" id="edit-modal-overlay" onclick="if (event.target === this) closeEditModal();">
             <div class="edit-modal">
                 <div class="edit-modal-hdr">
                     <h2>✏️ แก้ไขข้อมูล</h2>
-                    <button class="edit-modal-close" onclick="closeEditModal()">✕</button>
+                    <button class="edit-modal-close" onclick="closeEditModal()">
+                        ✕
+                    </button>
                 </div>
                 <div class="edit-modal-body">
                     <input type="hidden" id="edit-id" />
                     <div class="edit-field">
                         <label>วันที่เกิดเหตุ</label>
                         <input type="text" id="edit-incident_date" placeholder="d/m/yyyy" readonly
-                            style="background:#f5f5f5;cursor:default" />
+                            style="background: #f5f5f5; cursor: default" />
                     </div>
                     <div class="edit-field">
                         <label>ชื่อ-นามสกุล</label>
-                        <input type="text" id="edit-name" readonly style="background:#f5f5f5;cursor:default" />
+                        <input type="text" id="edit-name" readonly style="background: #f5f5f5; cursor: default" />
                     </div>
                     <div class="edit-field">
                         <label>เพศ</label>
-                        <input type="text" id="edit-gender" readonly style="background:#f5f5f5;cursor:default" />
+                        <input type="text" id="edit-gender" readonly style="background: #f5f5f5; cursor: default" />
                     </div>
                     <div class="edit-field">
                         <label>กรณีเยียวยา</label>
                         <input type="text" id="edit-compensation_case" readonly
-                            style="background:#f5f5f5;cursor:default" />
+                            style="background: #f5f5f5; cursor: default" />
                     </div>
                     <div class="edit-field">
                         <label>ปีงบประมาณ</label>
-                        <input type="text" id="edit-fiscal_year" readonly style="background:#f5f5f5;cursor:default" />
+                        <input type="text" id="edit-fiscal_year" readonly
+                            style="background: #f5f5f5; cursor: default" />
                     </div>
                     <div class="edit-field">
                         <label>สถานะการเยียวยา</label>
@@ -370,13 +399,17 @@
                     </div>
                 </div>
                 <div class="edit-modal-footer">
-                    <button class="btn-edit-cancel" onclick="closeEditModal()">ยกเลิก</button>
-                    <button class="btn-edit-save" onclick="confirmEdit()">💾 บันทึก</button>
+                    <button class="btn-edit-cancel" onclick="closeEditModal()">
+                        ยกเลิก
+                    </button>
+                    <button class="btn-edit-save" onclick="confirmEdit()">
+                        💾 บันทึก
+                    </button>
                 </div>
             </div>
         </div>
 
-        <button onclick="window.location.href='report.html'" class="fab-print">
+        <button onclick="window.location.href = 'report.html'" class="fab-print">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" height="22" width="22">
                 <path fill="white"
                     d="M17 8H7V6h10v2zm2 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-2 7H7v-4h10v4zm3-11H4c-1.1 0-2 .9-2 2v6h4v4h12v-4h4v-6c0-1.1-.9-2-2-2z" />
@@ -384,26 +417,34 @@
             <span class="fab-label">พิมพ์รายงาน</span>
         </button>
 
-
         <!-- REPORT MODAL -->
-        <div class="report-overlay" id="report-overlay" onclick="if(event.target===this)closeReport()">
+        <div class="report-overlay" id="report-overlay" onclick="if (event.target === this) closeReport();">
             <div class="report-modal">
                 <div class="report-modal-hdr">
                     <h2>🖨️ สร้างรายงาน</h2>
-                    <button class="report-modal-close" onclick="closeReport()">✕</button>
+                    <button class="report-modal-close" onclick="closeReport()">
+                        ✕
+                    </button>
                 </div>
                 <div class="report-modal-body">
-                    <label
-                        style="font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--c-ink3);display:block;margin-bottom:8px">ข้อมูลที่ต้องการออกรายงาน</label>
+                    <label style="
+                font-size: 11px;
+                font-weight: 600;
+                letter-spacing: 0.05em;
+                text-transform: uppercase;
+                color: var(--c-ink3);
+                display: block;
+                margin-bottom: 8px;
+              ">ข้อมูลที่ต้องการออกรายงาน</label>
                     <label class="report-option">
-                        <input type="radio" name="report-scope" value="all" checked>
+                        <input type="radio" name="report-scope" value="all" checked />
                         <div class="report-option-txt">
                             <strong>📋 ข้อมูลทั้งหมด</strong>
                             <span id="rpt-all-count">ทุกรายการ</span>
                         </div>
                     </label>
                     <label class="report-option">
-                        <input type="radio" name="report-scope" value="filtered">
+                        <input type="radio" name="report-scope" value="filtered" />
                         <div class="report-option-txt">
                             <strong>🔍 เฉพาะข้อมูลที่กรองอยู่</strong>
                             <span id="rpt-filtered-count">รายการที่เลือก</span>
@@ -412,22 +453,24 @@
 
                     <div class="report-sections">
                         <label>ส่วนที่ต้องการแสดงในรายงาน</label>
-                        <label class="report-check"><input type="checkbox" id="rpt-kpi" checked> สรุปตัวเลขสำคัญ
+                        <label class="report-check"><input type="checkbox" id="rpt-kpi" checked /> สรุปตัวเลขสำคัญ
                             (KPI)</label>
-                        <label class="report-check"><input type="checkbox" id="rpt-chart" checked> กราฟสถิติ</label>
-                        <label class="report-check"><input type="checkbox" id="rpt-table" checked>
+                        <label class="report-check"><input type="checkbox" id="rpt-chart" checked />
+                            กราฟสถิติ</label>
+                        <label class="report-check"><input type="checkbox" id="rpt-table" checked />
                             ตารางข้อมูลรายการ</label>
                     </div>
                 </div>
                 <div class="report-modal-footer">
-                    <button class="btn-print-cancel" onclick="closeReport()">ยกเลิก</button>
-                    <button class="btn-print-go" onclick="doPrint()">🖨️ พิมพ์รายงาน</button>
+                    <button class="btn-print-cancel" onclick="closeReport()">
+                        ยกเลิก
+                    </button>
+                    <button class="btn-print-go" onclick="doPrint()">
+                        🖨️ พิมพ์รายงาน
+                    </button>
                 </div>
             </div>
         </div>
-
-
-
     </main>
 
     <footer>
@@ -436,88 +479,169 @@
     </footer>
 
     <script>
-
         function openReport() {
             const all = RAW.length;
             const filtered = getFiltered().length;
-            document.getElementById('rpt-all-count').textContent = `${all} รายการทั้งหมด`;
-            document.getElementById('rpt-filtered-count').textContent =
-                filtered === all ? `${filtered} รายการ (ยังไม่ได้กรอง)` : `${filtered} รายการที่กรองแล้ว`;
-            document.getElementById('report-overlay').classList.add('open');
+            document.getElementById("rpt-all-count").textContent =
+                `${all} รายการทั้งหมด`;
+            document.getElementById("rpt-filtered-count").textContent =
+                filtered === all
+                    ? `${filtered} รายการ (ยังไม่ได้กรอง)`
+                    : `${filtered} รายการที่กรองแล้ว`;
+            document.getElementById("report-overlay").classList.add("open");
         }
 
         function closeReport() {
-            document.getElementById('report-overlay').classList.remove('open');
+            document.getElementById("report-overlay").classList.remove("open");
         }
 
         function doPrint() {
-            const scope = document.querySelector('input[name="report-scope"]:checked').value;
-            const data = scope === 'filtered' ? getFiltered() : RAW;
-            const showKPI = document.getElementById('rpt-kpi').checked;
-            const showChart = document.getElementById('rpt-chart').checked;
-            const showTable = document.getElementById('rpt-table').checked;
+            const scope = document.querySelector(
+                'input[name="report-scope"]:checked',
+            ).value;
+            const data = scope === "filtered" ? getFiltered() : RAW;
+            const showKPI = document.getElementById("rpt-kpi").checked;
+            const showChart = document.getElementById("rpt-chart").checked;
+            const showTable = document.getElementById("rpt-table").checked;
             const now = new Date();
-            const dateStr = now.toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+            const dateStr = now.toLocaleDateString("th-TH", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+            });
 
-            const paid = data.filter(r => r.compensation_status === 'จ่ายเงินแล้ว');
-            const pend = data.filter(r => r.compensation_status === 'รออนุมัติเบิกจ่าย');
+            const paid = data.filter(
+                (r) => r.compensation_status === "จ่ายเงินแล้ว",
+            );
+            const pend = data.filter(
+                (r) => r.compensation_status === "รออนุมัติเบิกจ่าย",
+            );
             const totalAmt = data.reduce((a, r) => a + r.requested_amount, 0);
             const paidAmt = paid.reduce((a, r) => a + r.requested_amount, 0);
 
-            const kpiHTML = showKPI ? `
+            const kpiHTML = showKPI
+                ? `
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0">
             ${[
-                    { lbl: 'กรณีทั้งหมด', val: data.length, sub: 'รายการ', color: '#1a4faa' },
-                    { lbl: 'จ่ายเงินแล้ว', val: paid.length, sub: '฿' + paidAmt.toLocaleString('th-TH'), color: '#059669' },
-                    { lbl: 'รออนุมัติเบิกจ่าย', val: pend.length, sub: '฿' + pend.reduce((a, r) => a + r.requested_amount, 0).toLocaleString('th-TH'), color: '#d97706' },
-                    { lbl: 'มูลค่ารวม', val: '฿' + (totalAmt >= 1000000 ? (totalAmt / 1000000).toFixed(2) + 'M' : totalAmt.toLocaleString('th-TH')), sub: 'บาท', color: '#dc2626' },
-                ].map(k => `
+                    {
+                        lbl: "กรณีทั้งหมด",
+                        val: data.length,
+                        sub: "รายการ",
+                        color: "#1a4faa",
+                    },
+                    {
+                        lbl: "จ่ายเงินแล้ว",
+                        val: paid.length,
+                        sub: "฿" + paidAmt.toLocaleString("th-TH"),
+                        color: "#059669",
+                    },
+                    {
+                        lbl: "รออนุมัติเบิกจ่าย",
+                        val: pend.length,
+                        sub:
+                            "฿" +
+                            pend
+                                .reduce((a, r) => a + r.requested_amount, 0)
+                                .toLocaleString("th-TH"),
+                        color: "#d97706",
+                    },
+                    {
+                        lbl: "มูลค่ารวม",
+                        val:
+                            "฿" +
+                            (totalAmt >= 1000000
+                                ? (totalAmt / 1000000).toFixed(2) + "M"
+                                : totalAmt.toLocaleString("th-TH")),
+                        sub: "บาท",
+                        color: "#dc2626",
+                    },
+                ]
+                    .map(
+                        (k) => `
                 <div style="border:1px solid #dde3d9;border-radius:8px;padding:10px 12px;border-top:3px solid ${k.color}">
                     <div style="font-size:9px;color:#7a927f;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">${k.lbl}</div>
                     <div style="font-size:20px;font-weight:600;color:${k.color};line-height:1">${k.val}</div>
                     <div style="font-size:10px;color:#7a927f;margin-top:3px">${k.sub}</div>
-                </div>`).join('')}
-        </div>` : '';
+                </div>`,
+                    )
+                    .join("")}
+        </div>`
+                : "";
 
-            const chartHTML = showChart ? `
+            const chartHTML = showChart
+                ? `
         <div style="margin:16px 0;padding:12px;border:1px solid #dde3d9;border-radius:8px">
             <div style="font-size:11px;font-weight:600;color:#3d5045;margin-bottom:10px">สัดส่วนสถานะการเยียวยา</div>
             <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
                 ${[
-                    { label: 'จ่ายเงินแล้ว', count: paid.length, color: '#059669' },
-                    { label: 'รออนุมัติเบิกจ่าย', count: pend.length, color: '#d97706' },
-                    { label: 'ไม่ขอรับ', count: data.filter(r => r.compensation_status === 'ไม่ขอรับการเยียวยา').length, color: '#9ca3af' },
-                ].map(s => {
-                    const pct = data.length > 0 ? Math.round(s.count / data.length * 100) : 0;
-                    return `<div style="flex:1;min-width:80px">
+                    {
+                        label: "จ่ายเงินแล้ว",
+                        count: paid.length,
+                        color: "#059669",
+                    },
+                    {
+                        label: "รออนุมัติเบิกจ่าย",
+                        count: pend.length,
+                        color: "#d97706",
+                    },
+                    {
+                        label: "ไม่ขอรับ",
+                        count: data.filter(
+                            (r) => r.compensation_status === "ไม่ขอรับการเยียวยา",
+                        ).length,
+                        color: "#9ca3af",
+                    },
+                ]
+                    .map((s) => {
+                        const pct =
+                            data.length > 0
+                                ? Math.round((s.count / data.length) * 100)
+                                : 0;
+                        return `<div style="flex:1;min-width:80px">
                         <div style="font-size:10px;color:#7a927f;margin-bottom:4px">${s.label}</div>
                         <div style="background:#f0f0ee;border-radius:4px;height:10px;overflow:hidden">
                             <div style="width:${pct}%;background:${s.color};height:100%;border-radius:4px"></div>
                         </div>
                         <div style="font-size:11px;font-weight:600;color:${s.color};margin-top:3px">${s.count} ราย (${pct}%)</div>
                     </div>`;
-                }).join('')}
+                    })
+                    .join("")}
             </div>
             <div style="margin-top:12px;font-size:11px;font-weight:600;color:#3d5045;margin-bottom:8px">ประเภทกรณีเยียวยา</div>
             ${(() => {
                     const types = {};
-                    data.forEach(r => { types[r.compensation_case] = (types[r.compensation_case] || 0) + 1; });
-                    const colors = { 'เสียชีวิต': '#8b17ff', 'บาดเจ็บ': '#be85ff', 'พืชผลทางการเกษตร': '#8eed58', 'ทรัพย์สิน': '#ffe121', ปศุสัตว์: "b-live", 'ทรัพย์สิน+พืชผลทางการเกษตร': '#ed66e6' };
-                    return Object.entries(types).sort((a, b) => b[1] - a[1]).map(([t, c]) => {
-                        const pct = Math.round(c / data.length * 100);
-                        const col = colors[t] || '#64748b';
-                        return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+                    data.forEach((r) => {
+                        types[r.compensation_case] =
+                            (types[r.compensation_case] || 0) + 1;
+                    });
+                    const colors = {
+                        เสียชีวิต: "#8b17ff",
+                        บาดเจ็บ: "#be85ff",
+                        พืชผลทางการเกษตร: "#8eed58",
+                        ทรัพย์สิน: "#ffe121",
+                        ปศุสัตว์: "b-live",
+                        "ทรัพย์สิน+พืชผลทางการเกษตร": "#ed66e6",
+                    };
+                    return Object.entries(types)
+                        .sort((a, b) => b[1] - a[1])
+                        .map(([t, c]) => {
+                            const pct = Math.round((c / data.length) * 100);
+                            const col = colors[t] || "#64748b";
+                            return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
                         <div style="font-size:11px;color:#3d5045;width:160px;flex-shrink:0">${t}</div>
                         <div style="flex:1;background:#f0f0ee;border-radius:4px;height:8px">
                             <div style="width:${pct}%;background:${col};height:100%;border-radius:4px"></div>
                         </div>
                         <div style="font-size:11px;font-weight:600;color:${col};width:50px;text-align:right">${c} ราย</div>
                     </div>`;
-                    }).join('');
+                        })
+                        .join("");
                 })()}
-        </div>` : '';
+        </div>`
+                : "";
 
-            const tableHTML = showTable ? `
+            const tableHTML = showTable
+                ? `
         <div style="margin-top:16px">
             <div style="font-size:11px;font-weight:600;color:#3d5045;margin-bottom:8px">รายละเอียดข้อมูลทั้งหมด (${data.length} รายการ)</div>
             <table style="width:100%;border-collapse:collapse;font-size:10px">
@@ -534,27 +658,32 @@
                     </tr>
                 </thead>
                 <tbody>
-                    ${data.map((r, i) => `
-                        <tr style="background:${i % 2 === 0 ? '#fff' : '#f8faf8'}">
-                            <td style="padding:5px 8px;color:#7a927f">${r.id || '—'}</td>
-                            <td style="padding:5px 8px;white-space:nowrap">${r.incident_date || '—'}</td>
-                            <td style="padding:5px 8px;font-weight:500">${r.name || '—'}</td>
-                            <td style="padding:5px 8px;text-align:center">${r.gender || '—'}</td>
-                            <td style="padding:5px 8px">${r.compensation_case || '—'}</td>
-                            <td style="padding:5px 8px;text-align:right;font-weight:500">${r.requested_amount > 0 ? '฿' + r.requested_amount.toLocaleString('th-TH') : '—'}</td>
-                            <td style="padding:5px 8px;text-align:center">${r.fiscal_year || '—'}</td>
-                            <td style="padding:5px 8px">${r.compensation_status || '—'}</td>
-                        </tr>`).join('')}
+                    ${data
+                    .map(
+                        (r, i) => `
+                        <tr style="background:${i % 2 === 0 ? "#fff" : "#f8faf8"}">
+                            <td style="padding:5px 8px;color:#7a927f">${r.id || "—"}</td>
+                            <td style="padding:5px 8px;white-space:nowrap">${r.incident_date || "—"}</td>
+                            <td style="padding:5px 8px;font-weight:500">${r.name || "—"}</td>
+                            <td style="padding:5px 8px;text-align:center">${r.gender || "—"}</td>
+                            <td style="padding:5px 8px">${r.compensation_case || "—"}</td>
+                            <td style="padding:5px 8px;text-align:right;font-weight:500">${r.requested_amount > 0 ? "฿" + r.requested_amount.toLocaleString("th-TH") : "—"}</td>
+                            <td style="padding:5px 8px;text-align:center">${r.fiscal_year || "—"}</td>
+                            <td style="padding:5px 8px">${r.compensation_status || "—"}</td>
+                        </tr>`,
+                    )
+                    .join("")}
                 </tbody>
             </table>
-        </div>` : '';
+        </div>`
+                : "";
 
-            document.getElementById('print-content').innerHTML = `
+            document.getElementById("print-content").innerHTML = `
         <div style="font-family:'IBM Plex Sans Thai','Sarabun',sans-serif;padding:0">
             <div style="background:linear-gradient(135deg,#0d2416,#133a22);padding:16px 20px;border-radius:0">
                 <div style="font-size:18px;font-weight:700;color:#fff">รายงานสถิติการเยียวยาผลกระทบจากช้างป่า</div>
                 <div style="font-size:11px;color:rgba(255,255,255,.6);margin-top:4px">อุทยานแห่งชาติแก่งกระจาน &nbsp;·&nbsp; ออกรายงาน: ${dateStr}</div>
-                <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:2px">${scope === 'filtered' ? `ข้อมูลที่กรองแล้ว: ${data.length} รายการ` : `ข้อมูลทั้งหมด: ${data.length} รายการ`}</div>
+                <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:2px">${scope === "filtered" ? `ข้อมูลที่กรองแล้ว: ${data.length} รายการ` : `ข้อมูลทั้งหมด: ${data.length} รายการ`}</div>
             </div>
             <div style="padding:16px 20px">
                 ${kpiHTML}
@@ -569,7 +698,6 @@
             closeReport();
             setTimeout(() => window.print(), 100);
         }
-
 
         const SUPABASE_URL = "https://xzuzpkzxyimcvgninskt.supabase.co";
         const SUPABASE_KEY =
@@ -588,7 +716,10 @@
                     .map((r) => ({
                         ...r,
                         requested_amount: parseFloat(r.requested_amount) || 0,
-                        fiscal_year: parseInt(r.fiscal_year) || 0,
+                        fiscal_year: computeFiscalYear(
+                            r.incident_date,
+                            parseInt(r.fiscal_year) || 0,
+                        ),
                     }));
                 buildFilters();
                 buildKPIs(RAW);
@@ -602,7 +733,7 @@
                 initMap(RAW);
                 renderTable();
 
-                document.getElementById('loading-screen').style.display = 'none';
+                document.getElementById("loading-screen").style.display = "none";
                 document.getElementById("filter-summary").innerHTML =
                     `แสดง <strong>${RAW.length}</strong> จาก ${RAW.length} รายการ`;
             });
@@ -617,7 +748,7 @@
             crop: "#8eed58",
             prop: "#ffe121",
             mix: "#ed66e6",
-            anim: '#66b3ed',
+            anim: "#66b3ed",
         };
         const TYPE_C = {
             เสียชีวิต: C.die,
@@ -640,7 +771,12 @@
             toolbar: { show: false },
             animations: { speed: 350, animateGradually: { enabled: false } },
         };
-        const F = { years: new Set(), statuses: new Set(), names: new Set(), months: new Set() };
+        const F = {
+            years: new Set(),
+            statuses: new Set(),
+            names: new Set(),
+            months: new Set(),
+        };
         let tableSort = { col: "id", dir: "asc" },
             tablePage = 1;
         const CHARTS = {};
@@ -651,18 +787,19 @@
             MAP_TOKEN = 0;
 
         function getFiltered() {
-            return RAW.filter(r => {
+            return RAW.filter((r) => {
                 if (F.years.size && !F.years.has(String(r.fiscal_year))) return false;
-                if (F.statuses.size && !F.statuses.has(r.compensation_status)) return false;
+                if (F.statuses.size && !F.statuses.has(r.compensation_status))
+                    return false;
                 if (F.names.size && !F.names.has(r.name)) return false;
                 if (F.months.size) {
                     if (!r.incident_date) return false;
-                    const parts = r.incident_date.split('/');
+                    const parts = r.incident_date.split("/");
                     if (parts.length !== 3) return false;
                     let m = parseInt(parts[1]);
                     let y = parseInt(parts[2]);
                     if (y > 2500) y = y - 543;
-                    const key = `${y}-${String(m).padStart(2, '0')}`;
+                    const key = `${y}-${String(m).padStart(2, "0")}`;
                     if (!F.months.has(key)) return false;
                 }
                 return true;
@@ -776,7 +913,9 @@
         }
 
         function buildInsights(d) {
-            const pend = d.filter((r) => r.compensation_status === "รออนุมัติเบิกจ่าย"),
+            const pend = d.filter(
+                (r) => r.compensation_status === "รออนุมัติเบิกจ่าย",
+            ),
                 pendAmt = pend.reduce((a, r) => a + r.requested_amount, 0);
             document.getElementById("insights-bar").innerHTML = [
                 {
@@ -821,48 +960,75 @@
         }
 
         async function makeDot(r) {
-            const color = CASE_COLOR[r.compensation_case] || '#64748b';
+            const color = CASE_COLOR[r.compensation_case] || "#64748b";
 
-            let damageHTML = '';
-            if (r.compensation_case && r.compensation_case.includes('พืชผล') || r.compensation_case === 'ทรัพย์สิน' || r.compensation_case === 'ทรัพย์สิน+พืชผลทางการเกษตร') {
-                const { data } = await fetch(`${SUPABASE_URL}/rest/v1/damage_items?compensation_id=eq.${r.id}&select=item_name,quantity,unit`, {
-                    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-                }).then(res => res.json()).then(data => ({ data })).catch(() => ({ data: [] }));
+            let damageHTML = "";
+            if (
+                (r.compensation_case && r.compensation_case.includes("พืชผล")) ||
+                r.compensation_case === "ทรัพย์สิน" ||
+                r.compensation_case === "ทรัพย์สิน+พืชผลทางการเกษตร"
+            ) {
+                const { data } = await fetch(
+                    `${SUPABASE_URL}/rest/v1/damage_items?compensation_id=eq.${r.id}&select=item_name,quantity,unit`,
+                    {
+                        headers: {
+                            apikey: SUPABASE_KEY,
+                            Authorization: `Bearer ${SUPABASE_KEY}`,
+                        },
+                    },
+                )
+                    .then((res) => res.json())
+                    .then((data) => ({ data }))
+                    .catch(() => ({ data: [] }));
 
                 if (data && data.length > 0) {
-                    const preview = data.slice(0, 2).map(d => `${d.item_name} ${d.quantity || ''} ${d.unit || ''}`).join(', ');
-                    const more = data.length > 2 ? `<br><small style="color:#9ca3af">+${data.length - 2} รายการ กดเพื่อดูเพิ่ม</small>` : '';
+                    const preview = data
+                        .slice(0, 2)
+                        .map((d) => `${d.item_name} ${d.quantity || ""} ${d.unit || ""}`)
+                        .join(", ");
+                    const more =
+                        data.length > 2
+                            ? `<br><small style="color:#9ca3af">+${data.length - 2} รายการ กดเพื่อดูเพิ่ม</small>`
+                            : "";
                     damageHTML = `
                 <details style="margin-top:6px;cursor:pointer">
                     <summary style="font-size:11px;color:#1a6b42;font-weight:500">📦 ความเสียหาย (${data.length} รายการ)</summary>
                     <div style="margin-top:4px;font-size:11px;color:#3d5045">
-                        ${data.map(d => `• ${d.item_name} ${d.quantity || ''} ${d.unit || ''}`).join('<br>')}
+                        ${data.map((d) => `• ${d.item_name} ${d.quantity || ""} ${d.unit || ""}`).join("<br>")}
                     </div>
                 </details>`;
                 }
             }
 
             const icon = L.divIcon({
-                className: '',
+                className: "",
                 html: `<div class="map-pulse"><div class="ring" style="background:${color}"></div><div class="dot" style="background:${color}"></div></div>`,
-                iconSize: [14, 14], iconAnchor: [7, 7], popupAnchor: [0, -10]
+                iconSize: [14, 14],
+                iconAnchor: [7, 7],
+                popupAnchor: [0, -10],
             });
 
-            return L.marker([r.lat, r.lon], { icon }).bindPopup(`
+            return L.marker([r.lat, r.lon], { icon }).bindPopup(
+                `
         <strong style="font-size:13px">${r.name}</strong><br>
         <span style="font-size:11px;color:#7a927f">${r.incident_date}</span><br>
         <span style="font-size:12px">${r.compensation_case}</span><br>
-        <span style="font-size:11px;color:${r.compensation_status === 'จ่ายเงินแล้ว' ? '#059669' : '#d97706'}">
+        <span style="font-size:11px;color:${r.compensation_status === "จ่ายเงินแล้ว" ? "#059669" : "#d97706"}">
             ${r.compensation_status}
         </span>
         ${damageHTML}
-    `, { maxWidth: 260 });
+    `,
+                { maxWidth: 260 },
+            );
         }
 
         async function initMap(d) {
             const pts = d.filter((r) => r.lat && r.lon);
             document.getElementById("chip-map").textContent = pts.length + " จุด";
-            MAP_INSTANCE = L.map("map", { tap: true }).setView([12.5733, 99.5320], 10);
+            MAP_INSTANCE = L.map("map", { tap: true }).setView(
+                [12.5733, 99.532],
+                10,
+            );
             L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
                 attribution: "© OpenStreetMap",
             }).addTo(MAP_INSTANCE);
@@ -919,12 +1085,14 @@
             return {
                 series: [
                     d.filter((r) => r.compensation_status === "จ่ายเงินแล้ว").length,
-                    d.filter((r) => r.compensation_status === "รออนุมัติเบิกจ่าย").length,
-                    d.filter(r => r.compensation_status === 'รอเอกสารจากผู้เสียหาย').length,
+                    d.filter((r) => r.compensation_status === "รออนุมัติเบิกจ่าย")
+                        .length,
+                    d.filter((r) => r.compensation_status === "รอเอกสารจากผู้เสียหาย")
+                        .length,
                     d.filter((r) => r.compensation_status === "ไม่ขอรับการเยียวยา")
                         .length,
                 ],
-                labels: ["จ่ายเงินแล้ว", "รออนุมัติเบิกจ่าย", 'รอเอกสาร', "ไม่ขอรับ"],
+                labels: ["จ่ายเงินแล้ว", "รออนุมัติเบิกจ่าย", "รอเอกสาร", "ไม่ขอรับ"],
             };
         }
         function initStatusChart(d) {
@@ -1005,7 +1173,12 @@
                     toolbar: { show: false },
                 },
                 plotOptions: {
-                    bar: { horizontal: true, borderRadius: 4, barHeight: "60%", distributed: true },
+                    bar: {
+                        horizontal: true,
+                        borderRadius: 4,
+                        barHeight: "60%",
+                        distributed: true,
+                    },
                 },
                 xaxis: {
                     categories: cats,
@@ -1017,7 +1190,7 @@
                         maxWidth: 130,
                     },
                 },
-                colors: cats.map(t => CASE_COLOR[t] || '#64748b'),
+                colors: cats.map((t) => CASE_COLOR[t] || "#64748b"),
                 legend: { show: false },
                 dataLabels: {
                     enabled: true,
@@ -1035,10 +1208,10 @@
             CHARTS.type.render();
         }
         function updateTypeChart(d) {
-            const m = countBy(d, r => r.compensation_case);
+            const m = countBy(d, (r) => r.compensation_case);
             const types = Object.keys(m).sort((a, b) => m[b] - m[a]);
-            const vals = types.map(t => m[t]);
-            const barColors = types.map(t => CASE_COLOR[t] || '#64748b');
+            const vals = types.map((t) => m[t]);
+            const barColors = types.map((t) => CASE_COLOR[t] || "#64748b");
 
             CHARTS.type.updateOptions({
                 series: [{ data: vals }],
@@ -1114,7 +1287,7 @@
 
         function parseDate(s) {
             if (!s) return null;
-            const p = s.split('/');
+            const p = s.split("/");
             if (p.length !== 3) return null;
             const d = parseInt(p[0]);
             const m = parseInt(p[1]);
@@ -1124,6 +1297,12 @@
             if (y < 2500) y = y + 543;
 
             return { m, y };
+        }
+
+        function computeFiscalYear(incidentDate, fallback) {
+            const p = parseDate(incidentDate);
+            if (!p) return fallback || 0;
+            return p.m >= 10 ? p.y + 1 : p.y;
         }
 
         function getMonthlyData(d) {
@@ -1232,10 +1411,10 @@
                     yaxis: {
                         labels: {
                             style: { fontSize: "10px", fontFamily: CD.fontFamily },
-                            formatter: v => Math.round(v)
+                            formatter: (v) => Math.round(v),
                         },
                         min: 0,
-                        stepSize: 10
+                        stepSize: 10,
                     },
                     grid: { borderColor: "#f0f0ee", padding: { left: 4, right: 4 } },
                     markers: {
@@ -1307,7 +1486,8 @@
                     d
                         .filter(
                             (r) =>
-                                r.fiscal_year === y && r.compensation_status === "รออนุมัติเบิกจ่าย",
+                                r.fiscal_year === y &&
+                                r.compensation_status === "รออนุมัติเบิกจ่าย",
                         )
                         .reduce((a, r) => a + r.requested_amount, 0),
                 ),
@@ -1377,35 +1557,50 @@
 
         function getAgeData(d) {
             const ranges = [
-                { label: 'เด็ก (ต่ำกว่า 18 ปี)', min: 1, max: 17 },
-                { label: 'วัยทำงาน (18-59 ปี)', min: 18, max: 59 },
-                { label: 'ผู้สูงอายุ (60 ปีขึ้นไป)', min: 60, max: 999 },
-                { label: 'ไม่ระบุอายุ', min: null, max: null },
+                { label: "เด็ก (ต่ำกว่า 18 ปี)", min: 1, max: 17 },
+                { label: "วัยทำงาน (18-59 ปี)", min: 18, max: 59 },
+                { label: "ผู้สูงอายุ (60 ปีขึ้นไป)", min: 60, max: 999 },
+                { label: "ไม่ระบุอายุ", min: null, max: null },
             ];
-            const series = ranges.map(r => {
-                if (r.min === null) return d.filter(x => !x.age || x.age === null).length;
-                return d.filter(x => x.age && x.age >= r.min && x.age <= r.max).length;
+            const series = ranges.map((r) => {
+                if (r.min === null)
+                    return d.filter((x) => !x.age || x.age === null).length;
+                return d.filter((x) => x.age && x.age >= r.min && x.age <= r.max)
+                    .length;
             });
-            return { series, labels: ranges.map(r => r.label) };
+            return { series, labels: ranges.map((r) => r.label) };
         }
 
         function initGenderChart(d) {
             const { series, labels } = getAgeData(d);
-            CHARTS.gender = new ApexCharts(document.getElementById('chart-gender'), {
-                ...CD,
-                series,
-                labels,
-                chart: { type: 'pie', height: 200, fontFamily: CD.fontFamily, toolbar: { show: false } },
-                colors: ['#3b82f6', '#8b5cf6', '#1a6b42', '#d97706', '#9ca3af'],
-                legend: { position: 'bottom', fontSize: '11px', fontFamily: CD.fontFamily },
-                dataLabels: {
-                    enabled: true,
-                    formatter: (v, o) => o.w.config.labels[o.seriesIndex] + '\n' + Math.round(v) + '%',
-                    style: { fontSize: '10.5px', fontFamily: CD.fontFamily },
+            CHARTS.gender = new ApexCharts(
+                document.getElementById("chart-gender"),
+                {
+                    ...CD,
+                    series,
+                    labels,
+                    chart: {
+                        type: "pie",
+                        height: 200,
+                        fontFamily: CD.fontFamily,
+                        toolbar: { show: false },
+                    },
+                    colors: ["#3b82f6", "#8b5cf6", "#1a6b42", "#d97706", "#9ca3af"],
+                    legend: {
+                        position: "bottom",
+                        fontSize: "11px",
+                        fontFamily: CD.fontFamily,
+                    },
+                    dataLabels: {
+                        enabled: true,
+                        formatter: (v, o) =>
+                            o.w.config.labels[o.seriesIndex] + "\n" + Math.round(v) + "%",
+                        style: { fontSize: "10.5px", fontFamily: CD.fontFamily },
+                    },
+                    stroke: { width: 2, colors: ["#fff"] },
+                    tooltip: { y: { formatter: (v) => v + " ราย" } },
                 },
-                stroke: { width: 2, colors: ['#fff'] },
-                tooltip: { y: { formatter: v => v + ' ราย' } },
-            });
+            );
             CHARTS.gender.render();
         }
 
@@ -1532,8 +1727,11 @@
                                 <td style="color:var(--c-ink3);font-size:11px">
                                     ${r.id || "—"}</td><td style="white-space:nowrap;font-size:11.5px">
                                         ${(() => {
-                                if (!r.incident_date) return '—'; const p = r.incident_date.split('/');
-                                if (p.length !== 3) return r.incident_date; return `${p[0]}/${p[1]}/${parseInt(p[2]) + 543}`;
+                                if (!r.incident_date) return "—";
+                                const p = r.incident_date.split("/");
+                                if (p.length !== 3)
+                                    return r.incident_date;
+                                return `${p[0]}/${p[1]}/${parseInt(p[2]) + 543}`;
                             })()}
                                             </td>
                                         <td>
@@ -1573,40 +1771,51 @@
             renderTable();
         }
 
-
-        const MONTH_NAMES = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+        const MONTH_NAMES = [
+            "ม.ค.",
+            "ก.พ.",
+            "มี.ค.",
+            "เม.ย.",
+            "พ.ค.",
+            "มิ.ย.",
+            "ก.ค.",
+            "ส.ค.",
+            "ก.ย.",
+            "ต.ค.",
+            "พ.ย.",
+            "ธ.ค.",
+        ];
         let MONTH_VALS = [];
 
         function buildFilters() {
-
             function buildMonthDD() {
                 const monthSet = new Set();
-                RAW.forEach(r => {
+                RAW.forEach((r) => {
                     if (!r.incident_date) return;
-                    const parts = r.incident_date.split('/');
+                    const parts = r.incident_date.split("/");
                     if (parts.length !== 3) return;
                     let m = parseInt(parts[1]);
                     let y = parseInt(parts[2]);
                     if (y > 2500) y = y - 543;
                     if (!m || !y) return;
-                    monthSet.add(`${y}-${String(m).padStart(2, '0')}`);
+                    monthSet.add(`${y}-${String(m).padStart(2, "0")}`);
                 });
 
                 MONTH_VALS = [...monthSet].sort();
 
-                const list = document.getElementById('month-dd-list');
-                list.innerHTML = MONTH_VALS.map(v => {
-                    const [y, m] = v.split('-');
+                const list = document.getElementById("month-dd-list");
+                list.innerHTML = MONTH_VALS.map((v) => {
+                    const [y, m] = v.split("-");
                     const label = `${MONTH_NAMES[parseInt(m) - 1]} ${parseInt(y) + 543}`;
                     return `<label class="dd-item">
-            <input type="checkbox" ${F.months.has(v) ? 'checked' : ''}
+            <input type="checkbox" ${F.months.has(v) ? "checked" : ""}
                 onchange="toggleGenericItem('month','${v}',this.checked)">
             <span>${label}</span>
         </label>`;
-                }).join('');
+                }).join("");
 
-                const target = document.getElementById('month-dd-wrap');
-                if (target) updateGenericBtn('month', 'ทุกเดือน');
+                const target = document.getElementById("month-dd-wrap");
+                if (target) updateGenericBtn("month", "ทุกเดือน");
             }
 
             const fys = [...new Set(RAW.map((r) => r.fiscal_year))].sort();
@@ -1619,6 +1828,7 @@
             const statuses = [
                 { val: "จ่ายเงินแล้ว", label: "✓ จ่ายแล้ว" },
                 { val: "รออนุมัติเบิกจ่าย", label: "⏳ รอจ่าย" },
+                { val: "รอเอกสารจากผู้เสียหาย", label: "📄 รอเอกสาร" },
                 { val: "ไม่ขอรับการเยียวยา", label: "✗ ไม่ขอรับ" },
             ];
 
@@ -1711,7 +1921,8 @@
         }
 
         function toggleGenericItem(type, val, checked) {
-            const FSet = type === 'year' ? F.years : type === 'status' ? F.statuses : F.months;
+            const FSet =
+                type === "year" ? F.years : type === "status" ? F.statuses : F.months;
             checked ? FSet.add(val) : FSet.delete(val);
             updateGenericBtn(type);
             refresh();
@@ -1726,7 +1937,12 @@
         }
 
         function clearGeneric(type) {
-            (type === 'year' ? F.years : type === 'status' ? F.statuses : F.months).clear();
+            (type === "year"
+                ? F.years
+                : type === "status"
+                    ? F.statuses
+                    : F.months
+            ).clear();
             rebuildGenericList(type);
             updateGenericBtn(type);
             refresh();
@@ -1754,33 +1970,41 @@
                 });
         }
 
-
         function updateGenericBtn(type, placeholder, items) {
-            const FSet = type === 'year' ? F.years : type === 'status' ? F.statuses : F.months;
-            const ph = placeholder || (type === 'year' ? 'ทุกปี' : type === 'status' ? 'ทุกสถานะ' : 'ทุกเดือน');
+            const FSet =
+                type === "year" ? F.years : type === "status" ? F.statuses : F.months;
+            const ph =
+                placeholder ||
+                (type === "year"
+                    ? "ทุกปี"
+                    : type === "status"
+                        ? "ทุกสถานะ"
+                        : "ทุกเดือน");
             const btn = document.getElementById(`${type}-dd-btn`);
             const lbl = document.getElementById(`${type}-dd-label`);
             if (!btn) return;
-            let cnt = btn.querySelector('.dd-count');
+            let cnt = btn.querySelector(".dd-count");
             if (FSet.size) {
-                if (type === 'month') {
-                    const [y, m] = [...FSet][0].split('-');
-                    lbl.textContent = FSet.size === 1
-                        ? `${MONTH_NAMES[parseInt(m) - 1]} ${parseInt(y) + 543}`
-                        : `${FSet.size} เดือน`;
+                if (type === "month") {
+                    const [y, m] = [...FSet][0].split("-");
+                    lbl.textContent =
+                        FSet.size === 1
+                            ? `${MONTH_NAMES[parseInt(m) - 1]} ${parseInt(y) + 543}`
+                            : `${FSet.size} เดือน`;
                 } else {
-                    lbl.textContent = FSet.size === 1 ? [...FSet][0] : `${FSet.size} รายการ`;
+                    lbl.textContent =
+                        FSet.size === 1 ? [...FSet][0] : `${FSet.size} รายการ`;
                 }
-                btn.classList.add('has-val');
+                btn.classList.add("has-val");
                 if (!cnt) {
-                    cnt = document.createElement('span');
-                    cnt.className = 'dd-count';
+                    cnt = document.createElement("span");
+                    cnt.className = "dd-count";
                     btn.insertBefore(cnt, btn.lastChild);
                 }
                 cnt.textContent = FSet.size;
             } else {
                 lbl.textContent = ph;
-                btn.classList.remove('has-val');
+                btn.classList.remove("has-val");
                 if (cnt) cnt.remove();
             }
         }
@@ -1791,26 +2015,38 @@
         F.provinces = new Set();
 
         const LOC_CFG = {
-            subdistrict: { field: 'subdistrict', set: 'subdistricts', ph: 'ทุกตำบล' },
-            district: { field: 'district', set: 'districts', ph: 'ทุกอำเภอ' },
-            province: { field: 'province', set: 'provinces', ph: 'ทุกจังหวัด' },
+            subdistrict: {
+                field: "subdistrict",
+                set: "subdistricts",
+                ph: "ทุกตำบล",
+            },
+            district: { field: "district", set: "districts", ph: "ทุกอำเภอ" },
+            province: { field: "province", set: "provinces", ph: "ทุกจังหวัด" },
         };
 
         function locOptions(type) {
             const f = LOC_CFG[type].field;
-            return [...new Set(RAW.map(r => r[f]).filter(Boolean))]
-                .sort((a, b) => a.localeCompare(b, 'th'));
+            return [...new Set(RAW.map((r) => r[f]).filter(Boolean))].sort((a, b) =>
+                a.localeCompare(b, "th"),
+            );
         }
 
         function buildLocList(type) {
             const set = F[LOC_CFG[type].set];
             const sEl = document.getElementById(`${type}-dd-search`);
-            const q = (sEl ? sEl.value : '').toLowerCase();
-            const opts = locOptions(type).filter(v => v.toLowerCase().includes(q));
+            const q = (sEl ? sEl.value : "").toLowerCase();
+            const opts = locOptions(type).filter((v) =>
+                v.toLowerCase().includes(q),
+            );
             const list = document.getElementById(`${type}-dd-list`);
             if (!list) return;
             list.innerHTML = opts.length
-                ? opts.map(v => `<label class="dd-item"><input type="checkbox" ${set.has(v) ? 'checked' : ''} onchange="toggleLoc('${type}','${v.replace(/'/g, "\\'")}',this.checked)"><span>${v}</span></label>`).join('')
+                ? opts
+                    .map(
+                        (v) =>
+                            `<label class="dd-item"><input type="checkbox" ${set.has(v) ? "checked" : ""} onchange="toggleLoc('${type}','${v.replace(/'/g, "\\'")}',this.checked)"><span>${v}</span></label>`,
+                    )
+                    .join("")
                 : '<div style="padding:12px;font-size:12px;color:var(--c-ink3)">ไม่พบข้อมูล</div>';
         }
 
@@ -1822,7 +2058,7 @@
         }
 
         function selectAllLoc(type) {
-            locOptions(type).forEach(v => F[LOC_CFG[type].set].add(v));
+            locOptions(type).forEach((v) => F[LOC_CFG[type].set].add(v));
             buildLocList(type);
             updateLocBtn(type);
             refresh();
@@ -1838,25 +2074,27 @@
         function toggleLocDD(type) {
             const p = document.getElementById(`${type}-dd-panel`);
             if (!p) return;
-            const wasOpen = p.classList.contains('open');
+            const wasOpen = p.classList.contains("open");
             closeAllDD();
             if (!wasOpen) {
                 buildLocList(type);
-                p.classList.add('open');
-                document.getElementById('dd-overlay').classList.add('open');
+                p.classList.add("open");
+                document.getElementById("dd-overlay").classList.add("open");
             }
         }
 
         function closeLocDD(type) {
-            document.getElementById(`${type}-dd-panel`).classList.remove('open');
-            if (!document.querySelector('.dd-panel.open'))
-                document.getElementById('dd-overlay').classList.remove('open');
+            document.getElementById(`${type}-dd-panel`).classList.remove("open");
+            if (!document.querySelector(".dd-panel.open"))
+                document.getElementById("dd-overlay").classList.remove("open");
         }
 
         function closeAllDD() {
-            document.querySelectorAll('.dd-panel.open').forEach(p => p.classList.remove('open'));
-            const o = document.getElementById('dd-overlay');
-            if (o) o.classList.remove('open');
+            document
+                .querySelectorAll(".dd-panel.open")
+                .forEach((p) => p.classList.remove("open"));
+            const o = document.getElementById("dd-overlay");
+            if (o) o.classList.remove("open");
         }
 
         function updateLocBtn(type) {
@@ -1865,30 +2103,38 @@
             const btn = document.getElementById(`${type}-dd-btn`);
             const lbl = document.getElementById(`${type}-dd-label`);
             if (!btn) return;
-            let cnt = btn.querySelector('.dd-count');
+            let cnt = btn.querySelector(".dd-count");
             if (set.size) {
                 lbl.textContent = set.size === 1 ? [...set][0] : `${set.size} รายการ`;
-                btn.classList.add('has-val');
-                if (!cnt) { cnt = document.createElement('span'); cnt.className = 'dd-count'; btn.insertBefore(cnt, btn.lastChild); }
+                btn.classList.add("has-val");
+                if (!cnt) {
+                    cnt = document.createElement("span");
+                    cnt.className = "dd-count";
+                    btn.insertBefore(cnt, btn.lastChild);
+                }
                 cnt.textContent = set.size;
             } else {
                 lbl.textContent = cfg.ph;
-                btn.classList.remove('has-val');
+                btn.classList.remove("has-val");
                 if (cnt) cnt.remove();
             }
         }
 
         function buildLocationFilters() {
-            ['subdistrict', 'district', 'province'].forEach(t => { buildLocList(t); updateLocBtn(t); });
+            ["subdistrict", "district", "province"].forEach((t) => {
+                buildLocList(t);
+                updateLocBtn(t);
+            });
         }
 
         (function () {
             const _getFiltered = getFiltered;
             getFiltered = function () {
-                return _getFiltered().filter(r =>
-                    (!F.subdistricts.size || F.subdistricts.has(r.subdistrict)) &&
-                    (!F.districts.size || F.districts.has(r.district)) &&
-                    (!F.provinces.size || F.provinces.has(r.province))
+                return _getFiltered().filter(
+                    (r) =>
+                        (!F.subdistricts.size || F.subdistricts.has(r.subdistrict)) &&
+                        (!F.districts.size || F.districts.has(r.district)) &&
+                        (!F.provinces.size || F.provinces.has(r.province)),
                 );
             };
             const _buildFilters = buildFilters;
@@ -1901,22 +2147,23 @@
                 F.subdistricts.clear();
                 F.districts.clear();
                 F.provinces.clear();
-                try { _resetAll(); } catch (e) { /* ข้ามบั๊กเดิม */ }
+                try {
+                    _resetAll();
+                } catch (e) {
+                    /* ข้ามบั๊กเดิม */
+                }
                 buildLocationFilters();
                 refresh();
             };
-            const ov = document.getElementById('dd-overlay');
-            if (ov) ov.addEventListener('click', closeAllDD);
+            const ov = document.getElementById("dd-overlay");
+            if (ov) ov.addEventListener("click", closeAllDD);
         })();
-
     </script>
 
     <!-- PRINT AREA -->
     <div id="print-area">
         <div id="print-content"></div>
     </div>
-
-
 </body>
 
 </html>
