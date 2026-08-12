@@ -101,7 +101,7 @@
                     <div class="pills" id="status-pills"></div>
                 </div>
 
-                <!-- <div class="filter-group">
+                <div class="filter-group">
                     <label>ตำบล</label>
                     <div class="dd-wrap" id="subdistrict-dd-wrap">
                         <button class="dd-btn" id="subdistrict-dd-btn" onclick="toggleLocDD('subdistrict')">
@@ -181,7 +181,8 @@
                             </div>
                         </div>
                     </div>
-                </div> -->
+                </div>
+
                 <div class="filter-group">
                     <label>ชื่อ-นามสกุล</label>
                     <div class="dd-wrap" id="name-dd-wrap">
@@ -471,7 +472,10 @@
                 </div>
             </div>
         </div>
+
     </main>
+
+
 
     <footer>
         สถิติการเยียวยาผลกระทบจากช้างป่า · อุทยานแห่งชาติแก่งกระจาน · ข้อมูลจาก
@@ -700,6 +704,33 @@
             closeReport();
             setTimeout(() => window.print(), 100);
         }
+
+
+        let VISITOR_COUNT = null;
+        (async function () {
+            const SB_URL = "https://xzuzpkzxyimcvgninskt.supabase.co";
+            const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6dXpwa3p4eWltY3Znbmluc2t0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MjcwMTksImV4cCI6MjA5NjMwMzAxOX0.P8uSZ4dlhCXyEfSOntD65eTAbYsJWkQ3SQFSsbmJm7k";
+
+            // นับ 1 ครั้งต่อการเปิดหน้าใน 1 ชั่วโมง (กันเลขพองจากรีเฟรชรัว ๆ)
+            const K = "kknp_view_bumped_at";
+            const fresh = Date.now() - parseInt(sessionStorage.getItem(K) || "0") > 3600000;
+            if (fresh) sessionStorage.setItem(K, String(Date.now()));
+
+            try {
+                const res = await fetch(`${SB_URL}/rest/v1/rpc/${fresh ? "bump_view" : "get_view"}`, {
+                    method: "POST",
+                    headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, "Content-Type": "application/json" },
+                    body: JSON.stringify({ p_key: "index_views" }),
+                });
+                VISITOR_COUNT = await res.json();
+            } catch (e) {
+                console.error("visitor counter error:", e);
+                VISITOR_COUNT = "-";
+            }
+            // อัปเดตแถบ insights ถ้าโหลดข้อมูลเสร็จแล้ว
+            if (typeof RAW !== "undefined" && RAW.length) buildInsights(getFiltered ? getFiltered() : RAW);
+        })();
+
 
         const SUPABASE_URL = "https://xzuzpkzxyimcvgninskt.supabase.co";
         const SUPABASE_KEY =
@@ -938,10 +969,17 @@
                     strong: "พืชผลฯ คือกรณีที่พบมากสุด",
                     span: `${d.filter((r) => (r.compensation_case || "").includes("พืชผล")).length} ราย จาก ${d.length} ราย`,
                 },
+                {
+                    ico: "👤",
+                    cls: "info",
+                    extra: "insight-right",
+                    strong: `ผู้เยี่ยมชม ${VISITOR_COUNT === null ? "…" : Number(VISITOR_COUNT).toLocaleString("th-TH")} ครั้ง`,
+                    span: "ยอดเข้าชมสะสมของหน้านี้",
+                },
             ]
                 .map(
                     (i) =>
-                        `<div class="insight"><div class="insight-ico ${i.cls}">${i.ico}</div><div class="insight-txt"><strong>${i.strong}</strong><span>${i.span}</span></div></div>`,
+                        `<div class="insight ${i.extra || ""}"><div class="insight-ico ${i.cls}">${i.ico}</div><div class="insight-txt"><strong>${i.strong}</strong><span>${i.span}</span></div></div>`,
                 )
                 .join("");
         }
@@ -2018,12 +2056,12 @@
 
         const LOC_CFG = {
             subdistrict: {
-                field: "subdistrict",
+                field: "event_subdistrict",
                 set: "subdistricts",
                 ph: "ทุกตำบล",
             },
-            district: { field: "district", set: "districts", ph: "ทุกอำเภอ" },
-            province: { field: "province", set: "provinces", ph: "ทุกจังหวัด" },
+            district: { field: "event_district", set: "districts", ph: "ทุกอำเภอ" },
+            province: { field: "event_province", set: "provinces", ph: "ทุกจังหวัด" },
         };
 
         function locOptions(type) {
@@ -2134,11 +2172,12 @@
             getFiltered = function () {
                 return _getFiltered().filter(
                     (r) =>
-                        (!F.subdistricts.size || F.subdistricts.has(r.subdistrict)) &&
-                        (!F.districts.size || F.districts.has(r.district)) &&
-                        (!F.provinces.size || F.provinces.has(r.province)),
+                        (!F.subdistricts.size || F.subdistricts.has(r.event_subdistrict)) &&
+                        (!F.districts.size || F.districts.has(r.event_district)) &&
+                        (!F.provinces.size || F.provinces.has(r.event_province)),
                 );
             };
+
             const _buildFilters = buildFilters;
             buildFilters = function () {
                 _buildFilters();
@@ -2160,6 +2199,9 @@
             const ov = document.getElementById("dd-overlay");
             if (ov) ov.addEventListener("click", closeAllDD);
         })();
+
+
+
     </script>
 
     <!-- PRINT AREA -->

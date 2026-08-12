@@ -203,6 +203,15 @@
             border-right: none;
         }
 
+        .insight.insight-right {
+            margin-left: auto;
+            margin-right: 0;
+            border-right: none;
+            border-left: 1px solid rgba(255, 255, 255, 0.07);
+            padding-left: 14px;
+            padding-right: 0;
+        }
+
         .insight-ico {
             font-size: 14px;
             width: 24px;
@@ -385,16 +394,16 @@
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, .35);
-            z-index: 999
+            background: rgba(0, 0, 0, 0.35);
+            z-index: 999;
         }
 
         .dd-overlay.open {
-            display: block
+            display: block;
         }
 
         .dd-wrap {
-            position: relative
+            position: relative;
         }
 
         .dd-btn {
@@ -409,19 +418,19 @@
             color: var(--c-ink2);
             min-width: 130px;
             justify-content: space-between;
-            transition: all .15s;
+            transition: all 0.15s;
             white-space: nowrap;
-            min-height: 34px
+            min-height: 34px;
         }
 
         .dd-btn:hover {
-            border-color: var(--c-green)
+            border-color: var(--c-green);
         }
 
         .dd-btn.has-val {
             background: var(--c-green-lt);
             border-color: var(--c-green);
-            color: var(--c-green)
+            color: var(--c-green);
         }
 
         .dd-count {
@@ -430,7 +439,7 @@
             border-radius: 10px;
             padding: 0 5px;
             font-size: 10px;
-            font-weight: 600
+            font-weight: 600;
         }
 
         .dd-panel {
@@ -444,23 +453,23 @@
             border-radius: var(--r-lg);
             box-shadow: var(--sh-md);
             z-index: 1000;
-            display: none
+            display: none;
         }
 
         .dd-panel.open {
             display: block;
-            animation: fadeIn .15s ease
+            animation: fadeIn 0.15s ease;
         }
 
         @keyframes fadeIn {
             from {
                 opacity: 0;
-                transform: translate(-50%, -47%)
+                transform: translate(-50%, -47%);
             }
 
             to {
                 opacity: 1;
-                transform: translate(-50%, -50%)
+                transform: translate(-50%, -50%);
             }
         }
 
@@ -469,13 +478,13 @@
             align-items: center;
             justify-content: space-between;
             padding: 10px 12px;
-            border-bottom: 1px solid var(--c-border)
+            border-bottom: 1px solid var(--c-border);
         }
 
         .dd-panel-hdr span {
             font-size: 13px;
             font-weight: 600;
-            color: var(--c-ink)
+            color: var(--c-ink);
         }
 
         .dd-panel-close {
@@ -486,14 +495,14 @@
             padding: 2px 6px;
             border-radius: 6px;
             line-height: 1;
-            cursor: pointer
+            cursor: pointer;
         }
 
         .dd-list {
             max-height: 240px;
             overflow-y: auto;
             padding: 4px 0;
-            -webkit-overflow-scrolling: touch
+            -webkit-overflow-scrolling: touch;
         }
 
         .dd-item {
@@ -504,25 +513,25 @@
             font-size: 13px;
             color: var(--c-ink2);
             cursor: pointer;
-            transition: background .1s
+            transition: background 0.1s;
         }
 
         .dd-item:hover {
-            background: var(--c-green-lt)
+            background: var(--c-green-lt);
         }
 
-        .dd-item input[type=checkbox] {
+        .dd-item input[type="checkbox"] {
             accent-color: var(--c-green);
             width: 15px;
             height: 15px;
-            flex-shrink: 0
+            flex-shrink: 0;
         }
 
         .dd-footer {
             padding: 8px 12px;
             border-top: 1px solid var(--c-border);
             display: flex;
-            gap: 8px
+            gap: 8px;
         }
 
         .dd-footer button {
@@ -531,7 +540,7 @@
             background: none;
             border: none;
             padding: 4px 0;
-            cursor: pointer
+            cursor: pointer;
         }
 
         /* KPI */
@@ -1053,6 +1062,45 @@
     </footer>
 
     <script>
+        // ===== ตัวนับผู้เยี่ยมชม (นับแยกหน้า: casualty_views) =====
+        let VISITOR_COUNT = null;
+        (async function () {
+            const SB_URL = "https://xzuzpkzxyimcvgninskt.supabase.co";
+            const SB_KEY =
+                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6dXpwa3p4eWltY3Znbmluc2t0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MjcwMTksImV4cCI6MjA5NjMwMzAxOX0.P8uSZ4dlhCXyEfSOntD65eTAbYsJWkQ3SQFSsbmJm7k";
+            const VIEW_KEY = "casualty_views";
+            const K = "kknp_view_" + VIEW_KEY;
+            const fresh =
+                Date.now() - parseInt(sessionStorage.getItem(K) || "0") > 3600000;
+            if (fresh) sessionStorage.setItem(K, String(Date.now()));
+            try {
+                const res = await fetch(
+                    `${SB_URL}/rest/v1/rpc/${fresh ? "bump_view" : "get_view"}`,
+                    {
+                        method: "POST",
+                        headers: {
+                            apikey: SB_KEY,
+                            Authorization: `Bearer ${SB_KEY}`,
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ p_key: VIEW_KEY }),
+                    },
+                );
+                VISITOR_COUNT = await res.json();
+            } catch (e) {
+                console.error("visitor counter error:", e);
+                VISITOR_COUNT = "-";
+            }
+            if (
+                typeof RAW !== "undefined" &&
+                RAW.length &&
+                typeof buildInsights === "function"
+            )
+                buildInsights(
+                    typeof getFiltered === "function" ? getFiltered() : RAW,
+                );
+        })();
+
         const SUPABASE_URL = "https://xzuzpkzxyimcvgninskt.supabase.co";
         const SUPABASE_KEY =
             "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6dXpwa3p4eWltY3Znbmluc2t0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MjcwMTksImV4cCI6MjA5NjMwMzAxOX0.P8uSZ4dlhCXyEfSOntD65eTAbYsJWkQ3SQFSsbmJm7k";
@@ -1119,8 +1167,16 @@
             refresh();
         }
         function resetAll() {
-            F.years.clear(); F.types.clear(); F.locs.clear();
-            ['year', 'type', 'loc'].forEach(t => { syncDDList(t, t === 'year' ? F.years : t === 'type' ? F.types : F.locs); updateDDBtn(t); });
+            F.years.clear();
+            F.types.clear();
+            F.locs.clear();
+            ["year", "type", "loc"].forEach((t) => {
+                syncDDList(
+                    t,
+                    t === "year" ? F.years : t === "type" ? F.types : F.locs,
+                );
+                updateDDBtn(t);
+            });
             refresh();
         }
         function countBy(arr, fn) {
@@ -1137,23 +1193,46 @@
         // <div class="dd-overlay" id="dd-overlay" onclick="closeAnyDD()"></div>
 
         function buildFilters() {
-            const years = [...new Set(RAW.map(r => r.year_be))].filter(Boolean).sort();
-            buildDD('year', 'ทุกปี', years.map(y => ({ val: String(y), label: `ปี ${y}` })), F.years);
+            const years = [...new Set(RAW.map((r) => r.year_be))]
+                .filter(Boolean)
+                .sort();
+            buildDD(
+                "year",
+                "ทุกปี",
+                years.map((y) => ({ val: String(y), label: `ปี ${y}` })),
+                F.years,
+            );
 
-            buildDD('type', 'ทุกประเภท', [
-                { val: 'บาดเจ็บ', label: '🤕 บาดเจ็บ' },
-                { val: 'เสียชีวิต', label: '💔 เสียชีวิต' },
-            ], F.types);
+            buildDD(
+                "type",
+                "ทุกประเภท",
+                [
+                    { val: "บาดเจ็บ", label: "🤕 บาดเจ็บ" },
+                    { val: "เสียชีวิต", label: "💔 เสียชีวิต" },
+                ],
+                F.types,
+            );
 
-            const locs = [...new Set(RAW.map(r => r.location_type))].filter(Boolean).sort();
-            buildDD('loc', 'ทุกสถานที่', locs.map(l => ({ val: l, label: l })), F.locs);
+            const locs = [...new Set(RAW.map((r) => r.location_type))]
+                .filter(Boolean)
+                .sort();
+            buildDD(
+                "loc",
+                "ทุกสถานที่",
+                locs.map((l) => ({ val: l, label: l })),
+                F.locs,
+            );
         }
 
         function buildDD(type, placeholder, items, FSet) {
-            const titles = { year: 'ปี พ.ศ.', type: 'บาดเจ็บ/เสียชีวิต', loc: 'ประเภทสถานที่' };
+            const titles = {
+                year: "ปี พ.ศ.",
+                type: "บาดเจ็บ/เสียชีวิต",
+                loc: "ประเภทสถานที่",
+            };
             const targetId = `${type}-pills`;
-            const wrapper = document.createElement('div');
-            wrapper.className = 'dd-wrap';
+            const wrapper = document.createElement("div");
+            wrapper.className = "dd-wrap";
             wrapper.id = `${type}-dd-wrap`;
             wrapper.innerHTML = `
         <button class="dd-btn" id="${type}-dd-btn" onclick="toggleDD('${type}')">
@@ -1165,15 +1244,19 @@
                 <button class="dd-panel-close" onclick="closeDD('${type}')">✕</button>
             </div>
             <div class="dd-list" id="${type}-dd-list">
-                ${items.map(i => `
+                ${items
+                    .map(
+                        (i) => `
                 <label class="dd-item">
-                    <input type="checkbox" ${FSet.has(i.val) ? 'checked' : ''}
+                    <input type="checkbox" ${FSet.has(i.val) ? "checked" : ""}
                         onchange="toggleDDItem('${type}','${i.val.replace(/'/g, "\\'")}',this.checked)">
                     <span>${i.label}</span>
-                </label>`).join('')}
+                </label>`,
+                    )
+                    .join("")}
             </div>
             <div class="dd-footer">
-                <button onclick="selectAllDD('${type}',${JSON.stringify(items.map(i => i.val))})">เลือกทั้งหมด</button>
+                <button onclick="selectAllDD('${type}',${JSON.stringify(items.map((i) => i.val))})">เลือกทั้งหมด</button>
                 <button onclick="clearDD('${type}')">ล้าง</button>
             </div>
         </div>`;
@@ -1183,60 +1266,94 @@
 
         function toggleDD(type) {
             const panel = document.getElementById(`${type}-dd-panel`);
-            const overlay = document.getElementById('dd-overlay');
-            if (panel.classList.contains('open')) { closeDD(type); }
-            else {
+            const overlay = document.getElementById("dd-overlay");
+            if (panel.classList.contains("open")) {
+                closeDD(type);
+            } else {
                 // ปิด panel อื่นก่อน
-                ['year', 'type', 'loc'].forEach(t => document.getElementById(`${t}-dd-panel`)?.classList.remove('open'));
-                panel.classList.add('open');
-                overlay.classList.add('open');
+                ["year", "type", "loc"].forEach((t) =>
+                    document.getElementById(`${t}-dd-panel`)?.classList.remove("open"),
+                );
+                panel.classList.add("open");
+                overlay.classList.add("open");
             }
         }
         function closeDD(type) {
-            document.getElementById(`${type}-dd-panel`).classList.remove('open');
-            const anyOpen = ['year', 'type', 'loc'].some(t => document.getElementById(`${t}-dd-panel`)?.classList.contains('open'));
-            if (!anyOpen) document.getElementById('dd-overlay').classList.remove('open');
+            document.getElementById(`${type}-dd-panel`).classList.remove("open");
+            const anyOpen = ["year", "type", "loc"].some((t) =>
+                document.getElementById(`${t}-dd-panel`)?.classList.contains("open"),
+            );
+            if (!anyOpen)
+                document.getElementById("dd-overlay").classList.remove("open");
         }
         function closeAnyDD() {
-            ['year', 'type', 'loc'].forEach(t => document.getElementById(`${t}-dd-panel`)?.classList.remove('open'));
-            document.getElementById('dd-overlay').classList.remove('open');
+            ["year", "type", "loc"].forEach((t) =>
+                document.getElementById(`${t}-dd-panel`)?.classList.remove("open"),
+            );
+            document.getElementById("dd-overlay").classList.remove("open");
         }
         function toggleDDItem(type, val, checked) {
-            const FSet = type === 'year' ? F.years : type === 'type' ? F.types : F.locs;
+            const FSet =
+                type === "year" ? F.years : type === "type" ? F.types : F.locs;
             checked ? FSet.add(val) : FSet.delete(val);
             updateDDBtn(type);
             refresh();
         }
         function selectAllDD(type, vals) {
-            const FSet = type === 'year' ? F.years : type === 'type' ? F.types : F.locs;
-            vals.forEach(v => FSet.add(v));
-            syncDDList(type, FSet); updateDDBtn(type); refresh();
+            const FSet =
+                type === "year" ? F.years : type === "type" ? F.types : F.locs;
+            vals.forEach((v) => FSet.add(v));
+            syncDDList(type, FSet);
+            updateDDBtn(type);
+            refresh();
         }
         function clearDD(type) {
-            const FSet = type === 'year' ? F.years : type === 'type' ? F.types : F.locs;
-            FSet.clear(); syncDDList(type, FSet); updateDDBtn(type); refresh();
+            const FSet =
+                type === "year" ? F.years : type === "type" ? F.types : F.locs;
+            FSet.clear();
+            syncDDList(type, FSet);
+            updateDDBtn(type);
+            refresh();
         }
         function syncDDList(type, FSet) {
-            document.getElementById(`${type}-dd-list`).querySelectorAll('label.dd-item').forEach(lbl => {
-                const cb = lbl.querySelector('input');
-                const val = cb.getAttribute('onchange').match(/'([^']+)',this/)?.[1];
-                if (val) cb.checked = FSet.has(val);
-            });
+            document
+                .getElementById(`${type}-dd-list`)
+                .querySelectorAll("label.dd-item")
+                .forEach((lbl) => {
+                    const cb = lbl.querySelector("input");
+                    const val = cb
+                        .getAttribute("onchange")
+                        .match(/'([^']+)',this/)?.[1];
+                    if (val) cb.checked = FSet.has(val);
+                });
         }
         function updateDDBtn(type, placeholder) {
-            const FSet = type === 'year' ? F.years : type === 'type' ? F.types : F.locs;
-            const ph = placeholder || (type === 'year' ? 'ทุกปี' : type === 'type' ? 'ทุกประเภท' : 'ทุกสถานที่');
+            const FSet =
+                type === "year" ? F.years : type === "type" ? F.types : F.locs;
+            const ph =
+                placeholder ||
+                (type === "year"
+                    ? "ทุกปี"
+                    : type === "type"
+                        ? "ทุกประเภท"
+                        : "ทุกสถานที่");
             const btn = document.getElementById(`${type}-dd-btn`);
             const lbl = document.getElementById(`${type}-dd-label`);
             if (!btn) return;
-            let cnt = btn.querySelector('.dd-count');
+            let cnt = btn.querySelector(".dd-count");
             if (FSet.size) {
-                lbl.textContent = FSet.size === 1 ? [...FSet][0] : `${FSet.size} รายการ`;
-                btn.classList.add('has-val');
-                if (!cnt) { cnt = document.createElement('span'); cnt.className = 'dd-count'; btn.insertBefore(cnt, btn.lastChild); }
+                lbl.textContent =
+                    FSet.size === 1 ? [...FSet][0] : `${FSet.size} รายการ`;
+                btn.classList.add("has-val");
+                if (!cnt) {
+                    cnt = document.createElement("span");
+                    cnt.className = "dd-count";
+                    btn.insertBefore(cnt, btn.lastChild);
+                }
                 cnt.textContent = FSet.size;
             } else {
-                lbl.textContent = ph; btn.classList.remove('has-val');
+                lbl.textContent = ph;
+                btn.classList.remove("has-val");
                 if (cnt) cnt.remove();
             }
         }
@@ -1273,10 +1390,17 @@
                     strong: topLoc ? `${topLoc[0]} พบมากสุด` : "—",
                     span: topLoc ? `${topLoc[1]} กรณี` : "",
                 },
+                {
+                    ico: "👤",
+                    cls: "info",
+                    extra: "insight-right",
+                    strong: `ผู้เยี่ยมชม ${VISITOR_COUNT === null ? "…" : Number(VISITOR_COUNT).toLocaleString("th-TH")} ครั้ง`,
+                    span: "ยอดเข้าชมสะสมของหน้านี้",
+                },
             ]
                 .map(
                     (i) =>
-                        `<div class="insight"><div class="insight-ico ${i.cls}">${i.ico}</div><div class="insight-txt"><strong>${i.strong}</strong><span>${i.span}</span></div></div>`,
+                        `<div class="insight ${i.extra || ""}"><div class="insight-ico ${i.cls}">${i.ico}</div><div class="insight-txt"><strong>${i.strong}</strong><span>${i.span}</span></div></div>`,
                 )
                 .join("");
         }
@@ -1338,57 +1462,86 @@
         }
 
         function initLocChart(d) {
-            const m = countBy(d, r => r.location_type || 'ไม่ระบุ');
+            const m = countBy(d, (r) => r.location_type || "ไม่ระบุ");
             const cats = Object.keys(m).sort((a, b) => m[b] - m[a]);
-            const vals = cats.map(c => m[c]);
+            const vals = cats.map((c) => m[c]);
 
             // กำหนดสีตามประเภทสถานที่
             const LOC_COLOR = {
-                'ป่า_ไม่ทราบ': '#86efac',  // เขียวอ่อน
-                'พื้นที่สาธารณะ': '#38bdf8',  // ฟ้า
-                'ถนน_ไม่ทราบ': '#9ca3af',  // เทา
-                'ถนน_ในชุมชน': '#CC9966',  // น้ำตาล
-                'สวน/ไร่': '#fbef7e',  // เหลือง
-                'ไม่ทราบ': '#8b5cf6',  // ม่วง
-                'ป่า_เขตอุทยาน': '#32CD32',  // เขียวเข้ม
-                'ถนน_เขตอุทยาน': '#FFA500',  // ส้ม
-                'บ้าน': '#ff4949',  // แดง
+                ป่า_ไม่ทราบ: "#86efac", // เขียวอ่อน
+                พื้นที่สาธารณะ: "#38bdf8", // ฟ้า
+                ถนน_ไม่ทราบ: "#9ca3af", // เทา
+                ถนน_ในชุมชน: "#CC9966", // น้ำตาล
+                "สวน/ไร่": "#fbef7e", // เหลือง
+                ไม่ทราบ: "#8b5cf6", // ม่วง
+                ป่า_เขตอุทยาน: "#32CD32", // เขียวเข้ม
+                ถนน_เขตอุทยาน: "#FFA500", // ส้ม
+                บ้าน: "#ff4949", // แดง
             };
 
-            const barColors = cats.map(c => LOC_COLOR[c] || '#64748b');
+            const barColors = cats.map((c) => LOC_COLOR[c] || "#64748b");
 
-            CHARTS.loc = new ApexCharts(document.getElementById('chart-loc'), {
+            CHARTS.loc = new ApexCharts(document.getElementById("chart-loc"), {
                 ...CD,
-                series: [{ name: 'จำนวนกรณี', data: vals }],
-                chart: { type: 'bar', height: 200, fontFamily: CD.fontFamily, toolbar: { show: false } },
-                plotOptions: { bar: { horizontal: true, borderRadius: 4, barHeight: '60%', distributed: true } }, // ← เพิ่ม distributed
-                xaxis: { categories: cats, labels: { style: { fontSize: '10px', fontFamily: CD.fontFamily } } },
-                yaxis: { labels: { style: { fontSize: '10px', fontFamily: CD.fontFamily }, maxWidth: 140 } },
+                series: [{ name: "จำนวนกรณี", data: vals }],
+                chart: {
+                    type: "bar",
+                    height: 200,
+                    fontFamily: CD.fontFamily,
+                    toolbar: { show: false },
+                },
+                plotOptions: {
+                    bar: {
+                        horizontal: true,
+                        borderRadius: 4,
+                        barHeight: "60%",
+                        distributed: true,
+                    },
+                }, // ← เพิ่ม distributed
+                xaxis: {
+                    categories: cats,
+                    labels: { style: { fontSize: "10px", fontFamily: CD.fontFamily } },
+                },
+                yaxis: {
+                    labels: {
+                        style: { fontSize: "10px", fontFamily: CD.fontFamily },
+                        maxWidth: 140,
+                    },
+                },
                 colors: barColors,
                 legend: { show: false },
-                dataLabels: { enabled: true, offsetX: 8, style: { fontSize: '10px', fontFamily: CD.fontFamily, colors: ['#475569'] }, formatter: v => v + ' กรณี' },
-                grid: { borderColor: '#f0f0ee' },
-                tooltip: { y: { formatter: v => v + ' กรณี' } }
+                dataLabels: {
+                    enabled: true,
+                    offsetX: 8,
+                    style: {
+                        fontSize: "10px",
+                        fontFamily: CD.fontFamily,
+                        colors: ["#475569"],
+                    },
+                    formatter: (v) => v + " กรณี",
+                },
+                grid: { borderColor: "#f0f0ee" },
+                tooltip: { y: { formatter: (v) => v + " กรณี" } },
             });
             CHARTS.loc.render();
         }
 
         function updateLocChart(d) {
-            const m = countBy(d, r => r.location_type || 'ไม่ระบุ');
+            const m = countBy(d, (r) => r.location_type || "ไม่ระบุ");
             const cats = Object.keys(m).sort((a, b) => m[b] - m[a]);
-            const vals = cats.map(c => m[c]);
+            const vals = cats.map((c) => m[c]);
             const LOC_COLOR = {
-                'ป่า_ไม่ทราบ': '#86efac',
-                'พื้นที่สาธารณะ': '#38bdf8',
-                'ถนน_ไม่ทราบ': '#9ca3af',
-                'ถนน_ในชุมชน': '#92400e',
-                'สวน/ไร่': '#eab308',
-                'ไม่ทราบ': '#8b5cf6',
-                'ป่า_เขตอุทยาน': '#15803d',
-                'ถนน_เขตอุทยาน': '#f97316',
-                'บ้าน': '#ff4949',
+                ป่า_ไม่ทราบ: "#86efac",
+                พื้นที่สาธารณะ: "#38bdf8",
+                ถนน_ไม่ทราบ: "#9ca3af",
+                ถนน_ในชุมชน: "#92400e",
+                "สวน/ไร่": "#eab308",
+                ไม่ทราบ: "#8b5cf6",
+                ป่า_เขตอุทยาน: "#15803d",
+                ถนน_เขตอุทยาน: "#f97316",
+                บ้าน: "#ff4949",
             };
-            CHARTS.loc.destroy();   // ← destroy แล้ว init ใหม่เลย เหมือนที่แก้ typeChart
+            CHARTS.loc.destroy(); // ← destroy แล้ว init ใหม่เลย เหมือนที่แก้ typeChart
             initLocChart(d);
         }
 

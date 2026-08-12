@@ -832,7 +832,7 @@
                     </div>
                 </div>
 
-                <div class="section-title">ที่อยู่</div>
+                <div class="section-title">ที่อยู่ตามบัตรประชาชน</div>
                 <div class="form-grid g3">
                     <div class="form-group">
                         <label>หมู่บ้าน</label>
@@ -863,9 +863,19 @@
                             <option value="">-- เลือกจังหวัด --</option>
                         </select>
                     </div>
+                </div>
+                <!-- hidden fields: ที่อยู่ตามบัตร -->
+                <input type="hidden" id="c-village" />
+                <input type="hidden" id="c-subdistrict" />
+                <input type="hidden" id="c-district" />
+                <input type="hidden" id="c-province" />
 
-
-
+                <div class="section-title">พิกัดที่เกิดเหตุ</div>
+                <p style="font-size:0.85rem;color:#6b7a72;margin:-0.4rem 0 0.6rem">
+                    กรอกพิกัด UTM ของจุดเกิดเหตุจริง — ระบบจะแปลงเป็น Lat/Lon
+                    และหาตำบล/อำเภอ/จังหวัดของจุดเกิดเหตุให้อัตโนมัติ (ไม่ต้องกรอกเอง)
+                </p>
+                <div class="form-grid g3">
                     <div class="form-group">
                         <label>UTM Easting</label>
                         <input type="number" id="c-utm-e" placeholder="เช่น 5XXXXX" oninput="autoConvertUTM()" />
@@ -874,6 +884,7 @@
                         <label>UTM Northing</label>
                         <input type="number" id="c-utm-n" placeholder="เช่น 13XXXXX" oninput="autoConvertUTM()" />
                     </div>
+                    <div class="form-group"></div>
                     <div class="form-group">
                         <label>Latitude (แปลงอัตโนมัติ)</label>
                         <input type="text" id="c-lat-display" readonly placeholder="Latitude"
@@ -886,14 +897,7 @@
                     </div>
                     <input type="hidden" id="c-lat" />
                     <input type="hidden" id="c-lon" />
-
-
                 </div>
-                <!-- hidden fields -->
-                <input type="hidden" id="c-village" />
-                <input type="hidden" id="c-subdistrict" />
-                <input type="hidden" id="c-district" />
-                <input type="hidden" id="c-province" />
 
                 <div class="section-title">รายการความเสียหาย</div>
                 <table class="damage-table">

@@ -254,6 +254,16 @@ input {
     border-right: none;
 }
 
+/* การ์ดผู้เยี่ยมชม — ดันไปชิดขวาสุด แยกจากกลุ่มสถิติ */
+.insight.insight-right {
+    margin-left: auto;
+    margin-right: 0;
+    border-right: none;
+    border-left: 1px solid rgba(255, 255, 255, 0.07);
+    padding-left: 14px;
+    padding-right: 0;
+}
+
 .insight-ico {
     font-size: 14px;
     width: 24px;
@@ -952,6 +962,7 @@ tr:last-child td {
     background: #dbeafe;
     color: #1d4ed8;
 }
+
 .b-waive {
     background: var(--c-slate-lt);
     color: #475569;
@@ -1115,6 +1126,7 @@ footer {
     opacity: 1;
     transform: translateY(0);
 }
+
 
 /* EDIT MODAL */
 .edit-modal-overlay {

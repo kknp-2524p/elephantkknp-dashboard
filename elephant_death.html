@@ -201,6 +201,15 @@
             border-right: none;
         }
 
+        .insight.insight-right {
+            margin-left: auto;
+            margin-right: 0;
+            border-right: none;
+            border-left: 1px solid rgba(255, 255, 255, 0.07);
+            padding-left: 14px;
+            padding-right: 0;
+        }
+
         .insight-ico {
             font-size: 14px;
             width: 24px;
@@ -951,6 +960,45 @@
     </footer>
 
     <script>
+        // ===== ตัวนับผู้เยี่ยมชม (นับแยกหน้า: elephant_views) =====
+        let VISITOR_COUNT = null;
+        (async function () {
+            const SB_URL = "https://xzuzpkzxyimcvgninskt.supabase.co";
+            const SB_KEY =
+                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6dXpwa3p4eWltY3Znbmluc2t0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MjcwMTksImV4cCI6MjA5NjMwMzAxOX0.P8uSZ4dlhCXyEfSOntD65eTAbYsJWkQ3SQFSsbmJm7k";
+            const VIEW_KEY = "elephant_views";
+            const K = "kknp_view_" + VIEW_KEY;
+            const fresh =
+                Date.now() - parseInt(sessionStorage.getItem(K) || "0") > 3600000;
+            if (fresh) sessionStorage.setItem(K, String(Date.now()));
+            try {
+                const res = await fetch(
+                    `${SB_URL}/rest/v1/rpc/${fresh ? "bump_view" : "get_view"}`,
+                    {
+                        method: "POST",
+                        headers: {
+                            apikey: SB_KEY,
+                            Authorization: `Bearer ${SB_KEY}`,
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ p_key: VIEW_KEY }),
+                    },
+                );
+                VISITOR_COUNT = await res.json();
+            } catch (e) {
+                console.error("visitor counter error:", e);
+                VISITOR_COUNT = "-";
+            }
+            if (
+                typeof RAW !== "undefined" &&
+                RAW.length &&
+                typeof buildInsights === "function"
+            )
+                buildInsights(
+                    typeof getFiltered === "function" ? getFiltered() : RAW,
+                );
+        })();
+
         const SUPABASE_URL = "https://xzuzpkzxyimcvgninskt.supabase.co";
         const SUPABASE_KEY =
             "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6dXpwa3p4eWltY3Znbmluc2t0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MjcwMTksImV4cCI6MjA5NjMwMzAxOX0.P8uSZ4dlhCXyEfSOntD65eTAbYsJWkQ3SQFSsbmJm7k";
@@ -1190,9 +1238,7 @@
                 <div class="kpi-lbl">สาเหตุหลัก</div>
                 <div class="kpi-val" style="font-size:13px;font-family:var(--ff);line-height:1.4;word-break:break-word;white-space:normal">${topCause ? topCause[0] : "—"}</div>
                 <div class="kpi-sub">${topCause ? topCause[1] + " กรณี" : ""}</div>
-                </div>`
-
-                ;
+                </div>`;
         }
 
         function buildInsights(d) {
@@ -1225,10 +1271,17 @@
                     strong: topYear ? `ปี ${topYear[0]} พบมากสุด` : "—",
                     span: topYear ? `${topYear[1]} ตัว` : "",
                 },
+                {
+                    ico: "👤",
+                    cls: "info",
+                    extra: "insight-right",
+                    strong: `ผู้เยี่ยมชม ${VISITOR_COUNT === null ? "…" : Number(VISITOR_COUNT).toLocaleString("th-TH")} ครั้ง`,
+                    span: "ยอดเข้าชมสะสมของหน้านี้",
+                },
             ]
                 .map(
                     (i) =>
-                        `<div class="insight"><div class="insight-ico ${i.cls}">${i.ico}</div><div class="insight-txt"><strong>${i.strong}</strong><span>${i.span}</span></div></div>`,
+                        `<div class="insight ${i.extra || ""}"><div class="insight-ico ${i.cls}">${i.ico}</div><div class="insight-txt"><strong>${i.strong}</strong><span>${i.span}</span></div></div>`,
                 )
                 .join("");
         }
@@ -1334,17 +1387,19 @@
                         maxWidth: 160,
                     },
                 },
-                colors: cats.map(c => ({
-                    'ไม่ทราบสาเหตุ': '#9ca3af',
-                    'โดนยิง': '#ef4444',
-                    'ถูกไฟฟ้าช็อต': '#8cffff',
-                    'แท้งลูก': '#f9a8d4',
-                    'โดนยิง(พบกระดูก)': '#f97316',
-                    'ภาวะร้อน-ฮีทสโตรก': '#46a2f2',
-                    'โดนยิง+ร่องรอยการต่อสู้': '#8b5cf6',
-                    'เกิดจากการต่อสู้กัน': '#16a34a',
-                    'ตกลูก': '#f7ed57',
-                })[c] || '#64748b'
+                colors: cats.map(
+                    (c) =>
+                        ({
+                            ไม่ทราบสาเหตุ: "#9ca3af",
+                            โดนยิง: "#ef4444",
+                            ถูกไฟฟ้าช็อต: "#8cffff",
+                            แท้งลูก: "#f9a8d4",
+                            "โดนยิง(พบกระดูก)": "#f97316",
+                            "ภาวะร้อน-ฮีทสโตรก": "#46a2f2",
+                            "โดนยิง+ร่องรอยการต่อสู้": "#8b5cf6",
+                            เกิดจากการต่อสู้กัน: "#16a34a",
+                            ตกลูก: "#f7ed57",
+                        })[c] || "#64748b",
                 ),
                 legend: { show: false },
                 dataLabels: {

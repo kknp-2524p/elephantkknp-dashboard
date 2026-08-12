@@ -135,6 +135,113 @@
             background: #fff;
         }
 
+        .setting-group select[multiple] {
+            padding: 4px;
+            height: auto;
+            background: #fff;
+        }
+
+        .setting-group select[multiple] option {
+            padding: 4px 6px;
+            border-radius: 4px;
+            font-size: 12.5px;
+        }
+
+        .setting-group select[multiple] option:checked {
+            background: var(--c-green) linear-gradient(0deg, var(--c-green), var(--c-green));
+            color: #fff;
+        }
+
+        /* AREA DROPDOWN (ติ๊กเลือกหลายค่า) */
+        .areadd {
+            position: relative;
+        }
+
+        .areadd-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 9px 12px;
+            border: 1.5px solid var(--c-border);
+            border-radius: 8px;
+            background: var(--c-bg);
+            font-size: 13px;
+            color: var(--c-ink);
+            text-align: left;
+        }
+
+        .areadd-btn:hover {
+            border-color: var(--c-green);
+        }
+
+        .areadd-caret {
+            color: var(--c-ink3);
+            font-size: 11px;
+        }
+
+        .areadd-panel {
+            display: none;
+            position: absolute;
+            z-index: 30;
+            top: calc(100% + 4px);
+            left: 0;
+            right: 0;
+            background: #fff;
+            border: 1.5px solid var(--c-border);
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            overflow: hidden;
+        }
+
+        .areadd-panel.open {
+            display: block;
+        }
+
+        .areadd-list {
+            max-height: 220px;
+            overflow-y: auto;
+            padding: 4px;
+        }
+
+        .areadd-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            color: var(--c-ink2);
+        }
+
+        .areadd-item:hover {
+            background: var(--c-green-lt);
+        }
+
+        .areadd-item input {
+            accent-color: var(--c-green);
+            width: 15px;
+            height: 15px;
+            flex-shrink: 0;
+        }
+
+        .areadd-foot {
+            border-top: 1px solid var(--c-border);
+            padding: 6px;
+            text-align: right;
+        }
+
+        .areadd-foot button {
+            background: none;
+            border: none;
+            color: var(--c-green);
+            font-size: 12px;
+            cursor: pointer;
+            padding: 2px 6px;
+        }
+
         /* CHECKBOX OPTIONS */
         .check-grid {
             display: grid;
@@ -734,6 +841,58 @@
             </div>
         </div>
 
+        <!-- กรองพื้นที่เกิดเหตุ -->
+        <div class="setting-card">
+            <div class="setting-title">กรองพื้นที่เกิดเหตุ (ตามพิกัด)</div>
+            <div class="setting-grid">
+                <div class="setting-group">
+                    <label>จังหวัด</label>
+                    <div class="areadd" id="province-dd">
+                        <button type="button" class="areadd-btn" onclick="toggleAreaDD('province')">
+                            <span id="province-dd-label">ทุกจังหวัด</span><span class="areadd-caret">▾</span>
+                        </button>
+                        <div class="areadd-panel" id="province-dd-panel">
+                            <div class="areadd-list" id="province-dd-list"></div>
+                            <div class="areadd-foot">
+                                <button type="button" onclick="clearArea('province')">ล้าง</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="setting-group">
+                    <label>อำเภอ</label>
+                    <div class="areadd" id="district-dd">
+                        <button type="button" class="areadd-btn" onclick="toggleAreaDD('district')">
+                            <span id="district-dd-label">ทุกอำเภอ</span><span class="areadd-caret">▾</span>
+                        </button>
+                        <div class="areadd-panel" id="district-dd-panel">
+                            <div class="areadd-list" id="district-dd-list"></div>
+                            <div class="areadd-foot">
+                                <button type="button" onclick="clearArea('district')">ล้าง</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="setting-group">
+                    <label>ตำบล</label>
+                    <div class="areadd" id="subdistrict-dd">
+                        <button type="button" class="areadd-btn" onclick="toggleAreaDD('subdistrict')">
+                            <span id="subdistrict-dd-label">ทุกตำบล</span><span class="areadd-caret">▾</span>
+                        </button>
+                        <div class="areadd-panel" id="subdistrict-dd-panel">
+                            <div class="areadd-list" id="subdistrict-dd-list"></div>
+                            <div class="areadd-foot">
+                                <button type="button" onclick="clearArea('subdistrict')">ล้าง</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="font-size:11.5px;color:var(--c-ink3);margin-top:8px">
+                กดเพื่อติ๊กเลือกได้หลายค่า · ไม่เลือก = ทุกพื้นที่ · เลือกจังหวัด/อำเภอแล้วรายการด้านล่างจะแคบลงตาม
+            </div>
+        </div>
+
         <!-- เนื้อหา -->
         <div class="setting-card">
             <div class="setting-title">เนื้อหารายงาน</div>
@@ -854,6 +1013,7 @@
                     }));
                 console.log(`โหลดข้อมูลสำเร็จ: ${RAW.length} รายการ`);
                 populateFiscalYearOptions();
+                populateAreaOptions();
             })
             .catch((err) => {
                 console.error("โหลดข้อมูลรายงานล้มเหลว:", err);
@@ -889,6 +1049,128 @@
                 years
                     .map((y) => `<option value="${y}">ปีงบประมาณ ${y}</option>`)
                     .join("");
+        }
+
+        // ===== ตัวกรองพื้นที่เกิดเหตุ (ดรอปดาวน์ติ๊กเลือก) =====
+        // เก็บค่าที่เลือกไว้เป็น Set
+        const AREA = {
+            province: { set: new Set(), field: "event_province", ph: "ทุกจังหวัด" },
+            district: { set: new Set(), field: "event_district", ph: "ทุกอำเภอ" },
+            subdistrict: { set: new Set(), field: "event_subdistrict", ph: "ทุกตำบล" },
+        };
+
+        function uniqSorted(rows, field) {
+            return [...new Set(rows.map((r) => r[field]).filter(Boolean))].sort((a, b) =>
+                a.localeCompare(b, "th"),
+            );
+        }
+
+        // ตัวเลือกของแต่ละระดับ (ไล่ตามที่เลือกด้านบน)
+        function areaOptions(type) {
+            let rows = RAW;
+            if (type === "district" || type === "subdistrict") {
+                if (AREA.province.set.size)
+                    rows = rows.filter((r) => AREA.province.set.has(r.event_province));
+            }
+            if (type === "subdistrict") {
+                if (AREA.district.set.size)
+                    rows = rows.filter((r) => AREA.district.set.has(r.event_district));
+            }
+            return uniqSorted(rows, AREA[type].field);
+        }
+
+        function buildAreaList(type) {
+            const cfg = AREA[type];
+            const list = document.getElementById(`${type}-dd-list`);
+            const opts = areaOptions(type);
+            list.innerHTML = opts.length
+                ? opts
+                    .map(
+                        (v) =>
+                            `<label class="areadd-item"><input type="checkbox" ${cfg.set.has(v) ? "checked" : ""
+                            } onchange="toggleArea('${type}','${v.replace(/'/g, "\\'")}',this.checked)"><span>${v}</span></label>`,
+                    )
+                    .join("")
+                : '<div style="padding:8px;font-size:12px;color:var(--c-ink3)">ไม่มีข้อมูล</div>';
+        }
+
+        function updateAreaBtn(type) {
+            const cfg = AREA[type];
+            const lbl = document.getElementById(`${type}-dd-label`);
+            lbl.textContent = cfg.set.size
+                ? cfg.set.size === 1
+                    ? [...cfg.set][0]
+                    : `${cfg.set.size} รายการ`
+                : cfg.ph;
+        }
+
+        function toggleArea(type, val, checked) {
+            checked ? AREA[type].set.add(val) : AREA[type].set.delete(val);
+            // ตัดค่าที่เลือกในระดับล่างที่ไม่เข้าเงื่อนไขแล้วออก
+            if (type === "province") {
+                const valid = new Set(areaOptions("district"));
+                [...AREA.district.set].forEach((v) => { if (!valid.has(v)) AREA.district.set.delete(v); });
+            }
+            if (type === "province" || type === "district") {
+                const validSub = new Set(areaOptions("subdistrict"));
+                [...AREA.subdistrict.set].forEach((v) => { if (!validSub.has(v)) AREA.subdistrict.set.delete(v); });
+            }
+            refreshAreaUI(type);
+        }
+
+        function clearArea(type) {
+            AREA[type].set.clear();
+            if (type === "province") { AREA.district.set.clear(); AREA.subdistrict.set.clear(); }
+            if (type === "district") { AREA.subdistrict.set.clear(); }
+            refreshAreaUI(type);
+        }
+
+        // รีเฟรชปุ่ม/รายการ ตั้งแต่ระดับที่แก้ลงไปข้างล่าง
+        function refreshAreaUI(changed) {
+            ["province", "district", "subdistrict"].forEach((t) => {
+                updateAreaBtn(t);
+                buildAreaList(t);
+            });
+        }
+
+        function populateAreaOptions() {
+            refreshAreaUI();
+        }
+
+        function toggleAreaDD(type) {
+            const panel = document.getElementById(`${type}-dd-panel`);
+            const isOpen = panel.classList.contains("open");
+            // ปิดทุกอันก่อน
+            document.querySelectorAll(".areadd-panel.open").forEach((p) => p.classList.remove("open"));
+            if (!isOpen) {
+                buildAreaList(type);
+                panel.classList.add("open");
+            }
+        }
+
+        // คลิกนอกพื้นที่ดรอปดาวน์ = ปิด
+        document.addEventListener("click", (e) => {
+            if (!e.target.closest(".areadd"))
+                document.querySelectorAll(".areadd-panel.open").forEach((p) => p.classList.remove("open"));
+        });
+
+        // กรองข้อมูลตามพื้นที่ที่เลือก
+        function getFilteredByArea(d) {
+            return d.filter(
+                (r) =>
+                    (!AREA.province.set.size || AREA.province.set.has(r.event_province)) &&
+                    (!AREA.district.set.size || AREA.district.set.has(r.event_district)) &&
+                    (!AREA.subdistrict.set.size || AREA.subdistrict.set.has(r.event_subdistrict)),
+            );
+        }
+
+        // ข้อความสรุปพื้นที่ที่เลือก (ไว้โชว์ในหัวรายงาน)
+        function areaLabel() {
+            const parts = [];
+            if (AREA.subdistrict.set.size) parts.push("ต." + [...AREA.subdistrict.set].join(", "));
+            if (AREA.district.set.size) parts.push("อ." + [...AREA.district.set].join(", "));
+            if (AREA.province.set.size) parts.push("จ." + [...AREA.province.set].join(", "));
+            return parts.join(" · ");
         }
 
         // ตั้งวันที่วันนี้
@@ -1010,6 +1292,7 @@
         function generateReport() {
             const checked = getChecked();
             let d = getFilteredByDate(RAW); // ← เปลี่ยนจาก const d = RAW;
+            d = getFilteredByArea(d); // กรองตามพื้นที่เกิดเหตุที่เลือก
 
             const fySelected = document.getElementById("report-period").value; // '' = ทั้งหมด, หรือปีงบ เช่น '2569'
             if (fySelected) {
@@ -1019,7 +1302,10 @@
             const agency1 = document.getElementById("agency1").value;
             const agency2 = document.getElementById("agency2").value;
             const title = document.getElementById("report-title").value;
-            const period = fySelected ? `ปีงบประมาณ ${fySelected}` : "";
+            const areaTxt = areaLabel();
+            const period = [fySelected ? `ปีงบประมาณ ${fySelected}` : "", areaTxt]
+                .filter(Boolean)
+                .join("  ·  ");
             const reportDate = document.getElementById("report-date").value;
 
             const paidAmt = d
