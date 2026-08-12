@@ -405,30 +405,30 @@
         .damage-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 8px
+            margin-bottom: 8px;
         }
 
         .damage-table th {
             font-size: 10px;
             font-weight: 600;
-            letter-spacing: .05em;
+            letter-spacing: 0.05em;
             text-transform: uppercase;
             color: var(--c-ink3);
             padding: 6px 8px;
             border-bottom: 2px solid var(--c-border);
-            text-align: left
+            text-align: left;
         }
 
         .damage-table td {
             padding: 6px 4px;
             border-bottom: 1px solid #f0f0ee;
-            vertical-align: middle
+            vertical-align: middle;
         }
 
         .damage-table input {
             padding: 8px 10px;
             font-size: 13px;
-            min-height: 40px
+            min-height: 40px;
         }
 
         .btn-add-row {
@@ -442,15 +442,15 @@
             font-size: 13px;
             color: var(--c-ink3);
             cursor: pointer;
-            transition: all .15s;
+            transition: all 0.15s;
             width: 100%;
             justify-content: center;
-            margin-top: 4px
+            margin-top: 4px;
         }
 
         .btn-add-row:hover {
             border-color: var(--c-green);
-            color: var(--c-green)
+            color: var(--c-green);
         }
 
         .btn-del-row {
@@ -462,7 +462,7 @@
             font-size: 13px;
             cursor: pointer;
             min-height: 36px;
-            min-width: 36px
+            min-width: 36px;
         }
 
         /* ALERT */
@@ -612,6 +612,13 @@
             margin-top: 0.5rem;
         }
 
+        .app-version {
+            margin-top: 3px;
+            font-size: 10px;
+            letter-spacing: 0.04em;
+            opacity: 0.55;
+        }
+
         .addr-search-wrap {
             position: relative;
         }
@@ -631,7 +638,7 @@
 
         .addr-search-input:focus {
             border-color: var(--c-green);
-            box-shadow: 0 0 0 3px rgba(26, 107, 66, .1);
+            box-shadow: 0 0 0 3px rgba(26, 107, 66, 0.1);
             background: #fff;
         }
 
@@ -660,7 +667,7 @@
             font-size: 13px;
             color: var(--c-ink2);
             cursor: pointer;
-            transition: background .1s;
+            transition: background 0.1s;
             border-bottom: 1px solid #f0f0ee;
         }
 
@@ -793,7 +800,6 @@
                             <option>จ่ายเงินแล้ว</option>
                             <option>รออนุมัติเบิกจ่าย</option>
                             <option>ไม่ขอรับการเยียวยา</option>
-
                         </select>
                     </div>
                 </div>
@@ -802,8 +808,8 @@
                 <div class="form-grid">
                     <div class="form-group">
                         <label>ชื่อ-นามสกุล<span class="req">*</span></label>
-                        <div style="display:flex;gap:6px">
-                            <select id="c-prefix" style="width:120px;flex-shrink:0" onchange="autoGender('c')">
+                        <div style="display: flex; gap: 6px">
+                            <select id="c-prefix" style="width: 120px; flex-shrink: 0" onchange="autoGender('c')">
                                 <option value="">-- คำนำหน้า --</option>
                                 <option>นาย</option>
                                 <option>นาง</option>
@@ -835,43 +841,37 @@
                 <div class="section-title">ที่อยู่ตามบัตรประชาชน</div>
                 <div class="form-grid g3">
                     <div class="form-group">
-                        <label>หมู่บ้าน</label>
+                        <label>บ้านเลขที่ / หมู่ที่</label>
+                        <input type="text" id="c-village" placeholder="เช่น 12 หมู่ 4" autocomplete="off" />
+                    </div>
+                    <div class="form-group">
+                        <label>ตำบล
+                            <small style="color: #6b7a72">(เลือกแล้วอำเภอ/จังหวัดเติมให้)</small></label>
                         <div class="addr-search-wrap">
-                            <input type="text" class="addr-search-input" id="c-village-search"
-                                placeholder="พิมพ์ค้นหาหมู่บ้าน..." oninput="searchVillage('c', this.value)"
-                                onfocus="openVillageDD('c')" autocomplete="off" />
-                            <div class="addr-dropdown" id="c-village-dd"></div>
+                            <input type="text" class="addr-search-input" id="c-subdistrict-search"
+                                placeholder="พิมพ์ค้นหาตำบล..." oninput="searchSubdistrict('c', this.value)"
+                                onfocus="openSubdistrictDD('c')" autocomplete="off" />
+                            <div class="addr-dropdown" id="c-subdistrict-dd"></div>
                         </div>
                     </div>
-
-                    <div class="form-group">
-                        <label>ตำบล</label>
-                        <select id="c-subdistrict-sel" onchange="onSubdistrictChange('c')">
-                            <option value="">-- เลือกตำบล --</option>
-                        </select>
-                    </div>
-
                     <div class="form-group">
                         <label>อำเภอ</label>
-                        <select id="c-district-sel" onchange="onDistrictChange('c')">
-                            <option value="">-- เลือกอำเภอ --</option>
-                        </select>
+                        <input type="text" id="c-district-display" readonly placeholder="เลือกตำบลก่อน"
+                            style="background: #f5f5f5; cursor: default" />
                     </div>
                     <div class="form-group">
                         <label>จังหวัด</label>
-                        <select id="c-province-sel" onchange="onProvinceChange('c')">
-                            <option value="">-- เลือกจังหวัด --</option>
-                        </select>
+                        <input type="text" id="c-province-display" readonly placeholder="เลือกตำบลก่อน"
+                            style="background: #f5f5f5; cursor: default" />
                     </div>
                 </div>
-                <!-- hidden fields: ที่อยู่ตามบัตร -->
-                <input type="hidden" id="c-village" />
+                <!-- hidden fields: ที่อยู่ตามบัตร (เติมโดย selectSubdistrict) -->
                 <input type="hidden" id="c-subdistrict" />
                 <input type="hidden" id="c-district" />
                 <input type="hidden" id="c-province" />
 
                 <div class="section-title">พิกัดที่เกิดเหตุ</div>
-                <p style="font-size:0.85rem;color:#6b7a72;margin:-0.4rem 0 0.6rem">
+                <p style="font-size: 0.85rem; color: #6b7a72; margin: -0.4rem 0 0.6rem">
                     กรอกพิกัด UTM ของจุดเกิดเหตุจริง — ระบบจะแปลงเป็น Lat/Lon
                     และหาตำบล/อำเภอ/จังหวัดของจุดเกิดเหตุให้อัตโนมัติ (ไม่ต้องกรอกเอง)
                 </p>
@@ -888,12 +888,12 @@
                     <div class="form-group">
                         <label>Latitude (แปลงอัตโนมัติ)</label>
                         <input type="text" id="c-lat-display" readonly placeholder="Latitude"
-                            style="background:#f5f5f5;cursor:default" />
+                            style="background: #f5f5f5; cursor: default" />
                     </div>
                     <div class="form-group">
                         <label>Longitude (แปลงอัตโนมัติ)</label>
                         <input type="text" id="c-lon-display" readonly placeholder="Longitude"
-                            style="background:#f5f5f5;cursor:default" />
+                            style="background: #f5f5f5; cursor: default" />
                     </div>
                     <input type="hidden" id="c-lat" />
                     <input type="hidden" id="c-lon" />
@@ -904,15 +904,16 @@
                     <thead>
                         <tr>
                             <th>รายการ</th>
-                            <th style="width:90px">จำนวน</th>
-                            <th style="width:90px">หน่วย</th>
-                            <th style="width:40px"></th>
+                            <th style="width: 90px">จำนวน</th>
+                            <th style="width: 90px">หน่วย</th>
+                            <th style="width: 40px"></th>
                         </tr>
                     </thead>
                     <tbody id="damage-tbody"></tbody>
                 </table>
-                <button type="button" class="btn-add-row" onclick="addDamageRow()">+ เพิ่มรายการ</button>
-
+                <button type="button" class="btn-add-row" onclick="addDamageRow()">
+                    + เพิ่มรายการ
+                </button>
 
                 <div class="section-title">ข้อมูลการจ่ายเงิน</div>
                 <div class="form-grid">
@@ -1005,11 +1006,10 @@
 
                 <div class="section-title">ข้อมูลผู้ได้รับผลกระทบ</div>
                 <div class="form-grid">
-
                     <div class="form-group">
                         <label>ชื่อ-นามสกุล<span class="req">*</span></label>
-                        <div style="display:flex;gap:6px">
-                            <select id="ca-prefix" style="width:120px;flex-shrink:0" onchange="autoGender('ca')">
+                        <div style="display: flex; gap: 6px">
+                            <select id="ca-prefix" style="width: 120px; flex-shrink: 0" onchange="autoGender('ca')">
                                 <option value="">-- คำนำหน้า --</option>
                                 <option>นาย</option>
                                 <option>นาง</option>
@@ -1053,18 +1053,17 @@
                     <div class="form-group">
                         <label>อำเภอ</label>
                         <input type="text" id="ca-district-display" readonly placeholder="อำเภอ"
-                            style="background:#f5f5f5;cursor:default" />
+                            style="background: #f5f5f5; cursor: default" />
                     </div>
                     <div class="form-group">
                         <label>จังหวัด</label>
                         <input type="text" id="ca-province-display" readonly placeholder="จังหวัด"
-                            style="background:#f5f5f5;cursor:default" />
+                            style="background: #f5f5f5; cursor: default" />
                     </div>
                 </div>
                 <input type="hidden" id="ca-subdistrict" />
                 <input type="hidden" id="ca-district" />
                 <input type="hidden" id="ca-province" />
-
 
                 <div class="form-grid" style="margin-top: 0.875rem">
                     <div class="form-group">
@@ -1148,8 +1147,6 @@
 
                 <div class="section-title">สถานที่</div>
                 <div class="form-grid g3">
-
-
                     <div class="form-group">
                         <label>บริเวณ</label>
                         <div class="addr-search-wrap">
@@ -1159,7 +1156,6 @@
                             <div class="addr-dropdown" id="e-village-dd"></div>
                         </div>
                     </div>
-
 
                     <div class="form-group">
                         <label>ตำบล</label>
@@ -1173,12 +1169,12 @@
                     <div class="form-group">
                         <label>อำเภอ</label>
                         <input type="text" id="e-district-display" readonly placeholder="อำเภอ"
-                            style="background:#f5f5f5;cursor:default" />
+                            style="background: #f5f5f5; cursor: default" />
                     </div>
                     <div class="form-group">
                         <label>จังหวัด</label>
                         <input type="text" id="e-province-display" readonly placeholder="จังหวัด"
-                            style="background:#f5f5f5;cursor:default" />
+                            style="background: #f5f5f5; cursor: default" />
                     </div>
                 </div>
                 <input type="hidden" id="e-subdistrict" />
@@ -1201,9 +1197,10 @@
                 </div>
             </div>
         </main>
-        <footer>อุทยานแห่งชาติแก่งกระจาน · ระบบกรอกข้อมูล
+        <footer>
+            อุทยานแห่งชาติแก่งกระจาน · ระบบกรอกข้อมูล
             <div>Developed by Sunanta SANGSILA</div>
-
+            <div class="app-version">v1.0.0</div>
         </footer>
     </div>
 
@@ -1310,8 +1307,8 @@
             return v !== "" ? parseInt(v) : null;
         }
         function thaiDateFromInput(dateStr) {
-            if (!dateStr) return '';
-            const [y, m, d] = dateStr.split('-');
+            if (!dateStr) return "";
+            const [y, m, d] = dateStr.split("-");
             return `${d}/${m}/${y}`; // ← เก็บเป็น ค.ศ. เลย ไม่บวก 543
         }
         function getYearBE(s) {
@@ -1324,41 +1321,84 @@
         }
 
         function autoConvertUTM() {
-            const E = parseFloat(document.getElementById('c-utm-e').value);
-            const N = parseFloat(document.getElementById('c-utm-n').value);
+            const E = parseFloat(document.getElementById("c-utm-e").value);
+            const N = parseFloat(document.getElementById("c-utm-n").value);
             if (!E || !N) return;
             const zone = 47;
-            const a = 6378137.0, f = 1 / 298.257223563;
-            const b = a * (1 - f), e2 = (a * a - b * b) / (a * a);
+            const a = 6378137.0,
+                f = 1 / 298.257223563;
+            const b = a * (1 - f),
+                e2 = (a * a - b * b) / (a * a);
             const e1 = (1 - Math.sqrt(1 - e2)) / (1 + Math.sqrt(1 - e2));
-            const x = E - 500000, y = N, k0 = 0.9996;
+            const x = E - 500000,
+                y = N,
+                k0 = 0.9996;
             const M = y / k0;
-            const mu = M / (a * (1 - e2 / 4 - 3 * e2 * e2 / 64 - 5 * e2 * e2 * e2 / 256));
-            const phi1 = mu
-                + (3 * e1 / 2 - 27 * e1 * e1 * e1 / 32) * Math.sin(2 * mu)
-                + (21 * e1 * e1 / 16 - 55 * e1 * e1 * e1 * e1 / 32) * Math.sin(4 * mu)
-                + (151 * e1 * e1 * e1 / 96) * Math.sin(6 * mu);
+            const mu =
+                M /
+                (a * (1 - e2 / 4 - (3 * e2 * e2) / 64 - (5 * e2 * e2 * e2) / 256));
+            const phi1 =
+                mu +
+                ((3 * e1) / 2 - (27 * e1 * e1 * e1) / 32) * Math.sin(2 * mu) +
+                ((21 * e1 * e1) / 16 - (55 * e1 * e1 * e1 * e1) / 32) *
+                Math.sin(4 * mu) +
+                ((151 * e1 * e1 * e1) / 96) * Math.sin(6 * mu);
             const N1 = a / Math.sqrt(1 - e2 * Math.sin(phi1) * Math.sin(phi1));
             const T1 = Math.tan(phi1) * Math.tan(phi1);
-            const C1 = e2 / (1 - e2) * Math.cos(phi1) * Math.cos(phi1);
-            const R1 = a * (1 - e2) / Math.pow(1 - e2 * Math.sin(phi1) * Math.sin(phi1), 1.5);
+            const C1 = (e2 / (1 - e2)) * Math.cos(phi1) * Math.cos(phi1);
+            const R1 =
+                (a * (1 - e2)) /
+                Math.pow(1 - e2 * Math.sin(phi1) * Math.sin(phi1), 1.5);
             const D = x / (N1 * k0);
-            const lat = phi1 - (N1 * Math.tan(phi1) / R1) * (
-                D * D / 2
-                - (5 + 3 * T1 + 10 * C1 - 4 * C1 * C1 - 9 * e2 / (1 - e2)) * D * D * D * D / 24
-                + (61 + 90 * T1 + 298 * C1 + 45 * T1 * T1 - 252 * e2 / (1 - e2) - 3 * C1 * C1) * D * D * D * D * D * D / 720
-            );
+            const lat =
+                phi1 -
+                ((N1 * Math.tan(phi1)) / R1) *
+                ((D * D) / 2 -
+                    ((5 + 3 * T1 + 10 * C1 - 4 * C1 * C1 - (9 * e2) / (1 - e2)) *
+                        D *
+                        D *
+                        D *
+                        D) /
+                    24 +
+                    ((61 +
+                        90 * T1 +
+                        298 * C1 +
+                        45 * T1 * T1 -
+                        (252 * e2) / (1 - e2) -
+                        3 * C1 * C1) *
+                        D *
+                        D *
+                        D *
+                        D *
+                        D *
+                        D) /
+                    720);
             const lon0 = (zone - 1) * 6 - 180 + 3;
-            const lon = (lon0 * Math.PI / 180 + (
-                D - (1 + 2 * T1 + C1) * D * D * D / 6
-                + (5 - 2 * C1 + 28 * T1 - 3 * C1 * C1 + 8 * e2 / (1 - e2) + 24 * T1 * T1) * D * D * D * D * D / 120
-            ) / Math.cos(phi1)) * 180 / Math.PI;
-            const latDeg = (lat * 180 / Math.PI).toFixed(6);
+            const lon =
+                (((lon0 * Math.PI) / 180 +
+                    (D -
+                        ((1 + 2 * T1 + C1) * D * D * D) / 6 +
+                        ((5 -
+                            2 * C1 +
+                            28 * T1 -
+                            3 * C1 * C1 +
+                            (8 * e2) / (1 - e2) +
+                            24 * T1 * T1) *
+                            D *
+                            D *
+                            D *
+                            D *
+                            D) /
+                        120) /
+                    Math.cos(phi1)) *
+                    180) /
+                Math.PI;
+            const latDeg = ((lat * 180) / Math.PI).toFixed(6);
             const lonDeg = lon.toFixed(6);
-            document.getElementById('c-lat').value = latDeg;
-            document.getElementById('c-lon').value = lonDeg;
-            document.getElementById('c-lat-display').value = latDeg;
-            document.getElementById('c-lon-display').value = lonDeg;
+            document.getElementById("c-lat").value = latDeg;
+            document.getElementById("c-lon").value = lonDeg;
+            document.getElementById("c-lat-display").value = latDeg;
+            document.getElementById("c-lon-display").value = lonDeg;
         }
 
         function showAlert(type, msg = "") {
@@ -1380,22 +1420,29 @@
             const p = val(`${prefix}-prefix`);
             const gSel = document.getElementById(`${prefix}-gender`);
             if (!gSel) return;
-            if (p === 'นาย' || p === 'เด็กชาย') {
-                gSel.value = 'ชาย';
-            } else if (p === 'นาง' || p === 'นางสาว' || p === 'เด็กหญิง') {
-                gSel.value = 'หญิง';
+            if (p === "นาย" || p === "เด็กชาย") {
+                gSel.value = "ชาย";
+            } else if (p === "นาง" || p === "นางสาว" || p === "เด็กหญิง") {
+                gSel.value = "หญิง";
             }
         }
 
         async function submitCompensation() {
             const prefix = val("c-prefix");
             const nameOnly = val("c-name");
-            const name = prefix && prefix !== 'อื่นๆ' ? `${prefix}${nameOnly}` : nameOnly;
+            const name =
+                prefix && prefix !== "อื่นๆ" ? `${prefix}${nameOnly}` : nameOnly;
             const incident_date = val("c-incident_date"),
                 compensation_case = val("c-compensation_case"),
                 compensation_status = val("c-compensation_status"),
                 fiscal_year = val("c-fiscal_year");
-            if (!name || !incident_date || !compensation_case || !compensation_status || !fiscal_year) {
+            if (
+                !name ||
+                !incident_date ||
+                !compensation_case ||
+                !compensation_status ||
+                !fiscal_year
+            ) {
                 showAlert("error", "กรุณากรอกข้อมูลที่จำเป็นให้ครบ (*)");
                 return;
             }
@@ -1403,20 +1450,21 @@
             // เก็บค่าไว้ก่อนทำอะไรทั้งนั้น
             const savedName = name;
             const savedDate = incident_date;
-            const savedGender = val('c-gender');
-            const savedAge = val('c-age');
-            const savedPrefix = val('c-prefix');
-            const savedNameOnly = val('c-name');
-            const savedSubdistrict = val('c-subdistrict');
-            const savedDistrict = val('c-district');
-            const savedProvince = val('c-province');
+            const savedGender = val("c-gender");
+            const savedAge = val("c-age");
+            const savedPrefix = val("c-prefix");
+            const savedNameOnly = val("c-name");
+            const savedSubdistrict = val("c-subdistrict");
+            const savedDistrict = val("c-district");
+            const savedProvince = val("c-province");
             const savedCase = compensation_case;
 
             const btn = document.getElementById("btn-compensation");
 
-            const { data: { user } } = await sb.auth.getUser();
+            const {
+                data: { user },
+            } = await sb.auth.getUser();
             const userEmail = user?.email || null;
-
 
             btn.disabled = true;
             btn.innerHTML = "<span>⏳ กำลังบันทึก...</span>";
@@ -1453,47 +1501,52 @@
 
                 const damageRows = getDamageRows();
                 if (damageRows.length > 0) {
-                    await sb.from('damage_items').insert(
-                        damageRows.map(r => ({
+                    await sb.from("damage_items").insert(
+                        damageRows.map((r) => ({
                             ...r,
                             compensation_id: id,
                             created_by: userEmail,
-                            updated_at: new Date().toISOString()
-                        })));
+                            updated_at: new Date().toISOString(),
+                        })),
+                    );
                 }
 
-                resetForm('compensation');
-                document.getElementById('damage-tbody').innerHTML = '';
+                resetForm("compensation");
+                document.getElementById("damage-tbody").innerHTML = "";
 
-                if (savedCase === 'บาดเจ็บ' || savedCase === 'เสียชีวิต') {
+                if (savedCase === "บาดเจ็บ" || savedCase === "เสียชีวิต") {
                     setTimeout(() => {
-                        switchTab('casualty');
-                        document.getElementById('ca-incident_date').value = savedDate;
-                        document.getElementById('ca-prefix').value = savedPrefix;
-                        document.getElementById('ca-name').value = savedNameOnly;
-                        autoGender('ca');
-                        document.getElementById('ca-gender').value = savedGender;
-                        document.getElementById('ca-age').value = savedAge;
-                        document.getElementById('ca-casualty_type').value = savedCase === 'เสียชีวิต' ? 'เสียชีวิต' : 'บาดเจ็บ';
-                        document.getElementById('ca-count').value = '1';
-                        document.getElementById('ca-subdistrict').value = savedSubdistrict;
-                        document.getElementById('ca-district').value = savedDistrict;
-                        document.getElementById('ca-province').value = savedProvince;
-                        if (document.getElementById('ca-subdistrict-search'))
-                            document.getElementById('ca-subdistrict-search').value = savedSubdistrict;
-                        if (document.getElementById('ca-district-display'))
-                            document.getElementById('ca-district-display').value = savedDistrict;
-                        if (document.getElementById('ca-province-display'))
-                            document.getElementById('ca-province-display').value = savedProvince;
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                        showAlert('success');
-                        document.getElementById('alert-success').textContent =
-                            '✅ บันทึกข้อมูลเยียวยาแล้ว — กรุณากรอกข้อมูลบาดเจ็บ/ตายด้านล่างนี้ด้วย';
+                        switchTab("casualty");
+                        document.getElementById("ca-incident_date").value = savedDate;
+                        document.getElementById("ca-prefix").value = savedPrefix;
+                        document.getElementById("ca-name").value = savedNameOnly;
+                        autoGender("ca");
+                        document.getElementById("ca-gender").value = savedGender;
+                        document.getElementById("ca-age").value = savedAge;
+                        document.getElementById("ca-casualty_type").value =
+                            savedCase === "เสียชีวิต" ? "เสียชีวิต" : "บาดเจ็บ";
+                        document.getElementById("ca-count").value = "1";
+                        document.getElementById("ca-subdistrict").value =
+                            savedSubdistrict;
+                        document.getElementById("ca-district").value = savedDistrict;
+                        document.getElementById("ca-province").value = savedProvince;
+                        if (document.getElementById("ca-subdistrict-search"))
+                            document.getElementById("ca-subdistrict-search").value =
+                                savedSubdistrict;
+                        if (document.getElementById("ca-district-display"))
+                            document.getElementById("ca-district-display").value =
+                                savedDistrict;
+                        if (document.getElementById("ca-province-display"))
+                            document.getElementById("ca-province-display").value =
+                                savedProvince;
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                        showAlert("success");
+                        document.getElementById("alert-success").textContent =
+                            "✅ บันทึกข้อมูลเยียวยาแล้ว — กรุณากรอกข้อมูลบาดเจ็บ/ตายด้านล่างนี้ด้วย";
                     }, 300);
                 } else {
-                    showAlert('success');
+                    showAlert("success");
                 }
-
             } catch (e) {
                 showAlert("error", e.message);
             } finally {
@@ -1503,27 +1556,27 @@
         }
 
         // DAMAGE ITEMS
-        function addDamageRow(name = '', qty = '', unit = '') {
-            const tbody = document.getElementById('damage-tbody');
-            const tr = document.createElement('tr');
+        function addDamageRow(name = "", qty = "", unit = "") {
+            const tbody = document.getElementById("damage-tbody");
+            const tr = document.createElement("tr");
             tr.innerHTML = `
         <td><input type="text" placeholder="เช่น สับปรด" value="${name}"/></td>
         <td><input type="number" placeholder="0" min="0" step="0.01" value="${qty}"/></td>
         <td>
             <select onchange="toggleCustomUnit(this)">
                 <option value="">-- หน่วย --</option>
-                <option ${unit === 'ไร่' ? 'selected' : ''}>ไร่</option>
-                <option ${unit === 'ตัน' ? 'selected' : ''}>ตัน</option>
-                <option ${unit === 'กิโลกรัม' ? 'selected' : ''}>กิโลกรัม</option>
-                <option ${unit === 'ตัว' ? 'selected' : ''}>ตัว</option>
-                <option ${unit === 'อัน' ? 'selected' : ''}>อัน</option>
-                <option ${unit === 'ต้น' ? 'selected' : ''}>ต้น</option>
-                <option ${unit === 'ลิตร' ? 'selected' : ''}>ลิตร</option>
-                <option ${unit === 'ถุง' ? 'selected' : ''}>ถุง</option>
-                <option ${unit === 'กล่อง' ? 'selected' : ''}>กล่อง</option>
-                <option value="other" ${!['', 'ไร่', 'ตัน', 'กิโลกรัม', 'ตัว', 'อัน', 'ต้น', 'ลิตร', 'ถุง', 'กล่อง'].includes(unit) ? 'selected' : ''}>อื่นๆ...</option>
+                <option ${unit === "ไร่" ? "selected" : ""}>ไร่</option>
+                <option ${unit === "ตัน" ? "selected" : ""}>ตัน</option>
+                <option ${unit === "กิโลกรัม" ? "selected" : ""}>กิโลกรัม</option>
+                <option ${unit === "ตัว" ? "selected" : ""}>ตัว</option>
+                <option ${unit === "อัน" ? "selected" : ""}>อัน</option>
+                <option ${unit === "ต้น" ? "selected" : ""}>ต้น</option>
+                <option ${unit === "ลิตร" ? "selected" : ""}>ลิตร</option>
+                <option ${unit === "ถุง" ? "selected" : ""}>ถุง</option>
+                <option ${unit === "กล่อง" ? "selected" : ""}>กล่อง</option>
+                <option value="other" ${!["", "ไร่", "ตัน", "กิโลกรัม", "ตัว", "อัน", "ต้น", "ลิตร", "ถุง", "กล่อง"].includes(unit) ? "selected" : ""}>อื่นๆ...</option>
             </select>
-            <input type="text" class="custom-unit" placeholder="ระบุหน่วย" value="${!['', 'ไร่', 'ตัน', 'กิโลกรัม', 'ตัว', 'อัน', 'ต้น', 'ลิตร', 'ถุง', 'กล่อง'].includes(unit) ? unit : ''}" style="display:${!['', 'ไร่', 'ตัน', 'กิโลกรัม', 'ตัว', 'อัน', 'ต้น', 'ลิตร', 'ถุง', 'กล่อง'].includes(unit) ? 'block' : 'none'};margin-top:4px"/>
+            <input type="text" class="custom-unit" placeholder="ระบุหน่วย" value="${!["", "ไร่", "ตัน", "กิโลกรัม", "ตัว", "อัน", "ต้น", "ลิตร", "ถุง", "กล่อง"].includes(unit) ? unit : ""}" style="display:${!["", "ไร่", "ตัน", "กิโลกรัม", "ตัว", "อัน", "ต้น", "ลิตร", "ถุง", "กล่อง"].includes(unit) ? "block" : "none"};margin-top:4px"/>
         </td>
         <td><button class="btn-del-row" onclick="this.closest('tr').remove()">✕</button></td>`;
             tbody.appendChild(tr);
@@ -1531,28 +1584,32 @@
 
         function toggleCustomUnit(sel) {
             const customInput = sel.nextElementSibling;
-            customInput.style.display = sel.value === 'other' ? 'block' : 'none';
-            if (sel.value !== 'other') customInput.value = '';
+            customInput.style.display = sel.value === "other" ? "block" : "none";
+            if (sel.value !== "other") customInput.value = "";
         }
 
         function getDamageRows() {
-            return [...document.querySelectorAll('#damage-tbody tr')].map(tr => {
-                const inputs = tr.querySelectorAll('input');
-                const sel = tr.querySelector('select');
-                const customUnit = tr.querySelector('.custom-unit');
-                const unit = sel.value === 'other' ? customUnit.value.trim() : sel.value;
-                return {
-                    item_name: inputs[0].value.trim(),
-                    quantity: parseFloat(inputs[1].value) || null,
-                    unit
-                };
-            }).filter(r => r.item_name);
+            return [...document.querySelectorAll("#damage-tbody tr")]
+                .map((tr) => {
+                    const inputs = tr.querySelectorAll("input");
+                    const sel = tr.querySelector("select");
+                    const customUnit = tr.querySelector(".custom-unit");
+                    const unit =
+                        sel.value === "other" ? customUnit.value.trim() : sel.value;
+                    return {
+                        item_name: inputs[0].value.trim(),
+                        quantity: parseFloat(inputs[1].value) || null,
+                        unit,
+                    };
+                })
+                .filter((r) => r.item_name);
         }
 
         async function submitCasualty() {
             const prefix = val("ca-prefix");
             const nameOnly = val("ca-name");
-            const name = prefix && prefix !== 'อื่นๆ' ? `${prefix}${nameOnly}` : nameOnly;
+            const name =
+                prefix && prefix !== "อื่นๆ" ? `${prefix}${nameOnly}` : nameOnly;
             const incident_date = val("ca-incident_date"),
                 casualty_type = val("ca-casualty_type"),
                 count = val("ca-count");
@@ -1560,7 +1617,9 @@
                 showAlert("error", "กรุณากรอกข้อมูลที่จำเป็นให้ครบ (*)");
                 return;
             }
-            const { data: { user } } = await sb.auth.getUser();
+            const {
+                data: { user },
+            } = await sb.auth.getUser();
             const userEmail = user?.email || null;
             const btn = document.getElementById("btn-casualty");
             btn.disabled = true;
@@ -1588,7 +1647,8 @@
                     updated_at: new Date().toISOString(),
                 });
                 showAlert("success");
-                document.getElementById('alert-success').textContent = '✅ บันทึกข้อมูลสำเร็จแล้ว';
+                document.getElementById("alert-success").textContent =
+                    "✅ บันทึกข้อมูลสำเร็จแล้ว";
                 resetForm("casualty");
             } catch (e) {
                 showAlert("error", e.message);
@@ -1606,7 +1666,9 @@
                 showAlert("error", "กรุณากรอกข้อมูลที่จำเป็นให้ครบ (*)");
                 return;
             }
-            const { data: { user } } = await sb.auth.getUser();
+            const {
+                data: { user },
+            } = await sb.auth.getUser();
             const userEmail = user?.email || null;
             const btn = document.getElementById("btn-elephant");
             btn.disabled = true;
@@ -1644,32 +1706,56 @@
         let ADDRESS_DATA = [];
 
         async function loadAddress() {
-            const { data, error } = await sb.from('address').select('*');
-            console.log('address count:', data?.length);
-            console.log('provinces:', [...new Set(data?.map(r => r.provinceth))]);
-            if (!error && data) {
-                ADDRESS_DATA = data;
-                buildProvinceDropdowns();
-                buildVillageDropdowns();
+            // Supabase จำกัดดึงสูงสุด 1000 แถว/ครั้ง — วนดึงทีละหน้าจนครบ
+            const PAGE = 1000;
+            let all = [];
+            for (let from = 0; ; from += PAGE) {
+                const { data, error } = await sb
+                    .from("address_tambon")
+                    .select("*")
+                    .range(from, from + PAGE - 1);
+                if (error) {
+                    console.error("load address_tambon error:", error.message);
+                    break;
+                }
+                if (!data || !data.length) break;
+                all = all.concat(data);
+                if (data.length < PAGE) break; // หน้าสุดท้าย
+            }
+            console.log("address_tambon total:", all.length);
+            if (all.length) {
+                // map ชื่อคอลัมน์ใหม่ -> ชื่อที่โค้ดส่วนอื่นใช้ (subdistrictth/districtth/provinceth)
+                ADDRESS_DATA = all.map((r) => ({
+                    subdistrictth: r.adm3_name1,
+                    districtth: r.adm2_name1,
+                    provinceth: r.adm1_name1,
+                    center_lat: r.center_lat,
+                    center_lon: r.center_lon,
+                    // รหัสสังเคราะห์ไว้ dedupe (ข้อมูลใหม่ไม่มี code จริง)
+                    subdistcode: `${r.adm3_name1}|${r.adm2_name1}|${r.adm1_name1}`,
+                }));
             }
         }
 
         function buildProvinceDropdowns() {
-            console.log('building dropdowns, data length:', ADDRESS_DATA.length);
-            const provinces = [...new Map(
-                ADDRESS_DATA.map(r => [r.provincecode, r.provinceth])
-            ).entries()].sort((a, b) => a[1].localeCompare(b[1], 'th'));
+            console.log("building dropdowns, data length:", ADDRESS_DATA.length);
+            const provinces = [
+                ...new Map(
+                    ADDRESS_DATA.map((r) => [r.provincecode, r.provinceth]),
+                ).entries(),
+            ].sort((a, b) => a[1].localeCompare(b[1], "th"));
 
-            console.log('provinces:', provinces);
+            console.log("provinces:", provinces);
 
-            ['c', 'ca', 'e'].forEach(prefix => {
+            ["c", "ca", "e"].forEach((prefix) => {
                 const sel = document.getElementById(`${prefix}-province-sel`);
                 console.log(`${prefix}-province-sel:`, sel);
                 if (!sel) return;
                 sel.innerHTML = '<option value="">-- เลือกจังหวัด --</option>';
                 provinces.forEach(([code, name]) => {
-                    const o = document.createElement('option');
-                    o.value = code; o.textContent = name;
+                    const o = document.createElement("option");
+                    o.value = code;
+                    o.textContent = name;
                     sel.appendChild(o);
                 });
             });
@@ -1677,14 +1763,15 @@
 
         function buildVillageDropdowns() {
             const villages = [...ADDRESS_DATA].sort((a, b) =>
-                a.villagenames.localeCompare(b.villagenames, 'th'));
+                a.villagenames.localeCompare(b.villagenames, "th"),
+            );
 
-            ['c', 'ca', 'e'].forEach(prefix => {
+            ["c", "ca", "e"].forEach((prefix) => {
                 const sel = document.getElementById(`${prefix}-village-sel`);
                 if (!sel) return;
                 sel.innerHTML = '<option value="">-- เลือกหมู่บ้าน --</option>';
-                villages.forEach(r => {
-                    const o = document.createElement('option');
+                villages.forEach((r) => {
+                    const o = document.createElement("option");
                     o.value = r.villagecode;
                     o.textContent = `${r.villagenames} (${r.subdistrictth}, ${r.districtth})`;
                     o.dataset.province = r.provinceth;
@@ -1700,7 +1787,9 @@
 
         function onProvinceChange(prefix) {
             const pvCode = document.getElementById(`${prefix}-province-sel`).value;
-            const pvName = document.getElementById(`${prefix}-province-sel`).selectedOptions[0]?.text || '';
+            const pvName =
+                document.getElementById(`${prefix}-province-sel`).selectedOptions[0]
+                    ?.text || "";
             document.getElementById(`${prefix}-province`).value = pvName;
 
             // reset อำเภอ ตำบล หมู่บ้าน
@@ -1709,12 +1798,18 @@
             if (!pvCode) return;
 
             const dSel = document.getElementById(`${prefix}-district-sel`);
-            const districts = [...new Map(
-                ADDRESS_DATA.filter(r => r.provincecode === pvCode)
-                    .map(r => [r.districtcode, r.districtth])
-            ).entries()].sort((a, b) => a[1].localeCompare(b[1], 'th'));
+            const districts = [
+                ...new Map(
+                    ADDRESS_DATA.filter((r) => r.provincecode === pvCode).map((r) => [
+                        r.districtcode,
+                        r.districtth,
+                    ]),
+                ).entries(),
+            ].sort((a, b) => a[1].localeCompare(b[1], "th"));
             districts.forEach(([code, name]) => {
-                const o = document.createElement('option'); o.value = code; o.textContent = name;
+                const o = document.createElement("option");
+                o.value = code;
+                o.textContent = name;
                 dSel.appendChild(o);
             });
 
@@ -1725,21 +1820,31 @@
         function onDistrictChange(prefix) {
             const pvCode = document.getElementById(`${prefix}-province-sel`).value;
             const dtCode = document.getElementById(`${prefix}-district-sel`).value;
-            const dtName = document.getElementById(`${prefix}-district-sel`).selectedOptions[0]?.text || '';
+            const dtName =
+                document.getElementById(`${prefix}-district-sel`).selectedOptions[0]
+                    ?.text || "";
             document.getElementById(`${prefix}-district`).value = dtName;
 
             resetSubdistrict(prefix);
 
-            if (!dtCode) { filterVillages(prefix, pvCode, null, null); return; }
+            if (!dtCode) {
+                filterVillages(prefix, pvCode, null, null);
+                return;
+            }
 
             const sSel = document.getElementById(`${prefix}-subdistrict-sel`);
             if (sSel) {
-                const subdistricts = [...new Map(
-                    ADDRESS_DATA.filter(r => r.provincecode === pvCode && r.districtcode === dtCode)
-                        .map(r => [r.subdistcode, r.subdistrictth])
-                ).entries()].sort((a, b) => a[1].localeCompare(b[1], 'th'));
+                const subdistricts = [
+                    ...new Map(
+                        ADDRESS_DATA.filter(
+                            (r) => r.provincecode === pvCode && r.districtcode === dtCode,
+                        ).map((r) => [r.subdistcode, r.subdistrictth]),
+                    ).entries(),
+                ].sort((a, b) => a[1].localeCompare(b[1], "th"));
                 subdistricts.forEach(([code, name]) => {
-                    const o = document.createElement('option'); o.value = code; o.textContent = name;
+                    const o = document.createElement("option");
+                    o.value = code;
+                    o.textContent = name;
                     sSel.appendChild(o);
                 });
             }
@@ -1750,14 +1855,19 @@
         function onSubdistrictChange(prefix) {
             const pvCode = document.getElementById(`${prefix}-province-sel`).value;
             const dtCode = document.getElementById(`${prefix}-district-sel`).value;
-            const sdCode = document.getElementById(`${prefix}-subdistrict-sel`).value;
-            const sdName = document.getElementById(`${prefix}-subdistrict-sel`).selectedOptions[0]?.text || '';
+            const sdCode = document.getElementById(
+                `${prefix}-subdistrict-sel`,
+            ).value;
+            const sdName =
+                document.getElementById(`${prefix}-subdistrict-sel`)
+                    .selectedOptions[0]?.text || "";
             document.getElementById(`${prefix}-subdistrict`).value = sdName;
 
             const vSel = document.getElementById(`${prefix}-village-sel`);
             if (vSel) {
                 vSel.innerHTML = '<option value="">-- เลือกหมู่บ้าน --</option>';
-                if (document.getElementById(`${prefix}-village`)) document.getElementById(`${prefix}-village`).value = '';
+                if (document.getElementById(`${prefix}-village`))
+                    document.getElementById(`${prefix}-village`).value = "";
             }
 
             filterVillages(prefix, pvCode, dtCode, sdCode);
@@ -1776,56 +1886,82 @@
             // set province
             const pSel = document.getElementById(`${prefix}-province-sel`);
             pSel.value = pvCode;
-            document.getElementById(`${prefix}-province`).value = opt.dataset.province;
+            document.getElementById(`${prefix}-province`).value =
+                opt.dataset.province;
 
             // build & set district
             const dSel = document.getElementById(`${prefix}-district-sel`);
             dSel.innerHTML = '<option value="">-- เลือกอำเภอ --</option>';
-            [...new Map(ADDRESS_DATA.filter(r => r.provincecode === pvCode).map(r => [r.districtcode, r.districtth])).entries()]
-                .sort((a, b) => a[1].localeCompare(b[1], 'th'))
+            [
+                ...new Map(
+                    ADDRESS_DATA.filter((r) => r.provincecode === pvCode).map((r) => [
+                        r.districtcode,
+                        r.districtth,
+                    ]),
+                ).entries(),
+            ]
+                .sort((a, b) => a[1].localeCompare(b[1], "th"))
                 .forEach(([code, name]) => {
-                    const o = document.createElement('option'); o.value = code; o.textContent = name;
+                    const o = document.createElement("option");
+                    o.value = code;
+                    o.textContent = name;
                     dSel.appendChild(o);
                 });
             dSel.value = dtCode;
-            document.getElementById(`${prefix}-district`).value = opt.dataset.district;
+            document.getElementById(`${prefix}-district`).value =
+                opt.dataset.district;
 
             // build & set subdistrict
             const sSel = document.getElementById(`${prefix}-subdistrict-sel`);
             if (sSel) {
                 sSel.innerHTML = '<option value="">-- เลือกตำบล --</option>';
-                [...new Map(ADDRESS_DATA.filter(r => r.provincecode === pvCode && r.districtcode === dtCode).map(r => [r.subdistcode, r.subdistrictth])).entries()]
-                    .sort((a, b) => a[1].localeCompare(b[1], 'th'))
+                [
+                    ...new Map(
+                        ADDRESS_DATA.filter(
+                            (r) => r.provincecode === pvCode && r.districtcode === dtCode,
+                        ).map((r) => [r.subdistcode, r.subdistrictth]),
+                    ).entries(),
+                ]
+                    .sort((a, b) => a[1].localeCompare(b[1], "th"))
                     .forEach(([code, name]) => {
-                        const o = document.createElement('option'); o.value = code; o.textContent = name;
+                        const o = document.createElement("option");
+                        o.value = code;
+                        o.textContent = name;
                         sSel.appendChild(o);
                     });
                 sSel.value = sdCode;
-                document.getElementById(`${prefix}-subdistrict`).value = opt.dataset.subdistrict;
+                document.getElementById(`${prefix}-subdistrict`).value =
+                    opt.dataset.subdistrict;
             }
 
             if (document.getElementById(`${prefix}-village`))
-                document.getElementById(`${prefix}-village`).value = opt.text.split(' (')[0];
+                document.getElementById(`${prefix}-village`).value =
+                    opt.text.split(" (")[0];
         }
 
         function filterVillages(prefix, pvCode, dtCode, sdCode) {
             const vSel = document.getElementById(`${prefix}-village-sel`);
             if (!vSel) return;
             vSel.innerHTML = '<option value="">-- เลือกหมู่บ้าน --</option>';
-            if (document.getElementById(`${prefix}-village`)) document.getElementById(`${prefix}-village`).value = '';
+            if (document.getElementById(`${prefix}-village`))
+                document.getElementById(`${prefix}-village`).value = "";
 
             let filtered = ADDRESS_DATA;
-            if (pvCode) filtered = filtered.filter(r => r.provincecode === pvCode);
-            if (dtCode) filtered = filtered.filter(r => r.districtcode === dtCode);
-            if (sdCode) filtered = filtered.filter(r => r.subdistcode === sdCode);
+            if (pvCode)
+                filtered = filtered.filter((r) => r.provincecode === pvCode);
+            if (dtCode)
+                filtered = filtered.filter((r) => r.districtcode === dtCode);
+            if (sdCode) filtered = filtered.filter((r) => r.subdistcode === sdCode);
 
-            filtered.sort((a, b) => a.villagenames.localeCompare(b.villagenames, 'th'))
-                .forEach(r => {
-                    const o = document.createElement('option');
+            filtered
+                .sort((a, b) => a.villagenames.localeCompare(b.villagenames, "th"))
+                .forEach((r) => {
+                    const o = document.createElement("option");
                     o.value = r.villagecode;
-                    o.textContent = pvCode && dtCode && sdCode
-                        ? r.villagenames
-                        : `${r.villagenames} (${r.subdistrictth}, ${r.districtth})`;
+                    o.textContent =
+                        pvCode && dtCode && sdCode
+                            ? r.villagenames
+                            : `${r.villagenames} (${r.subdistrictth}, ${r.districtth})`;
                     o.dataset.province = r.provinceth;
                     o.dataset.district = r.districtth;
                     o.dataset.subdistrict = r.subdistrictth;
@@ -1838,35 +1974,83 @@
 
         function searchSubdistrict(prefix, q) {
             const dd = document.getElementById(`${prefix}-subdistrict-dd`);
-            let filtered = ADDRESS_DATA;
-            if (q) filtered = filtered.filter(r =>
-                r.subdistrictth.includes(q) ||
-                r.districtth.includes(q) ||
-                r.provinceth.includes(q)
-            );
-            filtered = [...new Map(filtered.map(r => [r.subdistcode, r])).values()]
-                .sort((a, b) => a.subdistrictth.localeCompare(b.subdistrictth, 'th'))
-                .slice(0, 50);
+            q = (q || "").trim();
 
-            if (!filtered.length) {
+            // ตำบลไม่ซ้ำ
+            let list = [
+                ...new Map(ADDRESS_DATA.map((r) => [r.subdistcode, r])).values(),
+            ];
+
+            if (q) {
+                const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
+                // ทุกคำต้องเจอใน "ตำบล อำเภอ จังหวัด" (พิมพ์ชื่อจังหวัด/อำเภอต่อท้ายเพื่อแคบลงได้)
+                list = list.filter((r) => {
+                    const hay =
+                        `${r.subdistrictth} ${r.districtth} ${r.provinceth}`.toLowerCase();
+                    return terms.every((t) => hay.includes(t));
+                });
+                // จัดอันดับ: ตำบลที่ "ขึ้นต้น" ด้วยคำแรกมาก่อน แล้วค่อยตัวที่มีคำนั้นอยู่ข้างใน
+                const first = terms[0];
+                list.sort((a, b) => {
+                    const rank = (s) =>
+                        s.toLowerCase().startsWith(first)
+                            ? 0
+                            : s.toLowerCase().includes(first)
+                                ? 1
+                                : 2;
+                    const ra = rank(a.subdistrictth),
+                        rb = rank(b.subdistrictth);
+                    if (ra !== rb) return ra - rb;
+                    return a.subdistrictth.localeCompare(b.subdistrictth, "th");
+                });
+            } else {
+                list.sort((a, b) =>
+                    a.subdistrictth.localeCompare(b.subdistrictth, "th"),
+                );
+            }
+
+            const total = list.length;
+            const shown = list.slice(0, 80);
+
+            if (!shown.length) {
                 dd.innerHTML = '<div class="addr-no-result">ไม่พบข้อมูล</div>';
             } else {
-                dd.innerHTML = filtered.map(r => `
+                let html = shown
+                    .map(
+                        (r) => `
             <div class="addr-option" onclick="selectSubdistrict('${prefix}','${r.subdistcode}','${r.subdistrictth}','${r.districtth}','${r.provinceth}')">
                 ${r.subdistrictth}
                 <small>${r.districtth} · ${r.provinceth}</small>
-            </div>`).join('');
+            </div>`,
+                    )
+                    .join("");
+                if (total > shown.length) {
+                    html += `<div class="addr-no-result">แสดง ${shown.length} จาก ${total} รายการ — พิมพ์ชื่ออำเภอหรือจังหวัดต่อท้ายเพื่อค้นให้แคบลง</div>`;
+                }
+                dd.innerHTML = html;
             }
-            dd.classList.add('open');
+            dd.classList.add("open");
         }
 
         function openSubdistrictDD(prefix) {
-            searchSubdistrict(prefix, document.getElementById(`${prefix}-subdistrict-search`).value);
+            searchSubdistrict(
+                prefix,
+                document.getElementById(`${prefix}-subdistrict-search`).value,
+            );
         }
 
-        function selectSubdistrict(prefix, code, subdistrict, district, province) {
-            document.getElementById(`${prefix}-subdistrict-search`).value = subdistrict;
-            document.getElementById(`${prefix}-subdistrict-dd`).classList.remove('open');
+        function selectSubdistrict(
+            prefix,
+            code,
+            subdistrict,
+            district,
+            province,
+        ) {
+            document.getElementById(`${prefix}-subdistrict-search`).value =
+                subdistrict;
+            document
+                .getElementById(`${prefix}-subdistrict-dd`)
+                .classList.remove("open");
             document.getElementById(`${prefix}-subdistrict`).value = subdistrict;
             document.getElementById(`${prefix}-district`).value = district;
             document.getElementById(`${prefix}-province`).value = province;
@@ -1874,67 +2058,102 @@
             document.getElementById(`${prefix}-province-display`).value = province;
         }
 
-
         function resetDistrict(prefix) {
             const dSel = document.getElementById(`${prefix}-district-sel`);
             if (dSel) dSel.innerHTML = '<option value="">-- เลือกอำเภอ --</option>';
-            document.getElementById(`${prefix}-district`).value = '';
+            document.getElementById(`${prefix}-district`).value = "";
             resetSubdistrict(prefix);
         }
 
         function resetSubdistrict(prefix) {
             const sSel = document.getElementById(`${prefix}-subdistrict-sel`);
             if (sSel) sSel.innerHTML = '<option value="">-- เลือกตำบล --</option>';
-            document.getElementById(`${prefix}-subdistrict`).value = '';
+            document.getElementById(`${prefix}-subdistrict`).value = "";
             const vSel = document.getElementById(`${prefix}-village-sel`);
-            if (vSel) vSel.innerHTML = '<option value="">-- เลือกหมู่บ้าน --</option>';
-            if (document.getElementById(`${prefix}-village`)) document.getElementById(`${prefix}-village`).value = '';
+            if (vSel)
+                vSel.innerHTML = '<option value="">-- เลือกหมู่บ้าน --</option>';
+            if (document.getElementById(`${prefix}-village`))
+                document.getElementById(`${prefix}-village`).value = "";
         }
 
         function searchVillage(prefix, q) {
             const dd = document.getElementById(`${prefix}-village-dd`);
-            const pvCode = document.getElementById(`${prefix}-province-sel`)?.value || '';
-            const dtCode = document.getElementById(`${prefix}-district-sel`)?.value || '';
-            const sdCode = document.getElementById(`${prefix}-subdistrict-sel`)?.value || '';
+            // ข้อมูลที่อยู่ชุดใหม่ไม่มีหมู่บ้าน -> ปิด dropdown ให้พิมพ์ระบุเอง
+            if (!ADDRESS_DATA.length || !ADDRESS_DATA[0].villagenames) {
+                if (dd) {
+                    dd.innerHTML = "";
+                    dd.classList.remove("open");
+                }
+                return;
+            }
+            const pvCode =
+                document.getElementById(`${prefix}-province-sel`)?.value || "";
+            const dtCode =
+                document.getElementById(`${prefix}-district-sel`)?.value || "";
+            const sdCode =
+                document.getElementById(`${prefix}-subdistrict-sel`)?.value || "";
 
             let filtered = ADDRESS_DATA;
-            if (pvCode) filtered = filtered.filter(r => r.provincecode === pvCode);
-            if (dtCode) filtered = filtered.filter(r => r.districtcode === dtCode);
-            if (sdCode) filtered = filtered.filter(r => r.subdistcode === sdCode);
-            if (q) filtered = filtered.filter(r =>
-                r.villagenames.toLowerCase().includes(q.toLowerCase()) ||
-                r.subdistrictth.toLowerCase().includes(q.toLowerCase()) ||
-                r.districtth.toLowerCase().includes(q.toLowerCase())
-            );
+            if (pvCode)
+                filtered = filtered.filter((r) => r.provincecode === pvCode);
+            if (dtCode)
+                filtered = filtered.filter((r) => r.districtcode === dtCode);
+            if (sdCode) filtered = filtered.filter((r) => r.subdistcode === sdCode);
+            if (q)
+                filtered = filtered.filter(
+                    (r) =>
+                        r.villagenames.toLowerCase().includes(q.toLowerCase()) ||
+                        r.subdistrictth.toLowerCase().includes(q.toLowerCase()) ||
+                        r.districtth.toLowerCase().includes(q.toLowerCase()),
+                );
 
-            filtered = filtered.slice(0, 50).sort((a, b) => a.villagenames.localeCompare(b.villagenames, 'th'));
+            filtered = filtered
+                .slice(0, 50)
+                .sort((a, b) => a.villagenames.localeCompare(b.villagenames, "th"));
 
             if (!filtered.length) {
                 dd.innerHTML = '<div class="addr-no-result">ไม่พบข้อมูล</div>';
             } else {
-                dd.innerHTML = filtered.map(r => `
+                dd.innerHTML = filtered
+                    .map(
+                        (r) => `
             <div class="addr-option" onclick="selectVillage('${prefix}', '${r.villagecode}', '${r.villagenames}', '${r.subdistrictth}', '${r.districtth}', '${r.provinceth}', '${r.subdistcode}', '${r.districtcode}', '${r.provincecode}')">
                 ${r.villagenames}
                 <small>${r.subdistrictth} · ${r.districtth} · ${r.provinceth}</small>
-            </div>`).join('');
+            </div>`,
+                    )
+                    .join("");
             }
-            dd.classList.add('open');
+            dd.classList.add("open");
         }
 
         function openVillageDD(prefix) {
-            const inputId = prefix === 'e' ? `${prefix}-area` : `${prefix}-village-search`;
-            const q = document.getElementById(inputId)?.value || '';
+            const inputId =
+                prefix === "e" ? `${prefix}-area` : `${prefix}-village-search`;
+            const q = document.getElementById(inputId)?.value || "";
             searchVillage(prefix, q);
         }
 
-        function selectVillage(prefix, code, name, subdistrict, district, province, sdCode, dtCode, pvCode) {
+        function selectVillage(
+            prefix,
+            code,
+            name,
+            subdistrict,
+            district,
+            province,
+            sdCode,
+            dtCode,
+            pvCode,
+        ) {
             // set input
-            if (prefix === 'e') {
-                document.getElementById('e-area').value = name;
-                document.getElementById('e-village-dd').classList.remove('open');
+            if (prefix === "e") {
+                document.getElementById("e-area").value = name;
+                document.getElementById("e-village-dd").classList.remove("open");
             } else {
                 document.getElementById(`${prefix}-village-search`).value = name;
-                document.getElementById(`${prefix}-village-dd`).classList.remove('open');
+                document
+                    .getElementById(`${prefix}-village-dd`)
+                    .classList.remove("open");
                 if (document.getElementById(`${prefix}-village`))
                     document.getElementById(`${prefix}-village`).value = name;
             }
@@ -1945,13 +2164,16 @@
 
             // auto fill district/province display สำหรับ e และ ca
             if (document.getElementById(`${prefix}-district-display`))
-                document.getElementById(`${prefix}-district-display`).value = district;
+                document.getElementById(`${prefix}-district-display`).value =
+                    district;
             if (document.getElementById(`${prefix}-province-display`))
-                document.getElementById(`${prefix}-province-display`).value = province;
+                document.getElementById(`${prefix}-province-display`).value =
+                    province;
 
             // auto fill subdistrict search
             if (document.getElementById(`${prefix}-subdistrict-search`))
-                document.getElementById(`${prefix}-subdistrict-search`).value = subdistrict;
+                document.getElementById(`${prefix}-subdistrict-search`).value =
+                    subdistrict;
 
             const pSel = document.getElementById(`${prefix}-province-sel`);
             if (pSel) pSel.value = pvCode;
@@ -1959,26 +2181,51 @@
             const dSel = document.getElementById(`${prefix}-district-sel`);
             if (dSel) {
                 dSel.innerHTML = '<option value="">-- เลือกอำเภอ --</option>';
-                [...new Map(ADDRESS_DATA.filter(r => r.provincecode === pvCode).map(r => [r.districtcode, r.districtth])).entries()]
-                    .sort((a, b) => a[1].localeCompare(b[1], 'th'))
-                    .forEach(([c, n]) => { const o = document.createElement('option'); o.value = c; o.textContent = n; dSel.appendChild(o); });
+                [
+                    ...new Map(
+                        ADDRESS_DATA.filter((r) => r.provincecode === pvCode).map((r) => [
+                            r.districtcode,
+                            r.districtth,
+                        ]),
+                    ).entries(),
+                ]
+                    .sort((a, b) => a[1].localeCompare(b[1], "th"))
+                    .forEach(([c, n]) => {
+                        const o = document.createElement("option");
+                        o.value = c;
+                        o.textContent = n;
+                        dSel.appendChild(o);
+                    });
                 dSel.value = dtCode;
             }
 
             const sSel = document.getElementById(`${prefix}-subdistrict-sel`);
             if (sSel) {
                 sSel.innerHTML = '<option value="">-- เลือกตำบล --</option>';
-                [...new Map(ADDRESS_DATA.filter(r => r.provincecode === pvCode && r.districtcode === dtCode).map(r => [r.subdistcode, r.subdistrictth])).entries()]
-                    .sort((a, b) => a[1].localeCompare(b[1], 'th'))
-                    .forEach(([c, n]) => { const o = document.createElement('option'); o.value = c; o.textContent = n; sSel.appendChild(o); });
+                [
+                    ...new Map(
+                        ADDRESS_DATA.filter(
+                            (r) => r.provincecode === pvCode && r.districtcode === dtCode,
+                        ).map((r) => [r.subdistcode, r.subdistrictth]),
+                    ).entries(),
+                ]
+                    .sort((a, b) => a[1].localeCompare(b[1], "th"))
+                    .forEach(([c, n]) => {
+                        const o = document.createElement("option");
+                        o.value = c;
+                        o.textContent = n;
+                        sSel.appendChild(o);
+                    });
                 sSel.value = sdCode;
             }
         }
 
         // ปิด dropdown เมื่อคลิกที่อื่น
-        document.addEventListener('click', e => {
-            if (!e.target.closest('.addr-search-wrap')) {
-                document.querySelectorAll('.addr-dropdown').forEach(dd => dd.classList.remove('open'));
+        document.addEventListener("click", (e) => {
+            if (!e.target.closest(".addr-search-wrap")) {
+                document
+                    .querySelectorAll(".addr-dropdown")
+                    .forEach((dd) => dd.classList.remove("open"));
             }
         });
 
@@ -1988,7 +2235,6 @@
             document.getElementById("user-email").textContent = email;
             loadAddress(); // เพิ่มบรรทัดนี้
         }
-
 
         function resetForm(type) {
             const prefix = { compensation: "c-", casualty: "ca-", elephant: "e-" }[
