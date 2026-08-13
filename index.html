@@ -267,7 +267,7 @@
             </div>
         </div>
 
-        <div class="card">
+        <div class="card" id="map-card">
             <div class="card-hd">
                 <div>
                     <div class="card-title">แผนที่จุดเกิดเหตุ</div>
@@ -275,7 +275,19 @@
                         ตำแหน่งที่เกิดเหตุแต่ละกรณี
                     </div>
                 </div>
-                <span class="chip chip-g" id="chip-map"></span>
+                <div style="display: flex; align-items: center; gap: 8px">
+                    <span class="chip chip-g" id="chip-map"></span>
+                    <button class="map-expand-btn" id="map-expand-btn" onclick="openMapModal()"
+                        title="เปิดดูแผนที่ใหญ่">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="15 3 21 3 21 9" />
+                            <polyline points="9 21 3 21 3 15" />
+                            <line x1="21" y1="3" x2="14" y2="10" />
+                            <line x1="3" y1="21" x2="10" y2="14" />
+                        </svg>
+                    </button>
+                </div>
             </div>
             <div id="map"></div>
         </div>
@@ -473,16 +485,25 @@
             </div>
         </div>
 
+        <!-- MODAL แผนที่ใหญ่ -->
+        <div class="map-modal-overlay" id="map-modal-overlay" onclick="if (event.target === this) closeMapModal();">
+            <div class="map-modal">
+                <div class="map-modal-hd">
+                    <span class="card-title">แผนที่จุดเกิดเหตุ</span>
+                    <button class="map-modal-close" onclick="closeMapModal()" title="ปิด">
+                        ✕
+                    </button>
+                </div>
+                <div id="map-modal-body"></div>
+            </div>
+        </div>
     </main>
-
-
 
     <footer>
         สถิติการเยียวยาผลกระทบจากช้างป่า · อุทยานแห่งชาติแก่งกระจาน · ข้อมูลจาก
         Supabase
         <div>Developed by Sunanta SANGSILA</div>
         <div class="app-version">v1.0.0</div>
-
     </footer>
 
     <script>
@@ -706,32 +727,40 @@
             setTimeout(() => window.print(), 100);
         }
 
-
         let VISITOR_COUNT = null;
         (async function () {
             const SB_URL = "https://xzuzpkzxyimcvgninskt.supabase.co";
-            const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6dXpwa3p4eWltY3Znbmluc2t0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MjcwMTksImV4cCI6MjA5NjMwMzAxOX0.P8uSZ4dlhCXyEfSOntD65eTAbYsJWkQ3SQFSsbmJm7k";
+            const SB_KEY =
+                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6dXpwa3p4eWltY3Znbmluc2t0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MjcwMTksImV4cCI6MjA5NjMwMzAxOX0.P8uSZ4dlhCXyEfSOntD65eTAbYsJWkQ3SQFSsbmJm7k";
 
             // นับ 1 ครั้งต่อการเปิดหน้าใน 1 ชั่วโมง (กันเลขพองจากรีเฟรชรัว ๆ)
             const K = "kknp_view_bumped_at";
-            const fresh = Date.now() - parseInt(sessionStorage.getItem(K) || "0") > 3600000;
+            const fresh =
+                Date.now() - parseInt(sessionStorage.getItem(K) || "0") > 3600000;
             if (fresh) sessionStorage.setItem(K, String(Date.now()));
 
             try {
-                const res = await fetch(`${SB_URL}/rest/v1/rpc/${fresh ? "bump_view" : "get_view"}`, {
-                    method: "POST",
-                    headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, "Content-Type": "application/json" },
-                    body: JSON.stringify({ p_key: "index_views" }),
-                });
+                const res = await fetch(
+                    `${SB_URL}/rest/v1/rpc/${fresh ? "bump_view" : "get_view"}`,
+                    {
+                        method: "POST",
+                        headers: {
+                            apikey: SB_KEY,
+                            Authorization: `Bearer ${SB_KEY}`,
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ p_key: "index_views" }),
+                    },
+                );
                 VISITOR_COUNT = await res.json();
             } catch (e) {
                 console.error("visitor counter error:", e);
                 VISITOR_COUNT = "-";
             }
             // อัปเดตแถบ insights ถ้าโหลดข้อมูลเสร็จแล้ว
-            if (typeof RAW !== "undefined" && RAW.length) buildInsights(getFiltered ? getFiltered() : RAW);
+            if (typeof RAW !== "undefined" && RAW.length)
+                buildInsights(getFiltered ? getFiltered() : RAW);
         })();
-
 
         const SUPABASE_URL = "https://xzuzpkzxyimcvgninskt.supabase.co";
         const SUPABASE_KEY =
@@ -1107,6 +1136,90 @@
             document.getElementById("map").appendChild(btn);
             setTimeout(() => MAP_INSTANCE.invalidateSize(), 300);
         }
+
+        // ===== แผนที่แบบ modal (เปิดดูใหญ่) =====
+        let MODAL_MAP = null,
+            MODAL_LAYER = null,
+            MODAL_HEAT = null,
+            modalHeatOn = false;
+
+        async function openMapModal() {
+            const ov = document.getElementById("map-modal-overlay");
+            ov.classList.add("open");
+            document.body.style.overflow = "hidden";
+
+            const d = (
+                typeof getFiltered === "function" ? getFiltered() : RAW
+            ).filter((r) => r.lat && r.lon);
+
+            if (!MODAL_MAP) {
+                MODAL_MAP = L.map("map-modal-body", { tap: true }).setView(
+                    MAP_INSTANCE ? MAP_INSTANCE.getCenter() : [12.5733, 99.532],
+                    MAP_INSTANCE ? MAP_INSTANCE.getZoom() : 10,
+                );
+                L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                    attribution: "© OpenStreetMap",
+                }).addTo(MODAL_MAP);
+                MODAL_LAYER = L.layerGroup().addTo(MODAL_MAP);
+
+                // ปุ่ม heatmap ในกล่อง
+                const btn = document.createElement("button");
+                btn.textContent = "🌡️ Heatmap";
+                btn.style.cssText =
+                    "position:absolute;top:12px;right:12px;z-index:999;background:#fff;border:1px solid #dde3d9;border-radius:20px;padding:6px 13px;font-size:12px;font-family:var(--ff);cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.12);color:#3d5045;min-height:34px";
+                btn.onclick = () => {
+                    modalHeatOn = !modalHeatOn;
+                    if (modalHeatOn) {
+                        MODAL_HEAT.addTo(MODAL_MAP);
+                        btn.style.background = "#1a6b42";
+                        btn.style.color = "#fff";
+                        btn.style.borderColor = "#1a6b42";
+                    } else {
+                        MODAL_MAP.removeLayer(MODAL_HEAT);
+                        btn.style.background = "#fff";
+                        btn.style.color = "#3d5045";
+                        btn.style.borderColor = "#dde3d9";
+                    }
+                };
+                document.getElementById("map-modal-body").appendChild(btn);
+            } else if (MAP_INSTANCE) {
+                MODAL_MAP.setView(MAP_INSTANCE.getCenter(), MAP_INSTANCE.getZoom());
+            }
+
+            // ใส่หมุดตามข้อมูลที่กรองอยู่
+            MODAL_LAYER.clearLayers();
+            const markers = await Promise.all(d.map((r) => makeDot(r)));
+            markers.forEach((m) => m.addTo(MODAL_LAYER));
+
+            // เตรียม heat layer ใหม่ (ปิดไว้ก่อน)
+            if (MODAL_HEAT) MODAL_MAP.removeLayer(MODAL_HEAT);
+            MODAL_HEAT = L.heatLayer(
+                d.map((r) => [r.lat, r.lon, 1]),
+                {
+                    radius: 30,
+                    blur: 20,
+                    maxZoom: 14,
+                    gradient: { 0.3: "#3b82f6", 0.6: "#f97316", 1.0: "#ef4444" },
+                },
+            );
+            modalHeatOn = false;
+
+            setTimeout(() => MODAL_MAP.invalidateSize(), 200);
+        }
+
+        function closeMapModal() {
+            document.getElementById("map-modal-overlay").classList.remove("open");
+            document.body.style.overflow = "";
+        }
+
+        // กด Esc ปิด modal
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") {
+                const ov = document.getElementById("map-modal-overlay");
+                if (ov && ov.classList.contains("open")) closeMapModal();
+            }
+        });
+
         async function updateMap(d) {
             if (!MAP_INSTANCE) return;
             const myToken = ++MAP_TOKEN;
@@ -1791,7 +1904,12 @@
                 end = Math.min(tablePage * PAGE_SIZE, total);
             document.getElementById("tbl-info").textContent =
                 `แสดง ${start}–${end} จาก ${total} รายการ`;
-            let btns = `<button class="pg-btn" onclick="changePage(-1)" ${tablePage <= 1 ? "disabled" : ""}>←</button>`;
+            const svgFirst = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>`;
+            const svgPrev = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>`;
+            const svgNext = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>`;
+            const svgLast = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>`;
+            let btns = `<button class="pg-btn" onclick="gotoPage(1)" ${tablePage <= 1 ? "disabled" : ""} title="หน้าแรก">${svgFirst}</button>`;
+            btns += `<button class="pg-btn" onclick="changePage(-1)" ${tablePage <= 1 ? "disabled" : ""} title="ก่อนหน้า">${svgPrev}</button>`;
             const rng = 5,
                 half = Math.floor(rng / 2);
             let sP = Math.max(1, tablePage - half),
@@ -1799,7 +1917,8 @@
             if (eP - sP < rng - 1) sP = Math.max(1, eP - rng + 1);
             for (let i = sP; i <= eP; i++)
                 btns += `<button class="pg-btn ${i === tablePage ? "curr" : ""}" onclick="gotoPage(${i})">${i}</button>`;
-            btns += `<button class="pg-btn" onclick="changePage(1)" ${tablePage >= pages ? "disabled" : ""}>→</button>`;
+            btns += `<button class="pg-btn" onclick="changePage(1)" ${tablePage >= pages ? "disabled" : ""} title="ถัดไป">${svgNext}</button>`;
+            btns += `<button class="pg-btn" onclick="gotoPage(${pages})" ${tablePage >= pages ? "disabled" : ""} title="หน้าสุดท้าย">${svgLast}</button>`;
             document.getElementById("tbl-pager").innerHTML = btns;
         }
 
@@ -2062,7 +2181,11 @@
                 ph: "ทุกตำบล",
             },
             district: { field: "event_district", set: "districts", ph: "ทุกอำเภอ" },
-            province: { field: "event_province", set: "provinces", ph: "ทุกจังหวัด" },
+            province: {
+                field: "event_province",
+                set: "provinces",
+                ph: "ทุกจังหวัด",
+            },
         };
 
         function locOptions(type) {
@@ -2173,7 +2296,8 @@
             getFiltered = function () {
                 return _getFiltered().filter(
                     (r) =>
-                        (!F.subdistricts.size || F.subdistricts.has(r.event_subdistrict)) &&
+                        (!F.subdistricts.size ||
+                            F.subdistricts.has(r.event_subdistrict)) &&
                         (!F.districts.size || F.districts.has(r.event_district)) &&
                         (!F.provinces.size || F.provinces.has(r.event_province)),
                 );
@@ -2200,9 +2324,6 @@
             const ov = document.getElementById("dd-overlay");
             if (ov) ov.addEventListener("click", closeAllDD);
         })();
-
-
-
     </script>
 
     <!-- PRINT AREA -->
