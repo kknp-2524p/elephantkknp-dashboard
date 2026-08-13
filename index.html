@@ -275,7 +275,7 @@
                         ตำแหน่งที่เกิดเหตุแต่ละกรณี
                     </div>
                 </div>
-                <div style="display: flex; align-items: center; gap: 8px">
+                <div style="display:flex;align-items:center;gap:8px">
                     <span class="chip chip-g" id="chip-map"></span>
                     <button class="map-expand-btn" id="map-expand-btn" onclick="openMapModal()"
                         title="เปิดดูแผนที่ใหญ่">
@@ -486,24 +486,26 @@
         </div>
 
         <!-- MODAL แผนที่ใหญ่ -->
-        <div class="map-modal-overlay" id="map-modal-overlay" onclick="if (event.target === this) closeMapModal();">
+        <div class="map-modal-overlay" id="map-modal-overlay" onclick="if(event.target===this)closeMapModal()">
             <div class="map-modal">
                 <div class="map-modal-hd">
                     <span class="card-title">แผนที่จุดเกิดเหตุ</span>
-                    <button class="map-modal-close" onclick="closeMapModal()" title="ปิด">
-                        ✕
-                    </button>
+                    <button class="map-modal-close" onclick="closeMapModal()" title="ปิด">✕</button>
                 </div>
                 <div id="map-modal-body"></div>
             </div>
         </div>
+
     </main>
+
+
 
     <footer>
         สถิติการเยียวยาผลกระทบจากช้างป่า · อุทยานแห่งชาติแก่งกระจาน · ข้อมูลจาก
         Supabase
         <div>Developed by Sunanta SANGSILA</div>
         <div class="app-version">v1.0.0</div>
+
     </footer>
 
     <script>
@@ -727,40 +729,32 @@
             setTimeout(() => window.print(), 100);
         }
 
+
         let VISITOR_COUNT = null;
         (async function () {
             const SB_URL = "https://xzuzpkzxyimcvgninskt.supabase.co";
-            const SB_KEY =
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6dXpwa3p4eWltY3Znbmluc2t0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MjcwMTksImV4cCI6MjA5NjMwMzAxOX0.P8uSZ4dlhCXyEfSOntD65eTAbYsJWkQ3SQFSsbmJm7k";
+            const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6dXpwa3p4eWltY3Znbmluc2t0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MjcwMTksImV4cCI6MjA5NjMwMzAxOX0.P8uSZ4dlhCXyEfSOntD65eTAbYsJWkQ3SQFSsbmJm7k";
 
             // นับ 1 ครั้งต่อการเปิดหน้าใน 1 ชั่วโมง (กันเลขพองจากรีเฟรชรัว ๆ)
             const K = "kknp_view_bumped_at";
-            const fresh =
-                Date.now() - parseInt(sessionStorage.getItem(K) || "0") > 3600000;
+            const fresh = Date.now() - parseInt(sessionStorage.getItem(K) || "0") > 3600000;
             if (fresh) sessionStorage.setItem(K, String(Date.now()));
 
             try {
-                const res = await fetch(
-                    `${SB_URL}/rest/v1/rpc/${fresh ? "bump_view" : "get_view"}`,
-                    {
-                        method: "POST",
-                        headers: {
-                            apikey: SB_KEY,
-                            Authorization: `Bearer ${SB_KEY}`,
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({ p_key: "index_views" }),
-                    },
-                );
+                const res = await fetch(`${SB_URL}/rest/v1/rpc/${fresh ? "bump_view" : "get_view"}`, {
+                    method: "POST",
+                    headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, "Content-Type": "application/json" },
+                    body: JSON.stringify({ p_key: "index_views" }),
+                });
                 VISITOR_COUNT = await res.json();
             } catch (e) {
                 console.error("visitor counter error:", e);
                 VISITOR_COUNT = "-";
             }
             // อัปเดตแถบ insights ถ้าโหลดข้อมูลเสร็จแล้ว
-            if (typeof RAW !== "undefined" && RAW.length)
-                buildInsights(getFiltered ? getFiltered() : RAW);
+            if (typeof RAW !== "undefined" && RAW.length) buildInsights(getFiltered ? getFiltered() : RAW);
         })();
+
 
         const SUPABASE_URL = "https://xzuzpkzxyimcvgninskt.supabase.co";
         const SUPABASE_KEY =
@@ -1029,6 +1023,25 @@
                 `<div class="kpi b"><div class="kpi-ico">📋</div><div class="kpi-lbl">กรณีทั้งหมด</div><div class="kpi-val">${d.length}</div><div class="kpi-sub">รายการที่กรองแล้ว</div></div><div class="kpi g"><div class="kpi-ico">✅</div><div class="kpi-lbl">จ่ายเงินแล้ว</div><div class="kpi-val">${paid.length}</div><div class="kpi-sub">฿${pA.toLocaleString("th-TH")}</div></div><div class="kpi a"><div class="kpi-ico">⏳</div><div class="kpi-lbl">รอการจ่าย</div><div class="kpi-val">${pend.length}</div><div class="kpi-sub">${fmtAmt(eA)}</div></div><div class="kpi r"><div class="kpi-ico">💰</div><div class="kpi-lbl">มูลค่ารวม</div><div class="kpi-val" style="font-size:20px">${fmtAmt(pA + eA)}</div><div class="kpi-sub">฿${(pA + eA).toLocaleString("th-TH")}</div></div>`;
         }
 
+        // สร้างกล่องคำอธิบายสี (legend) ตามประเภทกรณี วางมุมล่างซ้ายของแผนที่
+        function addMapLegend(mapInstance) {
+            const legend = L.control({ position: "bottomleft" });
+            legend.onAdd = function () {
+                const div = L.DomUtil.create("div", "map-legend");
+                div.innerHTML =
+                    '<div class="map-legend-title">ประเภทกรณี</div>' +
+                    Object.entries(CASE_COLOR)
+                        .map(
+                            ([name, color]) =>
+                                `<div class="map-legend-row"><span class="map-legend-dot" style="background:${color}"></span>${name}</div>`,
+                        )
+                        .join("");
+                L.DomEvent.disableClickPropagation(div);
+                return div;
+            };
+            legend.addTo(mapInstance);
+        }
+
         async function makeDot(r) {
             const color = CASE_COLOR[r.compensation_case] || "#64748b";
 
@@ -1103,6 +1116,7 @@
                 attribution: "© OpenStreetMap",
             }).addTo(MAP_INSTANCE);
             MAP_LAYER = L.layerGroup().addTo(MAP_INSTANCE);
+            addMapLegend(MAP_INSTANCE);
             const myToken = ++MAP_TOKEN;
             const markers = await Promise.all(pts.map((r) => makeDot(r)));
             if (myToken === MAP_TOKEN) markers.forEach((m) => m.addTo(MAP_LAYER));
@@ -1138,19 +1152,16 @@
         }
 
         // ===== แผนที่แบบ modal (เปิดดูใหญ่) =====
-        let MODAL_MAP = null,
-            MODAL_LAYER = null,
-            MODAL_HEAT = null,
-            modalHeatOn = false;
+        let MODAL_MAP = null, MODAL_LAYER = null, MODAL_HEAT = null, modalHeatOn = false;
 
         async function openMapModal() {
             const ov = document.getElementById("map-modal-overlay");
             ov.classList.add("open");
             document.body.style.overflow = "hidden";
 
-            const d = (
-                typeof getFiltered === "function" ? getFiltered() : RAW
-            ).filter((r) => r.lat && r.lon);
+            const d = (typeof getFiltered === "function" ? getFiltered() : RAW).filter(
+                (r) => r.lat && r.lon,
+            );
 
             if (!MODAL_MAP) {
                 MODAL_MAP = L.map("map-modal-body", { tap: true }).setView(
@@ -1161,6 +1172,7 @@
                     attribution: "© OpenStreetMap",
                 }).addTo(MODAL_MAP);
                 MODAL_LAYER = L.layerGroup().addTo(MODAL_MAP);
+                addMapLegend(MODAL_MAP);
 
                 // ปุ่ม heatmap ในกล่อง
                 const btn = document.createElement("button");
@@ -1195,12 +1207,7 @@
             if (MODAL_HEAT) MODAL_MAP.removeLayer(MODAL_HEAT);
             MODAL_HEAT = L.heatLayer(
                 d.map((r) => [r.lat, r.lon, 1]),
-                {
-                    radius: 30,
-                    blur: 20,
-                    maxZoom: 14,
-                    gradient: { 0.3: "#3b82f6", 0.6: "#f97316", 1.0: "#ef4444" },
-                },
+                { radius: 30, blur: 20, maxZoom: 14, gradient: { 0.3: "#3b82f6", 0.6: "#f97316", 1.0: "#ef4444" } },
             );
             modalHeatOn = false;
 
@@ -2181,11 +2188,7 @@
                 ph: "ทุกตำบล",
             },
             district: { field: "event_district", set: "districts", ph: "ทุกอำเภอ" },
-            province: {
-                field: "event_province",
-                set: "provinces",
-                ph: "ทุกจังหวัด",
-            },
+            province: { field: "event_province", set: "provinces", ph: "ทุกจังหวัด" },
         };
 
         function locOptions(type) {
@@ -2296,8 +2299,7 @@
             getFiltered = function () {
                 return _getFiltered().filter(
                     (r) =>
-                        (!F.subdistricts.size ||
-                            F.subdistricts.has(r.event_subdistrict)) &&
+                        (!F.subdistricts.size || F.subdistricts.has(r.event_subdistrict)) &&
                         (!F.districts.size || F.districts.has(r.event_district)) &&
                         (!F.provinces.size || F.provinces.has(r.event_province)),
                 );
@@ -2324,6 +2326,9 @@
             const ov = document.getElementById("dd-overlay");
             if (ov) ov.addEventListener("click", closeAllDD);
         })();
+
+
+
     </script>
 
     <!-- PRINT AREA -->
