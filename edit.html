@@ -995,7 +995,8 @@
         function inputToThaiDate(s) {
             if (!s) return null;
             const [y, m, d] = s.split("-");
-            return `${d}/${m}/${y}`; // เก็บเป็น ค.ศ. ตามระบบเดิม
+            // แปลงเป็น int เพื่อตัดเลข 0 ตัวหน้าออก (เช่น "07" -> "7")
+            return `${parseInt(d, 10)}/${parseInt(m, 10)}/${y}`;
         }
         function isoOrNull(s) {
             // for submission/payment dates: keep YYYY-MM-DD as-is

@@ -1018,9 +1018,14 @@
                 eA = pend.reduce(
                     (a, r) => a + (parseFloat(r.requested_amount) || 0),
                     0,
+                ),
+                // มูลค่ารวม = ความเสียหายที่ขอมาทั้งหมด (ทุกสถานะ ไม่ใช่แค่จ่าย/รออนุมัติ)
+                totalA = d.reduce(
+                    (a, r) => a + (parseFloat(r.requested_amount) || 0),
+                    0,
                 );
             document.getElementById("kpi-row").innerHTML =
-                `<div class="kpi b"><div class="kpi-ico">📋</div><div class="kpi-lbl">กรณีทั้งหมด</div><div class="kpi-val">${d.length}</div><div class="kpi-sub">รายการที่กรองแล้ว</div></div><div class="kpi g"><div class="kpi-ico">✅</div><div class="kpi-lbl">จ่ายเงินแล้ว</div><div class="kpi-val">${paid.length}</div><div class="kpi-sub">฿${pA.toLocaleString("th-TH")}</div></div><div class="kpi a"><div class="kpi-ico">⏳</div><div class="kpi-lbl">รอการจ่าย</div><div class="kpi-val">${pend.length}</div><div class="kpi-sub">${fmtAmt(eA)}</div></div><div class="kpi r"><div class="kpi-ico">💰</div><div class="kpi-lbl">มูลค่ารวม</div><div class="kpi-val" style="font-size:20px">${fmtAmt(pA + eA)}</div><div class="kpi-sub">฿${(pA + eA).toLocaleString("th-TH")}</div></div>`;
+                `<div class="kpi b"><div class="kpi-ico">📋</div><div class="kpi-lbl">กรณีทั้งหมด</div><div class="kpi-val">${d.length}</div><div class="kpi-sub">รายการที่กรองแล้ว</div></div><div class="kpi g"><div class="kpi-ico">✅</div><div class="kpi-lbl">จ่ายเงินแล้ว</div><div class="kpi-val">${paid.length}</div><div class="kpi-sub">฿${pA.toLocaleString("th-TH")}</div></div><div class="kpi a"><div class="kpi-ico">⏳</div><div class="kpi-lbl">รอการจ่าย</div><div class="kpi-val">${pend.length}</div><div class="kpi-sub">${fmtAmt(eA)}</div></div><div class="kpi r"><div class="kpi-ico">💰</div><div class="kpi-lbl">มูลค่ารวม</div><div class="kpi-val" style="font-size:20px">${fmtAmt(totalA)}</div><div class="kpi-sub">฿${totalA.toLocaleString("th-TH")}</div></div>`;
         }
 
         // สร้างกล่องคำอธิบายสี (legend) ตามประเภทกรณี วางมุมล่างซ้ายของแผนที่
@@ -1892,7 +1897,9 @@
                                 const p = r.incident_date.split("/");
                                 if (p.length !== 3)
                                     return r.incident_date;
-                                return `${p[0]}/${p[1]}/${parseInt(p[2]) + 543}`;
+                                let y = parseInt(p[2]);
+                                if (y < 2500) y += 543;
+                                return `${p[0]}/${p[1]}/${y}`;
                             })()}
                                             </td>
                                         <td>
