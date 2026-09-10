@@ -275,7 +275,7 @@
                         ตำแหน่งที่เกิดเหตุแต่ละกรณี
                     </div>
                 </div>
-                <div style="display:flex;align-items:center;gap:8px">
+                <div style="display: flex; align-items: center; gap: 8px">
                     <span class="chip chip-g" id="chip-map"></span>
                     <button class="map-expand-btn" id="map-expand-btn" onclick="openMapModal()"
                         title="เปิดดูแผนที่ใหญ่">
@@ -486,26 +486,24 @@
         </div>
 
         <!-- MODAL แผนที่ใหญ่ -->
-        <div class="map-modal-overlay" id="map-modal-overlay" onclick="if(event.target===this)closeMapModal()">
+        <div class="map-modal-overlay" id="map-modal-overlay" onclick="if (event.target === this) closeMapModal();">
             <div class="map-modal">
                 <div class="map-modal-hd">
                     <span class="card-title">แผนที่จุดเกิดเหตุ</span>
-                    <button class="map-modal-close" onclick="closeMapModal()" title="ปิด">✕</button>
+                    <button class="map-modal-close" onclick="closeMapModal()" title="ปิด">
+                        ✕
+                    </button>
                 </div>
                 <div id="map-modal-body"></div>
             </div>
         </div>
-
     </main>
-
-
 
     <footer>
         สถิติการเยียวยาผลกระทบจากช้างป่า · อุทยานแห่งชาติแก่งกระจาน · ข้อมูลจาก
         Supabase
         <div>Developed by Sunanta SANGSILA</div>
-        <div class="app-version">v1.0.0</div>
-
+        <div class="app-version">v1.0.1</div>
     </footer>
 
     <script>
@@ -729,32 +727,40 @@
             setTimeout(() => window.print(), 100);
         }
 
-
         let VISITOR_COUNT = null;
         (async function () {
             const SB_URL = "https://xzuzpkzxyimcvgninskt.supabase.co";
-            const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6dXpwa3p4eWltY3Znbmluc2t0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MjcwMTksImV4cCI6MjA5NjMwMzAxOX0.P8uSZ4dlhCXyEfSOntD65eTAbYsJWkQ3SQFSsbmJm7k";
+            const SB_KEY =
+                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6dXpwa3p4eWltY3Znbmluc2t0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MjcwMTksImV4cCI6MjA5NjMwMzAxOX0.P8uSZ4dlhCXyEfSOntD65eTAbYsJWkQ3SQFSsbmJm7k";
 
             // นับ 1 ครั้งต่อการเปิดหน้าใน 1 ชั่วโมง (กันเลขพองจากรีเฟรชรัว ๆ)
             const K = "kknp_view_bumped_at";
-            const fresh = Date.now() - parseInt(sessionStorage.getItem(K) || "0") > 3600000;
+            const fresh =
+                Date.now() - parseInt(sessionStorage.getItem(K) || "0") > 3600000;
             if (fresh) sessionStorage.setItem(K, String(Date.now()));
 
             try {
-                const res = await fetch(`${SB_URL}/rest/v1/rpc/${fresh ? "bump_view" : "get_view"}`, {
-                    method: "POST",
-                    headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, "Content-Type": "application/json" },
-                    body: JSON.stringify({ p_key: "index_views" }),
-                });
+                const res = await fetch(
+                    `${SB_URL}/rest/v1/rpc/${fresh ? "bump_view" : "get_view"}`,
+                    {
+                        method: "POST",
+                        headers: {
+                            apikey: SB_KEY,
+                            Authorization: `Bearer ${SB_KEY}`,
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ p_key: "index_views" }),
+                    },
+                );
                 VISITOR_COUNT = await res.json();
             } catch (e) {
                 console.error("visitor counter error:", e);
                 VISITOR_COUNT = "-";
             }
             // อัปเดตแถบ insights ถ้าโหลดข้อมูลเสร็จแล้ว
-            if (typeof RAW !== "undefined" && RAW.length) buildInsights(getFiltered ? getFiltered() : RAW);
+            if (typeof RAW !== "undefined" && RAW.length)
+                buildInsights(getFiltered ? getFiltered() : RAW);
         })();
-
 
         const SUPABASE_URL = "https://xzuzpkzxyimcvgninskt.supabase.co";
         const SUPABASE_KEY =
@@ -834,7 +840,7 @@
             names: new Set(),
             months: new Set(),
         };
-        let tableSort = { col: "id", dir: "asc" },
+        let tableSort = { col: "id", dir: "desc" },
             tablePage = 1;
         const CHARTS = {};
         let MAP_INSTANCE = null,
@@ -848,7 +854,11 @@
                 if (F.years.size && !F.years.has(String(r.fiscal_year))) return false;
                 if (F.statuses.size && !F.statuses.has(r.compensation_status))
                     return false;
-                if (F.names.size && !F.names.has(r.name)) return false;
+                if (
+                    F.names.size &&
+                    !F.names.has((r.name || "").trim().replace(/\s+/g, " "))
+                )
+                    return false;
                 if (F.months.size) {
                     if (!r.incident_date) return false;
                     const parts = r.incident_date.split("/");
@@ -901,7 +911,15 @@
             refresh();
         }
         function uniqueNames() {
-            return [...new Set(RAW.map((r) => r.name))].sort();
+            // normalize: ตัดช่องว่างหน้า-หลัง + ยุบช่องว่างซ้ำให้เหลือเคาะเดียว
+            // กันชื่อเดียวกันโผล่ซ้ำเพราะเว้นวรรคต่างกัน
+            const seen = new Map();
+            RAW.forEach((r) => {
+                if (!r.name) return;
+                const norm = r.name.trim().replace(/\s+/g, " ");
+                if (norm && !seen.has(norm)) seen.set(norm, norm);
+            });
+            return [...seen.values()].sort((a, b) => a.localeCompare(b, "th"));
         }
         function toggleDD() {
             const p = document.getElementById("name-dd-panel"),
@@ -1023,9 +1041,15 @@
                 totalA = d.reduce(
                     (a, r) => a + (parseFloat(r.requested_amount) || 0),
                     0,
-                );
+                ),
+                // จำนวนคน = ชื่อไม่ซ้ำ (normalize ช่องว่าง) ชื่อเดียวกันนับเป็น 1
+                persons = new Set(
+                    d
+                        .map((r) => (r.name || "").trim().replace(/\s+/g, " "))
+                        .filter(Boolean),
+                ).size;
             document.getElementById("kpi-row").innerHTML =
-                `<div class="kpi b"><div class="kpi-ico">📋</div><div class="kpi-lbl">กรณีทั้งหมด</div><div class="kpi-val">${d.length}</div><div class="kpi-sub">รายการที่กรองแล้ว</div></div><div class="kpi g"><div class="kpi-ico">✅</div><div class="kpi-lbl">จ่ายเงินแล้ว</div><div class="kpi-val">${paid.length}</div><div class="kpi-sub">฿${pA.toLocaleString("th-TH")}</div></div><div class="kpi a"><div class="kpi-ico">⏳</div><div class="kpi-lbl">รอการจ่าย</div><div class="kpi-val">${pend.length}</div><div class="kpi-sub">${fmtAmt(eA)}</div></div><div class="kpi r"><div class="kpi-ico">💰</div><div class="kpi-lbl">มูลค่ารวม</div><div class="kpi-val" style="font-size:20px">${fmtAmt(totalA)}</div><div class="kpi-sub">฿${totalA.toLocaleString("th-TH")}</div></div>`;
+                `<div class="kpi b"><div class="kpi-ico">📋</div><div class="kpi-lbl">กรณีทั้งหมด</div><div class="kpi-val">${d.length}</div><div class="kpi-sub">รายการที่กรองแล้ว</div></div><div class="kpi p"><div class="kpi-ico">👥</div><div class="kpi-lbl">ผู้เสียหาย</div><div class="kpi-val">${persons.toLocaleString("th-TH")}</div><div class="kpi-sub">คน (ชื่อซ้ำนับเป็น 1)</div></div><div class="kpi g"><div class="kpi-ico">✅</div><div class="kpi-lbl">จ่ายเงินแล้ว</div><div class="kpi-val">${paid.length}</div><div class="kpi-sub">฿${pA.toLocaleString("th-TH")}</div></div><div class="kpi a"><div class="kpi-ico">⏳</div><div class="kpi-lbl">รอการจ่าย</div><div class="kpi-val">${pend.length}</div><div class="kpi-sub">${fmtAmt(eA)}</div></div><div class="kpi r"><div class="kpi-ico">💰</div><div class="kpi-lbl">มูลค่ารวม</div><div class="kpi-val" style="font-size:20px">${fmtAmt(totalA)}</div><div class="kpi-sub">฿${totalA.toLocaleString("th-TH")}</div></div>`;
         }
 
         // สร้างกล่องคำอธิบายสี (legend) ตามประเภทกรณี วางมุมล่างซ้ายของแผนที่
@@ -1157,16 +1181,19 @@
         }
 
         // ===== แผนที่แบบ modal (เปิดดูใหญ่) =====
-        let MODAL_MAP = null, MODAL_LAYER = null, MODAL_HEAT = null, modalHeatOn = false;
+        let MODAL_MAP = null,
+            MODAL_LAYER = null,
+            MODAL_HEAT = null,
+            modalHeatOn = false;
 
         async function openMapModal() {
             const ov = document.getElementById("map-modal-overlay");
             ov.classList.add("open");
             document.body.style.overflow = "hidden";
 
-            const d = (typeof getFiltered === "function" ? getFiltered() : RAW).filter(
-                (r) => r.lat && r.lon,
-            );
+            const d = (
+                typeof getFiltered === "function" ? getFiltered() : RAW
+            ).filter((r) => r.lat && r.lon);
 
             if (!MODAL_MAP) {
                 MODAL_MAP = L.map("map-modal-body", { tap: true }).setView(
@@ -1212,7 +1239,12 @@
             if (MODAL_HEAT) MODAL_MAP.removeLayer(MODAL_HEAT);
             MODAL_HEAT = L.heatLayer(
                 d.map((r) => [r.lat, r.lon, 1]),
-                { radius: 30, blur: 20, maxZoom: 14, gradient: { 0.3: "#3b82f6", 0.6: "#f97316", 1.0: "#ef4444" } },
+                {
+                    radius: 30,
+                    blur: 20,
+                    maxZoom: 14,
+                    gradient: { 0.3: "#3b82f6", 0.6: "#f97316", 1.0: "#ef4444" },
+                },
             );
             modalHeatOn = false;
 
@@ -1888,10 +1920,10 @@
             document.getElementById("tbl-body").innerHTML = slice.length
                 ? slice
                     .map(
-                        (r) =>
+                        (r, i) =>
                             `<tr>
                                 <td style="color:var(--c-ink3);font-size:11px">
-                                    ${r.id || "—"}</td><td style="white-space:nowrap;font-size:11.5px">
+                                    ${(tablePage - 1) * PAGE_SIZE + i + 1}<span style="color:#c2ccc6"> (ID ${r.id ?? "—"})</span></td><td style="white-space:nowrap;font-size:11.5px">
                                         ${(() => {
                                 if (!r.incident_date) return "—";
                                 const p = r.incident_date.split("/");
@@ -2195,7 +2227,11 @@
                 ph: "ทุกตำบล",
             },
             district: { field: "event_district", set: "districts", ph: "ทุกอำเภอ" },
-            province: { field: "event_province", set: "provinces", ph: "ทุกจังหวัด" },
+            province: {
+                field: "event_province",
+                set: "provinces",
+                ph: "ทุกจังหวัด",
+            },
         };
 
         function locOptions(type) {
@@ -2306,7 +2342,8 @@
             getFiltered = function () {
                 return _getFiltered().filter(
                     (r) =>
-                        (!F.subdistricts.size || F.subdistricts.has(r.event_subdistrict)) &&
+                        (!F.subdistricts.size ||
+                            F.subdistricts.has(r.event_subdistrict)) &&
                         (!F.districts.size || F.districts.has(r.event_district)) &&
                         (!F.provinces.size || F.provinces.has(r.event_province)),
                 );
@@ -2333,9 +2370,6 @@
             const ov = document.getElementById("dd-overlay");
             if (ov) ov.addEventListener("click", closeAllDD);
         })();
-
-
-
     </script>
 
     <!-- PRINT AREA -->
